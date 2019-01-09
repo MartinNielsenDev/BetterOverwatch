@@ -12,8 +12,6 @@ namespace OverwatchTracker
 {
     class Program
     {
-        //private static Bitmap testImage = new Bitmap(@"C:\Users\Avoid\Desktop\roundcomplete.png");
-        //private static Bitmap testImage2 = new Bitmap(@"C:\Users\Avoid\Documents\Overwatch\ScreenShots\Overwatch\ScreenShot_18-07-05_01-28-01-000.jpg");
         public static CustomMenu customMenu1;
         public static Thread uploaderThread;
         private static Bitmap currentImage = null;
