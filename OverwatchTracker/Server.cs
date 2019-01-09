@@ -163,6 +163,8 @@ namespace OverwatchTracker
         }
         public static string addEntry(string gameData)
         {
+            // no sensitive information is transmitted, so no need to proper encryption, if you see this, you can easily
+            // reverse engineer transmitted data, but there's no reason to
             string encrypted = encryptRJ256("Rsa9vfmQ3nxBTnZOb8MFsMRbZobW6NWR", "Rsa9vfmQ3nxBTnZOb8MFsMRbZobW6NWR", gameData);
 
             if (encrypted.Length > 0)
@@ -195,7 +197,6 @@ namespace OverwatchTracker
                     { "publicToken", Vars.gameData.battletag },
                     { "createUserOnFail", createUserOnFail.ToString() }
                 });
-                    //Functions.DebugMessage(String.Format("getToken {0} response: {1}", createUserOnFail, Encoding.Default.GetString(response)));
                     return Encoding.Default.GetString(response);
                 }
             }catch{ }
@@ -299,7 +300,6 @@ namespace OverwatchTracker
         }
         public static string md5Hash(string plainText)
         {
-            //Debug.WriteLine("Hashing:" + plainText);
             MD5 md5 = MD5.Create();
             byte[] inputBytes = Encoding.ASCII.GetBytes(plainText);
             byte[] hash = md5.ComputeHash(inputBytes);

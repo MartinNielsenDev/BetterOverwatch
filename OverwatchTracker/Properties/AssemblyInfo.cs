@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Overwatch Tracker")]
 [assembly: AssemblyDescription("by Avoid")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("https://owtracker.info/")]
+[assembly: AssemblyCompany("http://owtracker.info/")]
 [assembly: AssemblyProduct("Overwatch Tracker")]
 [assembly: AssemblyCopyright("by Avoid")]
 [assembly: AssemblyTrademark("by Avoid")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("18.08.21.0")]
-[assembly: AssemblyFileVersion("18.08.21.0")]
+[assembly: AssemblyVersion("19.01.09.0")]
+[assembly: AssemblyFileVersion("18.01.09.0")]

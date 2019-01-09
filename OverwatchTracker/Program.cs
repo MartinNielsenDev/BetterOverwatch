@@ -183,11 +183,6 @@ namespace OverwatchTracker
                             {
                                 
                                 checkMainMenu(frame.DesktopImage);
-                                //string testText = Functions.bitmapToText(frame.DesktopImage, 105, 55, 45, 14, contrastFirst: false, radius: 70, network: 5, invertColors: false, red: 180, green: 119, blue: 28, fillOutside: false);
-                                //Console.WriteLine(testText);
-                                //Vars.frameTimer.Restart();
-                                //Thread.Sleep(500);
-                                //Console.WriteLine($"gameTimer={Vars.gameTimer.ElapsedMilliseconds / 1000} adjustedgameTimer={(Vars.gameTimer.ElapsedMilliseconds - Functions.getTimeDeduction(getNextDeduction: false)) / 1000}");
 
                                 if (currentGame != Vars.STATUS_INGAME)
                                 {

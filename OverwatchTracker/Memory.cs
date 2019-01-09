@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
@@ -27,7 +25,6 @@ namespace OverwatchTracker
             IntPtr pointer = (IntPtr)0;
             IntPtr processBaseAddress = process.MainModule.BaseAddress;
 
-            //Debug.WriteLine("Original base: " + processBaseAddress);
             if (moduleName != null)
             {
                 foreach (ProcessModule processModule in process.Modules)
@@ -39,7 +36,6 @@ namespace OverwatchTracker
                     }
                 }
             }
-            //Debug.WriteLine("Module base?: " + processBaseAddress);
 
             for (int i = 0; i <= offsets.Length - 1; i++)
             {
@@ -53,7 +49,6 @@ namespace OverwatchTracker
                     IntPtr ptr2 = IntPtr.Add(pointer, (int)offsets[i]);
                     pointer = (IntPtr)ReadInt64(ptr2, 8, process.Handle);
                 }
-                //Debug.WriteLine(pointer);
                 if (pointer == IntPtr.Zero)
                 {
                     break;

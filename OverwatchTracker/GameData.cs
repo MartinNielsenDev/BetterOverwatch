@@ -59,9 +59,10 @@ namespace OverwatchTracker
     {
         [JsonProperty("battletag")]
         public string battletag { get; set; } = Functions.getBattletag();
+
         [JsonProperty("heroes")]
         public string heroes { get; set; } = "";
-        //public List<HeroesPlayedData> heroes = new List<HeroesPlayedData>();
+
         [JsonProperty("startsr")]
         public string startsr { get; set; } = "";
 

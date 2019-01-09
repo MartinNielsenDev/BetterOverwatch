@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing.Imaging;
-using System.IO;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -8,7 +7,6 @@ using Device = SharpDX.Direct3D11.Device;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
 using Rectangle = SharpDX.Rectangle;
 using System.Drawing;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace DesktopDuplication

@@ -10,8 +10,6 @@ using System.Text.RegularExpressions;
 using System.Reflection;
 using AForge.Imaging.Filters;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Security.Cryptography;
 
 namespace OverwatchTracker
 {
@@ -39,16 +37,6 @@ namespace OverwatchTracker
         }
         public static Bitmap captureRegion(Bitmap frame, int x, int y, int width, int height)
         {
-            /*
-            double xPercent = (double)x / 1920 * frame.Width;
-            double yPercent = (double)y / 1080 * frame.Height;
-            double widthPercent = (double)width / 1920 * frame.Width;
-            double heightPercent = (double)height / 1080 * frame.Height;
-            x = (int)xPercent;
-            y = (int)yPercent;
-            width = (int)widthPercent;
-            height = (int)heightPercent;
-            */
             return frame.Clone(new Rectangle(x, y, width, height), PixelFormat.Format32bppArgb /*bmp.PixelFormat*/);
         }
         public static Bitmap adjustColors(Bitmap b, short radius, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true)
@@ -137,22 +125,11 @@ namespace OverwatchTracker
             int[,] d = new int[n + 1, m + 1];
 
             if (n == 0)
-            {
                 return m;
-            }
-
             if (m == 0)
-            {
                 return n;
-            }
-
-            for (int i = 0; i <= n; d[i, 0] = i++)
-            {
-            }
-
-            for (int j = 0; j <= m; d[0, j] = j++)
-            {
-            }
+            for (int i = 0; i <= n; d[i, 0] = i++) { }
+            for (int j = 0; j <= m; d[0, j] = j++) { }
 
             for (int i = 1; i <= n; i++)
             {
@@ -194,45 +171,6 @@ namespace OverwatchTracker
             string output = String.Empty;
             try
             {
-                /*
-                if (Vars.desktopWidth != 1920)
-                {
-                    Bitmap result = new Bitmap(width, height);
-                    double xPercent = (double)x / 1920 * frame.Width;
-                    double yPercent = (double)y / 1080 * frame.Height;
-                    double widthPercent = (double)width / 1920 * frame.Width;
-                    double heightPercent = (double)height / 1080 * frame.Height;
-                    x = (int)xPercent;
-                    y = (int)yPercent;
-                    width = (int)widthPercent;
-                    height = (int)heightPercent;
-
-                    Bitmap b = new Bitmap(frame.Clone(new Rectangle(x, y, width, height), PixelFormat.Format32bppArgb));
-                    using (Graphics graphics = Graphics.FromImage(result))
-                    {
-                        graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-                        graphics.DrawImage(b, 0, 0, result.Width, result.Height);
-                    }
-                    
-                    if (contrastFirst)
-                    {
-                        adjustContrast(result, 255f);
-                        result = adjustColors(result, radius, red, green, blue);
-                    }
-                    else
-                    {
-                        result = adjustColors(result, radius, red, green, blue);
-                        adjustContrast(result, 255f, invertColors);
-                    }
-                    
-                    output = getTextFromImage(result, network);
-                    
-                    b.Dispose();
-                    result.Dispose();
-                }
-                */
-                //else
-                //{
                 Bitmap result = new Bitmap(frame.Clone(new Rectangle(x, y, width, height), PixelFormat.Format32bppArgb));
 
                 if (contrastFirst)
@@ -247,9 +185,7 @@ namespace OverwatchTracker
                 }
 
                 output = getTextFromImage(result, network);
-                //result.Save(@"C:\pics\newtest\" + Guid.NewGuid() + ".png");
                 result.Dispose();
-                //}
 
             }
             catch (Exception e)
@@ -624,35 +560,6 @@ namespace OverwatchTracker
                     {
                         text += getLetterFromImage(Vars.heroNamesNeuralNetwork, bitmaps[i], network);
                     }
-                    /*
-                    string output = getLetterFromImage(Vars.blizzardNeuralNetwork, bitmaps[i], network);
-                    
-                    int n;
-                    bool isNumeric = int.TryParse(output, out n);
-                    if (!isNumeric)
-                    {
-                        byte[] bytes = null;
-                        using (MemoryStream ms = new MemoryStream())
-                        {
-                            bitmaps[i].Save(ms, ImageFormat.Png);
-                            bytes = ms.ToArray();
-                        }
-                        MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-                        byte[] hash = md5.ComputeHash(bytes);
-                        StringBuilder sb = new StringBuilder();
-                        foreach (byte bByte in hash)
-                        {
-                            sb.Append(bByte.ToString("x2").ToLower());
-                        }
-                        /*
-                        if (!File.Exists(@"C:\pics\stats_trainingdata\768\test\" + output + "_" + sb + ".png"))
-                        {
-                            bitmaps[i].Save(@"C:\pics\stats_trainingdata\768\test\" + output + "_" + sb + ".png", ImageFormat.Png);
-                        }
-                        
-                    }
-                    */
-                    //bitmaps[i].Save(@"C:\pics\newtest\" + Guid.NewGuid() + ".png");
                     bitmaps[i].Dispose();
                 }
             }
