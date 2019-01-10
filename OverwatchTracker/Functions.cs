@@ -497,19 +497,26 @@ namespace OverwatchTracker
         }
         public static string getBattletag()
         {
-            string myString = Memory.getString("Battle.net", "battle.net.dll", new IntPtr[] { (IntPtr)Vars.blizzardAppOffset, (IntPtr)0x24, (IntPtr)0x10, (IntPtr)0x8, (IntPtr)0x84, (IntPtr)0x0 }, 18);
-            if (myString.Contains("#"))
+            if (Vars.isAdmin)
             {
-                string[] splits = myString.Split(Convert.ToChar("#"));
-                DebugMessage("BattleTag found");
+                string myString = Memory.getString("Battle.net", "battle.net.dll", new IntPtr[] { (IntPtr)Vars.blizzardAppOffset, (IntPtr)0x28, (IntPtr)0x10, (IntPtr)0x8, (IntPtr)0x84, (IntPtr)0x0 }, 18);
+                if (myString.Contains("#"))
+                {
+                    string[] splits = myString.Split(Convert.ToChar("#"));
+                    DebugMessage("BattleTag found");
 
-                return splits[0] + "-" + Regex.Replace(splits[1].Substring(0, 5), @"[^0-9]+", "");
+                    return splits[0] + "-" + Regex.Replace(splits[1].Substring(0, 5), @"[^0-9]+", "");
+                }
+                else
+                {
+                    DebugMessage("Failed to find BattleTag");
+                }
             }
             else
             {
-                DebugMessage("Could not find BattleTag");
+                DebugMessage("No administrator to find BattleTag (restart app as administrator to fix this)");
             }
-            return String.Empty;
+            return "PLAYER-0000";
         }
         public static string getLetterFromImage(OCRNetwork network, Bitmap image, int networkId)
         {

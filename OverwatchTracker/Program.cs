@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using DesktopDuplication;
 using System.IO;
+using System.Security.Principal;
 
 namespace OverwatchTracker
 {
@@ -88,12 +89,19 @@ namespace OverwatchTracker
             System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls;
             try
             {
+                using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+                {
+                    Vars.isAdmin = new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
+                }
                 if (!Server.newestVersion())
                 {
                     return;
                 }
                 Directory.CreateDirectory(Vars.configPath);
-
+                if (!Vars.isAdmin)
+                {
+                    MessageBox.Show("Overwatch Tracker was not run as administrator, this will result in your games being uploaded as PLAYER-0000 however the application will still function.\n\n\nIf you wish for Overwatch Tracker to also track your battletag, restart the app as administrator", "Missing privileges", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
                 Settings.Load();
                 Settings.Save();
                 customMenu1 = new CustomMenu();
@@ -179,8 +187,8 @@ namespace OverwatchTracker
                         {
                             try
                             {
-                                
                                 checkMainMenu(frame.DesktopImage);
+
 
                                 if (currentGame != Vars.STATUS_INGAME)
                                 {

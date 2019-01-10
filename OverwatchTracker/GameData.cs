@@ -6,25 +6,6 @@ using System.Windows.Forms;
 
 namespace OverwatchTracker
 {
-    /*
-    class HeroesPlayedData
-    {
-        [JsonProperty("heroPlayed")]
-        public string heroPlayed { get; set; }
-        [JsonProperty("percentPlayed")]
-        public string percentPlayed { get; set; }
-        public HeroesPlayedData(string hero, string percent)
-        {
-            heroPlayed = hero;
-            percentPlayed = percent;
-        }
-        public string GetData()
-        {
-            Debug.WriteLine(JsonConvert.SerializeObject(this, Formatting.Indented));
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
-        }
-    }
-    */
     class StatsData
     {
         [JsonProperty("playerElims")]

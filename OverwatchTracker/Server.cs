@@ -64,7 +64,7 @@ namespace OverwatchTracker
                 xmlTest.LoadXml(serverResponse);
                 XmlNodeList xmlNodeList = xmlTest.SelectNodes("update");
 
-                foreach(XmlNode xmlNode in xmlNodeList)
+                foreach (XmlNode xmlNode in xmlNodeList)
                 {
                     string serverVersion = xmlNode.SelectSingleNode("version").InnerText;
 
@@ -105,27 +105,29 @@ namespace OverwatchTracker
         }
         public static void uploadGame(string gameData, Bitmap image)
         {
-            Functions.DebugMessage("Uploading game...");
-            Program.uploaderThread = new Thread(() => upload1(gameData, image));
+            
+            Program.uploaderThread = new Thread(() => uploadGameData(gameData, image));
             Program.uploaderThread.Start();
         }
-        private static void upload1(string gameData, Bitmap image)
+        private static void uploadGameData(string gameData, Bitmap image)
         {
+            Functions.DebugMessage("Uploading gamedata...");
+
             for (var i = 1; i <= 10; i++)
             {
-                string attempt = addEntry(gameData);
+                string uploadResult = gameUploader(gameData);
 
-                if (attempt.Contains("success"))
+                if (uploadResult.Contains("success"))
                 {
-                    Functions.DebugMessage("Successfully uploaded game after " + i + " attempts");
+                    Functions.DebugMessage("Successfully uploaded game");
                     if (Vars.settings.uploadScreenshot && image != null)
                     {
                         for (int e = 1; e <= 10; e++)
                         {
-                            Functions.DebugMessage("Attempting to upload playerlist image");
-                            if (upload2(image, attempt.Replace("success", String.Empty)) == "success")
+                            Functions.DebugMessage("Uploading playerlist image...");
+                            if (uploadPlayerListImage(image, uploadResult.Replace("success", String.Empty)) == "success")
                             {
-                                Functions.DebugMessage("Successfully uploaded playerlist image after " + e + " attempts");
+                                Functions.DebugMessage("Successfully uploaded playerlist image");
                                 break;
                             }
                             Thread.Sleep(500);
@@ -140,7 +142,7 @@ namespace OverwatchTracker
                 Thread.Sleep(500);
             }
         }
-        public static string upload2(Bitmap image, string entryId)
+        public static string uploadPlayerListImage(Bitmap image, string entryId)
         {
             try
             {
@@ -161,28 +163,21 @@ namespace OverwatchTracker
             catch { }
             return String.Empty;
         }
-        public static string addEntry(string gameData)
+        public static string gameUploader(string gameData)
         {
-            // no sensitive information is transmitted, so no need to proper encryption, if you see this, you can easily
-            // reverse engineer transmitted data, but there's no reason to
-            string encrypted = encryptRJ256("Rsa9vfmQ3nxBTnZOb8MFsMRbZobW6NWR", "Rsa9vfmQ3nxBTnZOb8MFsMRbZobW6NWR", gameData);
-
-            if (encrypted.Length > 0)
+            try
             {
-                try
+                using (WebClient client = new WebClient())
                 {
-                    using (WebClient client = new WebClient())
-                    {
-                        byte[] response = client.UploadValues(Vars.host + "/api/upload-game/", new NameValueCollection()
+                    byte[] response = client.UploadValues(Vars.host + "/api/upload-game/", new NameValueCollection()
                         {
-                            { "entry", encrypted }
+                            { "entry", gameData }
                         });
 
-                        return Encoding.Default.GetString(response);
-                    }
+                    return Encoding.Default.GetString(response);
                 }
-                catch { }
             }
+            catch { }
             return String.Empty;
         }
         public static string getToken(bool createUserOnFail = false)
@@ -199,7 +194,8 @@ namespace OverwatchTracker
                 });
                     return Encoding.Default.GetString(response);
                 }
-            }catch{ }
+            }
+            catch { }
             return String.Empty;
         }
         public static string encryptRJ256(string prm_key, string prm_iv, string prm_text_to_encrypt)
