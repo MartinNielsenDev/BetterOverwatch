@@ -634,10 +634,16 @@ namespace OverwatchTracker
         }
         public static void DebugMessage(string msg)
         {
-            if (Directory.Exists(Vars.configPath))
+            try
             {
-                string date = DateTime.Now.ToString("dd/MM/yy HH:mm:ss");
-                File.AppendAllText(Path.Combine(Vars.configPath, "debug.log"), String.Format("[{0}] {1}", date, msg + "\r\n"));
+                if (Directory.Exists(Vars.configPath))
+                {
+                    string date = DateTime.Now.ToString("dd/MM/yy HH:mm:ss");
+                    File.AppendAllText(Path.Combine(Vars.configPath, "debug.log"), String.Format("[{0}] {1}", date, msg + "\r\n"));
+                }
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.ToString());
             }
             Debug.WriteLine(msg);
         }

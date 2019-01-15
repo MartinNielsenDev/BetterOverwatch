@@ -103,10 +103,9 @@ namespace OverwatchTracker
         }
         public static void uploadGame(string gameData)
         {
+            Functions.DebugMessage("Uploading GameData...");
             Program.uploaderThread = new Thread(() =>
             {
-                Functions.DebugMessage("Uploading GameData...");
-
                 for (var i = 1; i <= 10; i++)
                 {
                     string uploadResult = gameUploader(gameData);

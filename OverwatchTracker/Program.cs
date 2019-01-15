@@ -22,6 +22,7 @@ namespace OverwatchTracker
         static void Main()
         {
             Functions.DebugMessage("Starting Overwatch Tracker version " + Vars.version);
+            
             if (!mutex.WaitOne(TimeSpan.Zero, true))
             {
                 Functions.DebugMessage("Overwatch Tracker is already running...");
@@ -107,6 +108,8 @@ namespace OverwatchTracker
                 {
                     return;
                 }
+                Vars.gameData = new GameData();
+
                 Thread captureDesktopThread = new Thread(captureDesktop);
                 captureDesktopThread.IsBackground = true;
                 captureDesktopThread.Start();
@@ -205,7 +208,7 @@ namespace OverwatchTracker
                                     Protocols.checkMap(frame.DesktopImage);
                                     Protocols.checkTeamsSkillRating(frame.DesktopImage);
 
-                                    if(!Vars.gameData.map.Equals(String.Empty) && Vars.getInfoTimeout.ElapsedMilliseconds > 2000 && Vars.gameData.playerlistimage == null)
+                                    if(!Vars.gameData.map.Equals(String.Empty) && Vars.getInfoTimeout.ElapsedMilliseconds > 3000 && Vars.gameData.playerlistimage == null)
                                     {
                                         Vars.gameData.playerlistimage = new Bitmap(Functions.captureRegion(frame.DesktopImage, 0, 110, 1920, 700));
                                     }

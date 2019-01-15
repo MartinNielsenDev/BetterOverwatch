@@ -13,7 +13,7 @@ namespace OverwatchTracker
         public static bool isAdmin = false;
         public static int blizzardAppOffset = 0;
         public static string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "overwatchtracker");
-        public static GameData gameData = new GameData();
+        public static GameData gameData;
         public static Settings settings;
         public static bool overwatchRunning = false;
         public static string publicId = "";

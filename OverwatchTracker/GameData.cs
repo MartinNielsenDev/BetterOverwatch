@@ -38,12 +38,17 @@ namespace OverwatchTracker
     }
     class GameData
     {
+        [JsonIgnore]
         public int gameState = Vars.STATUS_IDLE;
+        [JsonIgnore]
         public int currentHero = -1;
+        [JsonIgnore]
         public string currentSkillRating = String.Empty;
+        [JsonIgnore]
         public List<Stopwatch> heroesTimePlayed = new List<Stopwatch>();
+        [JsonIgnore]
         public List<int> heroesPlayed = new List<int>();
-
+        [JsonIgnore]
         public Bitmap playerlistimage = null;
         [JsonProperty("battletag")]
         public string battletag { get; set; } = Functions.getBattletag();
@@ -111,8 +116,11 @@ namespace OverwatchTracker
             Vars.gameData.duration = Math.Floor(Convert.ToDouble(Vars.gameTimer.ElapsedMilliseconds / 1000)).ToString();
             Vars.gameData.endsr = currentSkillRating;
             // convert bitmap to base64 so server can decode it
-            this.playerlistimagebase64 = Convert.ToBase64String(Functions.imageToBytes(Functions.reduceImageSize(Vars.gameData.playerlistimage, 70)));
-            Debug.WriteLine(JsonConvert.SerializeObject(this, Formatting.Indented));
+            playerlistimagebase64 = Convert.ToBase64String(Functions.imageToBytes(Functions.reduceImageSize(Vars.gameData.playerlistimage, 70)));
+            Debug.WriteLine(JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
+            {
+                
+            }));
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }
