@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Drawing;
 using System.Diagnostics;
 using System.Media;
+
 namespace OverwatchTracker
 {
     class Vars
@@ -14,11 +13,8 @@ namespace OverwatchTracker
         public static bool isAdmin = false;
         public static int blizzardAppOffset = 0;
         public static string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "overwatchtracker");
-        public static GameData gameData;
+        public static GameData gameData = new GameData();
         public static Settings settings;
-        public static List<Bitmap> heroes = new List<Bitmap>();
-        public static List<Stopwatch> heroesTimePlayed = new List<Stopwatch>();
-        public static List<int> heroesPlayed = new List<int>();
         public static bool overwatchRunning = false;
         public static string publicId = "";
         public static string host = "http://owtracker.info";

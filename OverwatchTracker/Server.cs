@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
-using System.Security.Cryptography;
 using System.Collections.Specialized;
 using System.Net;
 using System.Threading;
@@ -103,65 +101,29 @@ namespace OverwatchTracker
                 return false;
             }
         }
-        public static void uploadGame(string gameData, Bitmap image)
+        public static void uploadGame(string gameData)
         {
-            
-            Program.uploaderThread = new Thread(() => uploadGameData(gameData, image));
-            Program.uploaderThread.Start();
-        }
-        private static void uploadGameData(string gameData, Bitmap image)
-        {
-            Functions.DebugMessage("Uploading gamedata...");
-
-            for (var i = 1; i <= 10; i++)
+            Program.uploaderThread = new Thread(() =>
             {
-                string uploadResult = gameUploader(gameData);
+                Functions.DebugMessage("Uploading GameData...");
 
-                if (uploadResult.Contains("success"))
+                for (var i = 1; i <= 10; i++)
                 {
-                    Functions.DebugMessage("Successfully uploaded game");
-                    if (Vars.settings.uploadScreenshot && image != null)
+                    string uploadResult = gameUploader(gameData);
+
+                    if (uploadResult.Contains("success"))
                     {
-                        for (int e = 1; e <= 10; e++)
-                        {
-                            Functions.DebugMessage("Uploading playerlist image...");
-                            if (uploadPlayerListImage(image, uploadResult.Replace("success", String.Empty)) == "success")
-                            {
-                                Functions.DebugMessage("Successfully uploaded playerlist image");
-                                break;
-                            }
-                            Thread.Sleep(500);
-                        }
+                        Functions.DebugMessage("Successfully uploaded game");
+                        break;
                     }
-                    break;
-                }
-                else
-                {
-                    Functions.DebugMessage("Game upload failed");
-                }
-                Thread.Sleep(500);
-            }
-        }
-        public static string uploadPlayerListImage(Bitmap image, string entryId)
-        {
-            try
-            {
-                byte[] bytes = Functions.imageToBytes(Functions.reduceImageSize(image, 70));
-                string base64image = Convert.ToBase64String(bytes);
-
-                using (WebClient client = new WebClient())
-                {
-                    byte[] response = client.UploadValues(Vars.host + "/api/upload-image/", new NameValueCollection()
+                    else
                     {
-                        { "image", base64image },
-                        {"entryId", entryId }
-                    });
-
-                    return Encoding.Default.GetString(response);
+                        Functions.DebugMessage("Game upload failed");
+                    }
+                    Thread.Sleep(500);
                 }
-            }
-            catch { }
-            return String.Empty;
+            });
+            Program.uploaderThread.Start();
         }
         public static string gameUploader(string gameData)
         {
@@ -171,7 +133,7 @@ namespace OverwatchTracker
                 {
                     byte[] response = client.UploadValues(Vars.host + "/api/upload-game/", new NameValueCollection()
                         {
-                            { "entry", gameData }
+                            { "gameData", gameData }
                         });
 
                     return Encoding.Default.GetString(response);
@@ -197,117 +159,6 @@ namespace OverwatchTracker
             }
             catch { }
             return String.Empty;
-        }
-        public static string encryptRJ256(string prm_key, string prm_iv, string prm_text_to_encrypt)
-        {
-            var sToEncrypt = prm_text_to_encrypt;
-
-            var myRijndael = new RijndaelManaged()
-            {
-                Padding = PaddingMode.Zeros,
-                Mode = CipherMode.CBC,
-                KeySize = 256,
-                BlockSize = 256
-            };
-
-            var key = Encoding.ASCII.GetBytes(prm_key);
-            var IV = Encoding.ASCII.GetBytes(prm_iv);
-
-            var encryptor = myRijndael.CreateEncryptor(key, IV);
-
-            var msEncrypt = new MemoryStream();
-            var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write);
-
-            var toEncrypt = Encoding.ASCII.GetBytes(sToEncrypt);
-
-            csEncrypt.Write(toEncrypt, 0, toEncrypt.Length);
-            csEncrypt.FlushFinalBlock();
-
-            var encrypted = msEncrypt.ToArray();
-
-            return (Convert.ToBase64String(encrypted));
-        }
-        public static string computeHash(string plainText, string hashAlgorithm, byte[] saltBytes = null)
-        {
-            if (saltBytes == null)
-            {
-                int minSaltSize = 4;
-                int maxSaltSize = 8;
-
-                Random random = new Random();
-                int saltSize = random.Next(minSaltSize, maxSaltSize);
-
-                saltBytes = new byte[saltSize];
-
-                RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-
-                rng.GetNonZeroBytes(saltBytes);
-            }
-
-            byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-            byte[] plainTextWithSaltBytes = new byte[plainTextBytes.Length + saltBytes.Length];
-
-            for (int i = 0; i < plainTextBytes.Length; i++)
-                plainTextWithSaltBytes[i] = plainTextBytes[i];
-
-            for (int i = 0; i < saltBytes.Length; i++)
-                plainTextWithSaltBytes[plainTextBytes.Length + i] = saltBytes[i];
-
-            HashAlgorithm hash;
-
-            if (hashAlgorithm == null)
-                hashAlgorithm = "";
-
-            switch (hashAlgorithm.ToUpper())
-            {
-                case "SHA1":
-                    hash = new SHA1Managed();
-                    break;
-
-                case "SHA256":
-                    hash = new SHA256Managed();
-                    break;
-
-                case "SHA384":
-                    hash = new SHA384Managed();
-                    break;
-
-                case "SHA512":
-                    hash = new SHA512Managed();
-                    break;
-
-                default:
-                    hash = new MD5CryptoServiceProvider();
-                    break;
-            }
-
-            byte[] hashBytes = hash.ComputeHash(plainTextWithSaltBytes);
-            byte[] hashWithSaltBytes = new byte[hashBytes.Length + saltBytes.Length];
-
-            for (int i = 0; i < hashBytes.Length; i++)
-                hashWithSaltBytes[i] = hashBytes[i];
-
-            for (int i = 0; i < saltBytes.Length; i++)
-                hashWithSaltBytes[hashBytes.Length + i] = saltBytes[i];
-
-            string hashValue = Convert.ToBase64String(hashWithSaltBytes);
-
-            return hashValue;
-        }
-        public static string md5Hash(string plainText)
-        {
-            MD5 md5 = MD5.Create();
-            byte[] inputBytes = Encoding.ASCII.GetBytes(plainText);
-            byte[] hash = md5.ComputeHash(inputBytes);
-
-            StringBuilder sb = new StringBuilder();
-
-            for (int i = 0; i < hash.Length; i++)
-            {
-                sb.Append(hash[i].ToString("X2"));
-            }
-
-            return sb.ToString().ToLower();
         }
     }
 }

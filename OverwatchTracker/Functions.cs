@@ -8,8 +8,8 @@ using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
 using System.Text.RegularExpressions;
 using System.Reflection;
-using AForge.Imaging.Filters;
 using System.Collections.Generic;
+using AForge.Imaging.Filters;
 
 namespace OverwatchTracker
 {
@@ -618,6 +618,19 @@ namespace OverwatchTracker
             int NewVolume = ((ushort.MaxValue / 100) * vol);
             uint NewVolumeAllChannels = (((uint)NewVolume & 0x0000ffff) | ((uint)NewVolume << 16));
             waveOutSetVolume(IntPtr.Zero, NewVolumeAllChannels);
+        }
+        public static string secondsToMinutes(double secs)
+        {
+            double mins = Math.Floor(secs / 60);
+            secs -= (mins * 60);
+            string minutes, seconds;
+            if (mins < 10) { minutes = "0" + mins; }
+            else { minutes = mins.ToString(); }
+
+            if (secs < 10) { seconds = "0" + secs; }
+            else { seconds = secs.ToString(); }
+
+            return String.Format("{0}:{1}", minutes, seconds);
         }
         public static void DebugMessage(string msg)
         {

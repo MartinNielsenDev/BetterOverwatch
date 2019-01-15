@@ -5,14 +5,14 @@ using Microsoft.Win32;
 
 namespace OverwatchTracker
 {
-    public class CustomMenu : Form
+    public class ContextMenu : Form
     {
         public MenuItem currentGame = new MenuItem("Last Game");
         public NotifyIcon trayIcon = new NotifyIcon();
-        public ContextMenu trayMenu = new ContextMenu();
+        public System.Windows.Forms.ContextMenu trayMenu = new System.Windows.Forms.ContextMenu();
         private RegistryKey reg = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
 
-        public CustomMenu()
+        public ContextMenu()
         {
             try
             {
@@ -158,7 +158,7 @@ namespace OverwatchTracker
             }
             if (!Vars.publicId.Equals(String.Empty))
             {
-                Process.Start(Vars.host + "/" + Vars.publicId + "?logIn=" + Vars.settings.privateToken);
+                Process.Start(Vars.host + "/" + Vars.publicId + "?login=" + Vars.settings.privateToken);
             }
             else
             {
