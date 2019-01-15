@@ -1,4 +1,6 @@
 # Overwatch Match Tracker
+[![Build status](https://ci.appveyor.com/api/projects/status/94bxngssk039i80q?svg=true)](https://ci.appveyor.com/project/MartinNielsenDev/overwatchtracker)
+
 Official website at http://owtracker.info/
 
 ![overwatch tracker website](https://i.imgur.com/yaC0p57.png)
