@@ -19,6 +19,8 @@ My match tracker will seamlessly run as you play competitive Overwatch games and
 * Store or send any private information
 * Store or send any images of your screen (aside from optional playerlist at the start of the game)
 * Inject into the game
+* Read or write memory to the game
+* Send any inputs to the game
 
 ## How does it work?
 The Tracker works by looking at the game screen and applying computer vision then passing it through trained neural networks to analyze and extract data from small parts of the screen.
