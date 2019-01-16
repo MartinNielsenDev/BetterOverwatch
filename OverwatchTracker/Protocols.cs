@@ -56,7 +56,7 @@ namespace OverwatchTracker
                                 return;
                             }
                             Server.uploadGame(Vars.gameData.GetData());
-                            Vars.gameData = new GameData();
+                            Vars.gameData = new GameData(Vars.gameData.currentSkillRating);
                             resetGame();
                         }
                         Program.contextMenu.trayIcon.Text = "Ready to record, enter a competitive game to begin";
@@ -134,7 +134,7 @@ namespace OverwatchTracker
                     if (Vars.gameData.gameState == Vars.STATUS_FINISHED || Vars.gameData.gameState == Vars.STATUS_WAITFORUPLOAD) // a game finished
                     {
                         Server.uploadGame(Vars.gameData.GetData());
-                        Vars.gameData = new GameData();
+                        Vars.gameData = new GameData(Vars.gameData.currentSkillRating);
                         resetGame();
                     }
                     Vars.getInfoTimeout.Restart();

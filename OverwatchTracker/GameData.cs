@@ -38,6 +38,12 @@ namespace OverwatchTracker
     }
     class GameData
     {
+        public GameData(string currentSkillRating = "")
+        {
+            // need to save previous current skill rating since the GameData object is disposed and recreated
+            // every game
+            this.currentSkillRating = currentSkillRating;
+        }
         [JsonIgnore]
         public int gameState = Vars.STATUS_IDLE;
         [JsonIgnore]

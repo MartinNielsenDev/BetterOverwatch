@@ -108,7 +108,6 @@ namespace OverwatchTracker
                 {
                     return;
                 }
-                Vars.gameData = new GameData();
 
                 Thread captureDesktopThread = new Thread(captureDesktop);
                 captureDesktopThread.IsBackground = true;

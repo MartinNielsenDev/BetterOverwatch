@@ -10,13 +10,10 @@ namespace OverwatchTracker
     {
         [JsonProperty("privateToken")]
         public string privateToken { get; set; } = "";
-
         [JsonProperty("uploadScreenshot")]
         public bool uploadScreenshot { get; set; } = true;
-
         [JsonProperty("startWithWindows")]
         public bool startWithWindows { get; set; } = true;
-
         [JsonProperty("playAudioOnSuccess")]
         public bool playAudioOnSuccess { get; set; } = true;
 
