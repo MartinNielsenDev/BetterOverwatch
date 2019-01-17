@@ -121,12 +121,12 @@ namespace OverwatchTracker
             }
             Vars.gameData.duration = Math.Floor(Convert.ToDouble(Vars.gameTimer.ElapsedMilliseconds / 1000)).ToString();
             Vars.gameData.endsr = currentSkillRating;
-            // convert bitmap to base64 so server can decode it
-            playerlistimagebase64 = Convert.ToBase64String(Functions.imageToBytes(Functions.reduceImageSize(Vars.gameData.playerlistimage, 70)));
-            Debug.WriteLine(JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
+            if (Vars.settings.uploadScreenshot && Vars.gameData.playerlistimage != null)
             {
-                
-            }));
+                // convert bitmap to base64 so server can decode it
+                playerlistimagebase64 = Convert.ToBase64String(Functions.imageToBytes(Functions.reduceImageSize(Vars.gameData.playerlistimage, 70)));
+            }
+            Debug.WriteLine(JsonConvert.SerializeObject(this, Formatting.Indented));
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }

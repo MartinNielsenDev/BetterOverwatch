@@ -100,15 +100,23 @@ namespace OverwatchTracker
                 {
                     MessageBox.Show("Overwatch Tracker was not run as administrator, this will result in your games being uploaded as PLAYER-0000 however the application will still function.\n\n\nIf you wish for Overwatch Tracker to also track your battletag, restart the app as administrator", "Missing privileges", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
+                Vars.settings = new Settings();
                 Settings.Load();
                 Settings.Save();
+                // load settings first, create GameData() object, then
+                Vars.gameData = new GameData();
                 contextMenu = new ContextMenu { TopMost = true };
-
-                if (!Settings.User())
+                
+                if (!Settings.FetchUserInfo())
                 {
                     return;
                 }
-
+                /*
+                Vars.gameData.map = "Hanamura";
+                Vars.gameData.currentSkillRating = "3025";
+                Vars.gameData.startsr = "3000";
+                Server.uploadGame(Vars.gameData.GetData());
+                */
                 Thread captureDesktopThread = new Thread(captureDesktop);
                 captureDesktopThread.IsBackground = true;
                 captureDesktopThread.Start();
@@ -207,17 +215,18 @@ namespace OverwatchTracker
                                     Protocols.checkMap(frame.DesktopImage);
                                     Protocols.checkTeamsSkillRating(frame.DesktopImage);
 
-                                    if(!Vars.gameData.map.Equals(String.Empty) && Vars.getInfoTimeout.ElapsedMilliseconds > 3000 && Vars.gameData.playerlistimage == null)
-                                    {
-                                        Vars.gameData.playerlistimage = new Bitmap(Functions.captureRegion(frame.DesktopImage, 0, 110, 1920, 700));
-                                    }
                                     if (!Vars.gameData.team1sr.Equals(String.Empty) &&
                                         !Vars.gameData.team2sr.Equals(String.Empty) &&
                                         !Vars.gameData.map.Equals(String.Empty) ||
                                         !Vars.gameData.map.Equals(String.Empty) && Vars.getInfoTimeout.ElapsedMilliseconds >= 4000)
                                     {
-                                        if(Vars.gameData.playerlistimage == null)
+                                        if (Vars.gameData.playerlistimage == null)
+                                        {
+                                            Functions.DebugMessage("Taking screenshot in 1.5 seconds...");
+                                            Thread.Sleep(1500);
                                             Vars.gameData.playerlistimage = new Bitmap(Functions.captureRegion(frame.DesktopImage, 0, 110, 1920, 700));
+                                            Functions.DebugMessage("*CLICK* done");
+                                        }
                                         Vars.loopDelay = 500;
                                         Vars.gameData.gameState = Vars.STATUS_RECORDING;
                                         contextMenu.trayIcon.Text = "Recording... visit the main menu after the game";

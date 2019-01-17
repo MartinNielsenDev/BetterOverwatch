@@ -19,8 +19,6 @@ namespace OverwatchTracker
 
         public static void Load()
         {
-            Vars.settings = new Settings();
-            Vars.gameData = new GameData();
             Vars.mapsNeuralNetwork.LoadFromArray(Vars.mapsNeuralNetworkData);
             Vars.digitsNeuralNetwork.LoadFromArray(Vars.digitsNeuralNetworkData);
             Vars.mainMenuNeuralNetwork.LoadFromArray(Vars.mainMenuNeuralNetworkData);
@@ -51,7 +49,7 @@ namespace OverwatchTracker
             string json = JsonConvert.SerializeObject(Vars.settings, Formatting.Indented);
             File.WriteAllText(Path.Combine(Vars.configPath, "settings.json"), json);
         }
-        public static bool User()
+        public static bool FetchUserInfo()
         {
             string token = Server.getToken(true);
 
@@ -70,8 +68,8 @@ namespace OverwatchTracker
                 }
                 else
                 {
-                    Functions.DebugMessage("SERVER ERROR 3");
-                    MessageBox.Show("SERVER ERROR 3", "Overwatch Tracker error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Functions.DebugMessage("SERVER ERROR, message: " + token);
+                    MessageBox.Show("SERVER ERROR", "Overwatch Tracker error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
             }

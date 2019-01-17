@@ -117,7 +117,7 @@ namespace OverwatchTracker
                     }
                     else
                     {
-                        Functions.DebugMessage("Game upload failed");
+                        Functions.DebugMessage("Game upload failed, message: " + uploadResult);
                     }
                     Thread.Sleep(500);
                 }
