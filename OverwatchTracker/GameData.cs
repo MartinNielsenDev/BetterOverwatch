@@ -57,7 +57,7 @@ namespace OverwatchTracker
         [JsonIgnore]
         public Bitmap playerlistimage = null;
         [JsonProperty("battletag")]
-        public string battletag { get; set; } = Functions.getBattletag();
+        public string battletag { get; set; } = Functions.FetchBattleTag();
         [JsonProperty("heroes")]
         public string heroes { get; set; } = "";
         [JsonProperty("startsr")]
@@ -124,7 +124,7 @@ namespace OverwatchTracker
             if (Vars.settings.uploadScreenshot && Vars.gameData.playerlistimage != null)
             {
                 // convert bitmap to base64 so server can decode it
-                playerlistimagebase64 = Convert.ToBase64String(Functions.imageToBytes(Functions.reduceImageSize(Vars.gameData.playerlistimage, 70)));
+                playerlistimagebase64 = Convert.ToBase64String(Functions.ImageToBytes(Functions.ReduceImageSize(Vars.gameData.playerlistimage, 70)));
             }
             Debug.WriteLine(JsonConvert.SerializeObject(this, Formatting.Indented));
             return JsonConvert.SerializeObject(this, Formatting.Indented);

@@ -7,21 +7,22 @@ using System.Net;
 using System.Threading;
 using System.Text;
 using System.Xml;
+using Newtonsoft.Json;
 
 namespace OverwatchTracker
 {
     class Server
     {
         public static Stopwatch autoUpdaterTimer = new Stopwatch();
-        public static void autoUpdater()
+        public static void AutoUpdater()
         {
             if (autoUpdaterTimer.ElapsedMilliseconds >= 600000)
             {
-                newestVersion(false);
+                NewestVersion(false);
                 autoUpdaterTimer.Restart();
             }
         }
-        public static void openUpdate()
+        public static void OpenUpdate()
         {
             string argument = "/C choice /C Y /N /D Y /T 4 & Del /F /Q \"{0}\" & choice /C Y /N /D Y /T 2 & Move /Y \"{1}\" \"{2}\" & Start \"\" /D \"{3}\" \"{4}\" {5}";
             string tempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"overwatchtracker\overwatchtracker.exe");
@@ -35,7 +36,7 @@ namespace OverwatchTracker
             Process.Start(Info);
             Application.Exit();
         }
-        public static bool downloadUpdate(string url)
+        public static bool DownloadUpdate(string url)
         {
             using (WebClient webClient = new WebClient())
             {
@@ -43,12 +44,11 @@ namespace OverwatchTracker
                 {
                     webClient.DownloadFile(url, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"overwatchtracker\overwatchtracker.exe"));
                     return true;
-                }
-                catch { }
+                }catch { }
             }
             return false;
         }
-        public static bool newestVersion(bool firstRun = true)
+        public static bool NewestVersion(bool firstRun = true)
         {
             Debug.WriteLine("checking newest version");
             try
@@ -74,7 +74,7 @@ namespace OverwatchTracker
                         if ((thisDate - serverDate).TotalSeconds < 0)
                         {
                             Functions.DebugMessage("New update required: v" + serverVersion);
-                            UpdateNoficationForm updateForm = new UpdateNoficationForm();
+                            UpdateNotificationForm updateForm = new UpdateNotificationForm();
                             updateForm.label2.Text = "Current Version: " + Vars.version;
                             updateForm.label3.Text = "Newest Version: " + serverVersion;
                             updateForm.textBox1.Text = xmlNode.SelectSingleNode("changelog").InnerText;
@@ -82,11 +82,7 @@ namespace OverwatchTracker
                             Application.Run(updateForm);
                             return false;
                         }
-                        try
-                        {
-                            Vars.blizzardAppOffset = Convert.ToInt32(xmlNode.SelectSingleNode("blizzardapp").InnerText, 16);
-                        }
-                        catch { }
+                        Vars.blizzardAppOffset = Convert.ToInt32(xmlNode.SelectSingleNode("blizzardapp").InnerText, 16);
                     }
                 }
                 return true;
@@ -101,63 +97,85 @@ namespace OverwatchTracker
                 return false;
             }
         }
-        public static void uploadGame(string gameData)
+        public static void UploadGame(string gameData)
         {
             Functions.DebugMessage("Uploading GameData...");
             Program.uploaderThread = new Thread(() =>
             {
                 for (var i = 1; i <= 10; i++)
                 {
-                    string uploadResult = gameUploader(gameData);
-
-                    if (uploadResult.Contains("success"))
+                    if (GameUploader(gameData))
                     {
-                        Functions.DebugMessage("Successfully uploaded game");
                         break;
-                    }
-                    else
-                    {
-                        Functions.DebugMessage("Game upload failed, message: " + uploadResult);
                     }
                     Thread.Sleep(500);
                 }
             });
             Program.uploaderThread.Start();
         }
-        public static string gameUploader(string gameData)
+        public static bool GameUploader(string gameData)
         {
             try
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues(Vars.host + "/api/upload-game/", new NameValueCollection()
-                        {
-                            { "gameData", gameData }
-                        });
+                    byte[] response = client.UploadValues(Vars.host + "/api/v2/upload-game/", new NameValueCollection()
+                    {
+                        { "gameData", gameData }
+                    });
+                    ServerOutput result = JsonConvert.DeserializeObject<ServerOutput>(Encoding.Default.GetString(response));
 
-                    return Encoding.Default.GetString(response);
+                    if(result.success)
+                    {
+                        Functions.DebugMessage("Successfully uploaded game");
+                        return true;
+                    }
+                    else
+                    {
+                        Functions.DebugMessage("Failed to upload game, message: " + result.message);
+                    }
                 }
-            }
-            catch { }
-            return String.Empty;
+            } catch { }
+            return false;
         }
-        public static string getToken(bool createUserOnFail = false)
+        public static bool FetchTokens()
         {
             try
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues(Vars.host + "/api/get-token/", new NameValueCollection()
-                {
-                    { "privateToken", Vars.settings.privateToken },
-                    { "publicToken", Vars.gameData.battletag },
-                    { "createUserOnFail", createUserOnFail.ToString() }
-                });
-                    return Encoding.Default.GetString(response);
+                    byte[] response = client.UploadValues(Vars.host + "/api/v2/fetch-token/", new NameValueCollection()
+                    {
+                        { "privateToken", Vars.settings.privateToken },
+                        { "publicToken", Vars.gameData.battletag }
+                    });
+                    ServerOutput result = JsonConvert.DeserializeObject<ServerOutput>(Encoding.Default.GetString(response));
+                    if (result.success)
+                    {
+                        Vars.settings.privateToken = result.privateToken;
+                        Vars.settings.publicToken = result.publicToken;
+                        Settings.Save();
+                        return true;
+                    }
+                    else
+                    {
+                        Functions.DebugMessage("Failed to fetch tokens, message: " + result.message);
+                        MessageBox.Show("Failed to fetch tokens, message: " + result.message, "Overwatch Tracker error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
-            }
-            catch { }
-            return String.Empty;
+            }catch { }
+            return false;
         }
+    }
+    class ServerOutput
+    {
+        [JsonProperty("success")]
+        public bool success { get; set; }
+        [JsonProperty("message")]
+        public string message { get; set; }
+        [JsonProperty("privateToken")]
+        public string privateToken { get; set; }
+        [JsonProperty("publicToken")]
+        public string publicToken { get; set; }
     }
 }

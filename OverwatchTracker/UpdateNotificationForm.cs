@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace OverwatchTracker
 {
-    public partial class UpdateNoficationForm : Form
+    public partial class UpdateNotificationForm : Form
     {
         [StructLayout(LayoutKind.Sequential)]
         public struct FLASHWINFO
@@ -33,7 +33,7 @@ namespace OverwatchTracker
         const int FLASHW_TIMER = 4;
         const int FLASHW_TIMERNOFG = 12;
         public string urlToDownload = String.Empty;
-        public UpdateNoficationForm()
+        public UpdateNotificationForm()
         {
             InitializeComponent();
         }
@@ -42,9 +42,9 @@ namespace OverwatchTracker
         {
             button1.Enabled = false;
             button1.Text = "Updating...";
-            if (Server.downloadUpdate(urlToDownload))
+            if (Server.DownloadUpdate(urlToDownload))
             {
-                Server.openUpdate();
+                Server.OpenUpdate();
             }
             else
             {

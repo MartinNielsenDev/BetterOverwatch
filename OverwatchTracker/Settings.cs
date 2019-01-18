@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Windows.Forms;
 using Newtonsoft.Json;
 
 namespace OverwatchTracker
@@ -10,6 +8,8 @@ namespace OverwatchTracker
     {
         [JsonProperty("privateToken")]
         public string privateToken { get; set; } = "";
+        [JsonProperty("publicToken")]
+        public string publicToken { get; set; } = "";
         [JsonProperty("uploadScreenshot")]
         public bool uploadScreenshot { get; set; } = true;
         [JsonProperty("startWithWindows")]
@@ -24,7 +24,7 @@ namespace OverwatchTracker
             Vars.mainMenuNeuralNetwork.LoadFromArray(Vars.mainMenuNeuralNetworkData);
             Vars.blizzardNeuralNetwork.LoadFromArray(Vars.blizzardNeuralNetworkData);
             Vars.heroNamesNeuralNetwork.LoadFromArray(Vars.heroNamesNeuralNetworkData);
-            Functions.setVolume(10);
+            Functions.SetVolume(10);
 
             try
             {
@@ -38,42 +38,25 @@ namespace OverwatchTracker
                         Vars.settings = JsonConvert.DeserializeObject<Settings>(json);
                     }
                 }
-            }
-            catch
-            {
-
-            }
+            }catch { }
         }
         public static void Save()
         {
             string json = JsonConvert.SerializeObject(Vars.settings, Formatting.Indented);
             File.WriteAllText(Path.Combine(Vars.configPath, "settings.json"), json);
         }
-        public static bool FetchUserInfo()
+        public static bool VerifyUser()
         {
-            string token = Server.getToken(true);
-
-            if (token.Contains("success"))
+            if (Server.FetchTokens())
             {
-                Vars.publicId = token.Replace("success", "");
-                Functions.DebugMessage("Retrieved publicId: " + Vars.publicId);
+                Functions.DebugMessage("privateToken verified");
+                Save();
+                return true;
             }
             else
             {
-                if(!token.Equals(String.Empty))
-                {
-                    Functions.DebugMessage("privateToken verified");
-                    Vars.settings.privateToken = token;
-                    Save();
-                }
-                else
-                {
-                    Functions.DebugMessage("SERVER ERROR, message: " + token);
-                    MessageBox.Show("SERVER ERROR", "Overwatch Tracker error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
+                return false;
             }
-            return true;
         }
     }
 }

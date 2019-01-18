@@ -20,7 +20,7 @@ namespace OverwatchTracker
         {
             return BitConverter.ToInt32(ReadBytes((IntPtr)Handle, Address, length), 0);
         }
-        public static IntPtr readMultiLevelPointer(Process process, IntPtr[] offsets, string moduleName = null)
+        public static IntPtr ReadMultiLevelPointer(Process process, IntPtr[] offsets, string moduleName = null)
         {
             IntPtr pointer = (IntPtr)0;
             IntPtr processBaseAddress = process.MainModule.BaseAddress;
@@ -57,7 +57,7 @@ namespace OverwatchTracker
 
             return pointer;
         }
-        public static string getString(string processName, string moduleName, IntPtr[] offsets, int size = 256)
+        public static string FetchString(string processName, string moduleName, IntPtr[] offsets, int size = 256)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace OverwatchTracker
                 if (processes.Length == 0) return String.Empty;
                 foreach (Process process in processes)
                 {
-                    IntPtr pointer = readMultiLevelPointer(process, offsets, moduleName);
+                    IntPtr pointer = ReadMultiLevelPointer(process, offsets, moduleName);
 
                     byte[] memoryBytes = ReadBytes(process.Handle, pointer, size);
                     process.Dispose();
@@ -73,8 +73,7 @@ namespace OverwatchTracker
                     if (memoryBytes.Length > 0 && memoryBytes[0] != 0 && memoryBytes[1] != 0)
                         return Encoding.Default.GetString(memoryBytes);
                 }
-            }
-            catch (Exception e){ Functions.DebugMessage("readString() error:" + e.ToString()); }
+            }catch{ }
 
             return String.Empty;
         }

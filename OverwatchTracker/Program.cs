@@ -91,14 +91,14 @@ namespace OverwatchTracker
                 {
                     Vars.isAdmin = new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
                 }
-                if (!Server.newestVersion())
+                if (!Server.NewestVersion())
                 {
                     return;
                 }
                 Directory.CreateDirectory(Vars.configPath);
                 if (!Vars.isAdmin)
                 {
-                    MessageBox.Show("Overwatch Tracker was not run as administrator, this will result in your games being uploaded as PLAYER-0000 however the application will still function.\n\n\nIf you wish for Overwatch Tracker to also track your battletag, restart the app as administrator", "Missing privileges", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    new AdminPromptForm().Show();
                 }
                 Vars.settings = new Settings();
                 Settings.Load();
@@ -107,18 +107,15 @@ namespace OverwatchTracker
                 Vars.gameData = new GameData();
                 contextMenu = new ContextMenu { TopMost = true };
                 
-                if (!Settings.FetchUserInfo())
+                if (!Settings.VerifyUser())
                 {
                     return;
                 }
-                /*
-                Vars.gameData.map = "Hanamura";
-                Vars.gameData.currentSkillRating = "3025";
-                Vars.gameData.startsr = "3000";
-                Server.uploadGame(Vars.gameData.GetData());
-                */
-                Thread captureDesktopThread = new Thread(captureDesktop);
-                captureDesktopThread.IsBackground = true;
+                
+                Thread captureDesktopThread = new Thread(CaptureDesktop)
+                {
+                    IsBackground = true
+                };
                 captureDesktopThread.Start();
                 Server.autoUpdaterTimer.Start();
                 Functions.DebugMessage("> Success - Overwatch Tracker started without fail");
@@ -130,7 +127,7 @@ namespace OverwatchTracker
             }
             Application.Run(contextMenu);
         }
-        public static void captureDesktop()
+        public static void CaptureDesktop()
         {
             Vars.statsTimer.Restart();
             try
@@ -138,9 +135,9 @@ namespace OverwatchTracker
                 desktopDuplicator = new DesktopDuplicator(0);
                 Vars.frameTimer.Start();
             }
-            catch (Exception err)
+            catch (Exception e)
             {
-                Functions.DebugMessage("Could not initialize desktopDuplication API - shutting down:" + err.ToString());
+                Functions.DebugMessage("Could not initialize desktopDuplication API - shutting down:" + e.ToString());
                 Environment.Exit(0);
             }
             while (true)
@@ -149,7 +146,7 @@ namespace OverwatchTracker
                 {
                     if (!Vars.overwatchRunning)
                     {
-                        if (Functions.isProcessOpen("Overwatch"))
+                        if (Functions.IsProcessOpen("Overwatch"))
                         {
                             contextMenu.trayIcon.Text = "Visit play menu to update your skill rating";
                             contextMenu.trayIcon.Icon = Properties.Resources.IconVisitMenu;
@@ -157,12 +154,12 @@ namespace OverwatchTracker
                         }
                         else
                         {
-                            Server.autoUpdater();
+                            Server.AutoUpdater();
                         }
                     }
                     else
                     {
-                        if (!Functions.isProcessOpen("Overwatch"))
+                        if (!Functions.IsProcessOpen("Overwatch"))
                         {
                             contextMenu.trayIcon.Text = "Waiting for Overwatch, idle...";
                             contextMenu.trayIcon.Icon = Properties.Resources.Idle;
@@ -174,7 +171,7 @@ namespace OverwatchTracker
                 else
                 {
                     Thread.Sleep(50);
-                    contextMenu.currentGame.MenuItems[0].Text = "Game elapsed: " + Functions.secondsToMinutes((int)Math.Floor(Convert.ToDouble(Vars.gameTimer.ElapsedMilliseconds / 1000)));
+                    contextMenu.currentGame.MenuItems[0].Text = "Game elapsed: " + Functions.SecondsToMinutes((int)Math.Floor(Convert.ToDouble(Vars.gameTimer.ElapsedMilliseconds / 1000)));
 
                     if (Vars.frameTimer.ElapsedMilliseconds >= Vars.loopDelay)
                     {
@@ -193,27 +190,27 @@ namespace OverwatchTracker
                         {
                             try
                             {
-                                Protocols.checkMainMenu(frame.DesktopImage);
+                                Protocols.CheckMainMenu(frame.DesktopImage);
 
                                 if (Vars.gameData.gameState != Vars.STATUS_INGAME)
                                 {
-                                    string quickPlayText = Functions.bitmapToText(frame.DesktopImage, 476, 644, 80, 40, contrastFirst: false, radius: 140, network: 0, invertColors: true);
+                                    string quickPlayText = Functions.BitmapToText(frame.DesktopImage, 476, 644, 80, 40, contrastFirst: false, radius: 140, network: 0, invertColors: true);
 
-                                    if (Functions.compareStrings(quickPlayText, "PLRY") >= 70)
+                                    if (Functions.CompareStrings(quickPlayText, "PLRY") >= 70)
                                     {
-                                        Protocols.checkPlayMenu(frame.DesktopImage);
+                                        Protocols.CheckPlayMenu(frame.DesktopImage);
                                     }
                                 }
 
                                 if (Vars.gameData.gameState == Vars.STATUS_IDLE || Vars.gameData.gameState == Vars.STATUS_FINISHED || Vars.gameData.gameState == Vars.STATUS_WAITFORUPLOAD)
                                 {
-                                    Protocols.checkCompetitiveGameEntered(frame.DesktopImage);
+                                    Protocols.CheckCompetitiveGameEntered(frame.DesktopImage);
                                 }
 
                                 if (Vars.gameData.gameState == Vars.STATUS_INGAME)
                                 {
-                                    Protocols.checkMap(frame.DesktopImage);
-                                    Protocols.checkTeamsSkillRating(frame.DesktopImage);
+                                    Protocols.CheckMap(frame.DesktopImage);
+                                    Protocols.CheckTeamsSkillRating(frame.DesktopImage);
 
                                     if (!Vars.gameData.team1sr.Equals(String.Empty) &&
                                         !Vars.gameData.team2sr.Equals(String.Empty) &&
@@ -222,10 +219,13 @@ namespace OverwatchTracker
                                     {
                                         if (Vars.gameData.playerlistimage == null)
                                         {
-                                            Functions.DebugMessage("Taking screenshot in 1.5 seconds...");
-                                            Thread.Sleep(1500);
-                                            Vars.gameData.playerlistimage = new Bitmap(Functions.captureRegion(frame.DesktopImage, 0, 110, 1920, 700));
-                                            Functions.DebugMessage("*CLICK* done");
+                                            Thread.Sleep(2000);
+                                            try
+                                            {
+                                                frame = desktopDuplicator.GetLatestFrame();
+                                                Vars.gameData.playerlistimage = new Bitmap(Functions.CaptureRegion(frame.DesktopImage, 0, 110, 1920, 700));
+                                            } catch { }
+                                            
                                         }
                                         Vars.loopDelay = 500;
                                         Vars.gameData.gameState = Vars.STATUS_RECORDING;
@@ -233,7 +233,6 @@ namespace OverwatchTracker
                                         contextMenu.trayIcon.Icon = Properties.Resources.IconRecord;
                                         Vars.statsTimer.Restart();
                                         Vars.getInfoTimeout.Stop();
-
                                     }
                                     else if (Vars.getInfoTimeout.ElapsedMilliseconds >= 4500)
                                     {
@@ -249,23 +248,23 @@ namespace OverwatchTracker
                                 {
                                     if (GetAsyncKeyState(0x09) < 0)
                                     {
-                                        Protocols.checkHeroPlayed(frame.DesktopImage);
-                                        if (Vars.roundTimer.ElapsedMilliseconds >= Functions.getTimeDeduction(getNextDeduction: true))
+                                        Protocols.CheckHeroPlayed(frame.DesktopImage);
+                                        if (Vars.roundTimer.ElapsedMilliseconds >= Functions.GetTimeDeduction(getNextDeduction: true))
                                         {
-                                            Protocols.checkStats(frame.DesktopImage);
+                                            Protocols.CheckStats(frame.DesktopImage);
                                         }
                                     }
-                                    else if (Vars.roundTimer.ElapsedMilliseconds >= Functions.getTimeDeduction(getNextDeduction: true))
+                                    else if (Vars.roundTimer.ElapsedMilliseconds >= Functions.GetTimeDeduction(getNextDeduction: true))
                                     {
-                                        Protocols.checkRoundCompleted(frame.DesktopImage);
+                                        Protocols.CheckRoundCompleted(frame.DesktopImage);
                                     }
-                                    Protocols.checkMainMenu(frame.DesktopImage);
-                                    Protocols.checkFinalScore(frame.DesktopImage);
+                                    Protocols.CheckMainMenu(frame.DesktopImage);
+                                    Protocols.CheckFinalScore(frame.DesktopImage);
                                 }
 
                                 if (Vars.gameData.gameState == Vars.STATUS_FINISHED)
                                 {
-                                    Protocols.checkGameScore(frame.DesktopImage);
+                                    Protocols.CheckGameScore(frame.DesktopImage);
                                 }
                             }
                             catch (Exception e)

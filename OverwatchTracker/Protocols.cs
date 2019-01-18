@@ -8,14 +8,14 @@ namespace OverwatchTracker
 {
     class Protocols
     {
-        public static void checkPlayMenu(Bitmap frame)
+        public static void CheckPlayMenu(Bitmap frame)
         {
-            string srText = Functions.bitmapToText(frame, 1100, 444, 100, 40, contrastFirst: true, radius: 110, network: 2); // GROUP CHECK
+            string srText = Functions.BitmapToText(frame, 1100, 444, 100, 40, contrastFirst: true, radius: 110, network: 2); // GROUP CHECK
             srText = Regex.Match(srText, "[0-9]+").ToString();
 
             if (srText.Length < 4)
             {
-                srText = srText = Functions.bitmapToText(frame, 1100, 504, 100, 32, contrastFirst: true, radius: 110, network: 2); // SOLO CHECK
+                srText = srText = Functions.BitmapToText(frame, 1100, 504, 100, 32, contrastFirst: true, radius: 110, network: 2); // SOLO CHECK
                 srText = Regex.Match(srText, "[0-9]+").ToString();
             }
             if (srText.Length > 4)
@@ -40,7 +40,7 @@ namespace OverwatchTracker
                     {
                         if (!Vars.gameData.currentSkillRating.Equals(srText) || Vars.gameData.gameState >= Vars.STATUS_FINISHED)
                         {
-                            Functions.playSound();
+                            Functions.PlaySound();
                             Program.contextMenu.currentGame.MenuItems[1].Text = "Skill rating: " + srText;
                             Functions.DebugMessage("Recognized sr: '" + srText + "'");
                         }
@@ -51,13 +51,13 @@ namespace OverwatchTracker
 
                         if (Vars.gameData.gameState >= 2)
                         {
-                            if (!isValidGame())
+                            if (!IsValidGame())
                             {
                                 return;
                             }
-                            Server.uploadGame(Vars.gameData.GetData());
+                            Server.UploadGame(Vars.gameData.GetData());
                             Vars.gameData = new GameData(Vars.gameData.currentSkillRating);
-                            resetGame();
+                            ResetGame();
                         }
                         Program.contextMenu.trayIcon.Text = "Ready to record, enter a competitive game to begin";
                         Program.contextMenu.trayIcon.Icon = Properties.Resources.IconActive;
@@ -65,26 +65,26 @@ namespace OverwatchTracker
                 }
             }
         }
-        public static void checkStats(Bitmap frame)
+        public static void CheckStats(Bitmap frame)
         {
             short threshold = 110;
-            string elimsText = Functions.bitmapToText(frame, 130, 895, 40, 22, contrastFirst: false, radius: threshold, network: 3);
+            string elimsText = Functions.BitmapToText(frame, 130, 895, 40, 22, contrastFirst: false, radius: threshold, network: 3);
 
             if (!elimsText.Equals(String.Empty))
             {
-                string damageText = Functions.bitmapToText(frame, 130, 957, 80, 22, contrastFirst: false, radius: threshold, network: 3);
+                string damageText = Functions.BitmapToText(frame, 130, 957, 80, 22, contrastFirst: false, radius: threshold, network: 3);
 
                 if (!damageText.Equals(String.Empty))
                 {
-                    string objKillsText = Functions.bitmapToText(frame, 375, 895, 40, 22, contrastFirst: false, radius: threshold, network: 3);
+                    string objKillsText = Functions.BitmapToText(frame, 375, 895, 40, 22, contrastFirst: false, radius: threshold, network: 3);
 
                     if (!objKillsText.Equals(String.Empty))
                     {
-                        string healingText = Functions.bitmapToText(frame, 375, 957, 80, 22, contrastFirst: false, radius: threshold, network: 3);
+                        string healingText = Functions.BitmapToText(frame, 375, 957, 80, 22, contrastFirst: false, radius: threshold, network: 3);
 
                         if (!healingText.Equals(String.Empty))
                         {
-                            string deathsText = Functions.bitmapToText(frame, 625, 957, 40, 22, contrastFirst: false, radius: threshold, network: 3);
+                            string deathsText = Functions.BitmapToText(frame, 625, 957, 40, 22, contrastFirst: false, radius: threshold, network: 3);
 
                             if (!deathsText.Equals(String.Empty))
                             {
@@ -97,7 +97,7 @@ namespace OverwatchTracker
                                     if (Vars.statsTimer.ElapsedMilliseconds > 30000 &&
                                         !(elimsText == "0" && damageText == "0" && objKillsText == "0" && healingText == "0" && deathsText == "0"))
                                     {
-                                        Vars.gameData.statsRecorded.Add(new StatsData(elimsText, damageText, objKillsText, healingText, deathsText, Vars.gameTimer.ElapsedMilliseconds - Functions.getTimeDeduction()));
+                                        Vars.gameData.statsRecorded.Add(new StatsData(elimsText, damageText, objKillsText, healingText, deathsText, Vars.gameTimer.ElapsedMilliseconds - Functions.GetTimeDeduction()));
 
                                         Vars.statsTimer.Restart();
                                         Vars.statsCheck[0] = "";
@@ -121,21 +121,21 @@ namespace OverwatchTracker
                 }
             }
         }
-        public static void checkCompetitiveGameEntered(Bitmap frame)
+        public static void CheckCompetitiveGameEntered(Bitmap frame)
         {
-            string compText = Functions.bitmapToText(frame, 1354, 892, 323, 48, contrastFirst: false, radius: 120, network: 0, invertColors: false, red: 255, green: 255, blue: 0);
+            string compText = Functions.BitmapToText(frame, 1354, 892, 323, 48, contrastFirst: false, radius: 120, network: 0, invertColors: false, red: 255, green: 255, blue: 0);
 
             if (!compText.Equals(String.Empty))
             {
-                double percent = Functions.compareStrings(compText, "COMPETITIVEPLAY");
+                double percent = Functions.CompareStrings(compText, "COMPETITIVEPLAY");
 
                 if (percent >= 70)
                 {
                     if (Vars.gameData.gameState == Vars.STATUS_FINISHED || Vars.gameData.gameState == Vars.STATUS_WAITFORUPLOAD) // a game finished
                     {
-                        Server.uploadGame(Vars.gameData.GetData());
+                        Server.UploadGame(Vars.gameData.GetData());
                         Vars.gameData = new GameData(Vars.gameData.currentSkillRating);
-                        resetGame();
+                        ResetGame();
                     }
                     Vars.getInfoTimeout.Restart();
                     Vars.gameData.gameState = Vars.STATUS_INGAME;
@@ -145,15 +145,15 @@ namespace OverwatchTracker
                 }
             }
         }
-        public static void checkMap(Bitmap frame)
+        public static void CheckMap(Bitmap frame)
         {
             if (Vars.gameData.map.Equals(String.Empty))
             {
-                string mapText = Functions.bitmapToText(frame, 915, 945, 780, 85);
+                string mapText = Functions.BitmapToText(frame, 915, 945, 780, 85);
 
                 if (!mapText.Equals(String.Empty))
                 {
-                    mapText = Functions.checkMaps(mapText);
+                    mapText = Functions.CheckMaps(mapText);
 
                     if (!mapText.Equals(String.Empty))
                     {
@@ -175,11 +175,11 @@ namespace OverwatchTracker
                 }
             }
         }
-        public static void checkTeamsSkillRating(Bitmap frame)
+        public static void CheckTeamsSkillRating(Bitmap frame)
         {
             if (Vars.gameData.team1sr.Equals(String.Empty))
             {
-                string team1SR = Functions.bitmapToText(frame, 545, 220, 245, 70, contrastFirst: false, radius: 90, network: 1);
+                string team1SR = Functions.BitmapToText(frame, 545, 220, 245, 70, contrastFirst: false, radius: 90, network: 1);
                 team1SR = Regex.Match(team1SR, "[0-9]+").ToString();
 
                 if (!team1SR.Equals(String.Empty) && team1SR.Length >= 4) // TEAM 1 SR
@@ -209,7 +209,7 @@ namespace OverwatchTracker
             }
             if (Vars.gameData.team2sr.Equals(String.Empty))
             {
-                string team2SR = Functions.bitmapToText(frame, 1135, 220, 245, 70, contrastFirst: false, radius: 90, network: 1);
+                string team2SR = Functions.BitmapToText(frame, 1135, 220, 245, 70, contrastFirst: false, radius: 90, network: 1);
                 team2SR = Regex.Match(team2SR, "[0-9]+").ToString();
 
                 if (!team2SR.Equals(String.Empty) && team2SR.Length >= 4) // TEAM 1 SR
@@ -251,16 +251,16 @@ namespace OverwatchTracker
                 Program.contextMenu.currentGame.MenuItems[3].Text = "Team ratings: - | " + Vars.gameData.team2sr;
             }
         }
-        public static void checkMainMenu(Bitmap frame)
+        public static void CheckMainMenu(Bitmap frame)
         {
-            string menuText = Functions.bitmapToText(frame, 50, 234, 118, 58, contrastFirst: false, radius: 140);
+            string menuText = Functions.BitmapToText(frame, 50, 234, 118, 58, contrastFirst: false, radius: 140);
 
             if (!menuText.Equals(String.Empty))
             {
                 if (menuText.Equals("PRAY"))
                 {
                     Functions.DebugMessage("Recognized main menu");
-                    if (!isValidGame())
+                    if (!IsValidGame())
                     {
                         return;
                     }
@@ -278,17 +278,17 @@ namespace OverwatchTracker
                 }
             }
         }
-        public static bool checkHeroPlayed(Bitmap frame)
+        public static bool CheckHeroPlayed(Bitmap frame)
         {
             bool heroDetected = false;
-            string heroText = Functions.bitmapToText(frame, 955, 834, 170, 35, contrastFirst: false, radius: 200, network: 4);
+            string heroText = Functions.BitmapToText(frame, 955, 834, 170, 35, contrastFirst: false, radius: 200, network: 4);
 
             if (!heroText.Equals(String.Empty))
             {
                 for (int i = 0; i < Vars.heroNames.Length; i++)
                 {
                     if (heroText.Equals("UVR") || heroText.Equals("OVR")) { heroText = "DVA"; }
-                    double accuracy = Functions.compareStrings(heroText, Vars.heroNames[i]);
+                    double accuracy = Functions.CompareStrings(heroText, Vars.heroNames[i]);
 
                     if (accuracy >= 70)
                     {
@@ -334,13 +334,13 @@ namespace OverwatchTracker
             }
             return heroDetected;
         }
-        public static void checkRoundCompleted(Bitmap frame)
+        public static void CheckRoundCompleted(Bitmap frame)
         {
-            string roundCompletedText = Functions.bitmapToText(frame, 940, 160, 290, 76);
+            string roundCompletedText = Functions.BitmapToText(frame, 940, 160, 290, 76);
 
             if (!roundCompletedText.Equals(String.Empty))
             {
-                if (Functions.compareStrings(roundCompletedText, "COMPLETED") >= 70)
+                if (Functions.CompareStrings(roundCompletedText, "COMPLETED") >= 70)
                 {
                     Vars.roundsCompleted++;
                     Vars.roundTimer.Restart();
@@ -348,16 +348,16 @@ namespace OverwatchTracker
                 }
             }
         }
-        public static void checkFinalScore(Bitmap frame)
+        public static void CheckFinalScore(Bitmap frame)
         {
-            string finalScoreText = Functions.bitmapToText(frame, 870, 433, 180, 40);
+            string finalScoreText = Functions.BitmapToText(frame, 870, 433, 180, 40);
 
             if (!finalScoreText.Equals(String.Empty))
             {
-                if (Functions.compareStrings(finalScoreText, "FINALSCORE") >= 40)
+                if (Functions.CompareStrings(finalScoreText, "FINALSCORE") >= 40)
                 {
                     Functions.DebugMessage("Recognized final score");
-                    if (!isValidGame())
+                    if (!IsValidGame())
                     {
                         return;
                     }
@@ -375,13 +375,13 @@ namespace OverwatchTracker
                 }
             }
         }
-        public static void checkGameScore(Bitmap frame)
+        public static void CheckGameScore(Bitmap frame)
         {
             if (Vars.gameData.team1score.Equals(String.Empty) && Vars.gameData.team1score.Equals(String.Empty))
             {
                 Thread.Sleep(1000); //hackfix, wait 1 second just in case
-                string scoreTextLeft = Functions.bitmapToText(frame, 800, 560, 95, 135, contrastFirst: false, radius: 45, network: 1);
-                string scoreTextRight = Functions.bitmapToText(frame, 1000, 560, 95, 135, contrastFirst: false, radius: 45, network: 1);
+                string scoreTextLeft = Functions.BitmapToText(frame, 800, 560, 95, 135, contrastFirst: false, radius: 45, network: 1);
+                string scoreTextRight = Functions.BitmapToText(frame, 1000, 560, 95, 135, contrastFirst: false, radius: 45, network: 1);
                 scoreTextLeft = Regex.Match(scoreTextLeft, "[0-9]+").ToString();
                 scoreTextRight = Regex.Match(scoreTextRight, "[0-9]+").ToString();
 
@@ -402,20 +402,20 @@ namespace OverwatchTracker
                 }
             }
         }
-        private static bool isValidGame()
+        private static bool IsValidGame()
         {
             if (Vars.gameTimer.ElapsedMilliseconds / 1000 < 300)
             {
                 if (Vars.gameData.gameState >= Vars.STATUS_RECORDING)
                 {
                     Functions.DebugMessage("Invalid game");
-                    resetGame();
+                    ResetGame();
                 }
                 return false;
             }
             return true;
         }
-        private static void resetGame()
+        private static void ResetGame()
         {
             Program.contextMenu.trayIcon.Text = "Ready to record, enter a competitive game to begin";
             Program.contextMenu.trayIcon.Icon = Properties.Resources.IconActive;

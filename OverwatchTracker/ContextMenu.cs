@@ -28,11 +28,11 @@ namespace OverwatchTracker
                 debugTools.MenuItems.Add(currentGame);
                 
                 trayMenu.MenuItems.Add("Overwatch Tracker v" + Vars.version);
-                trayMenu.MenuItems.Add("Login", openMatchHistory);
+                trayMenu.MenuItems.Add("Login", OpenMatchHistory);
                 trayMenu.MenuItems.Add("-");
-                trayMenu.MenuItems.Add("Upload screenshot of player list", toggleUpload);
-                trayMenu.MenuItems.Add("Start when Windows starts", toggleWindows);
-                trayMenu.MenuItems.Add("Play audio on success", toggleAudio);
+                trayMenu.MenuItems.Add("Upload screenshot of player list", ToggleUpload);
+                trayMenu.MenuItems.Add("Start when Windows starts", ToggleWindows);
+                trayMenu.MenuItems.Add("Play audio on success", ToggleAudio);
                 trayMenu.MenuItems.Add(debugTools);
                 trayMenu.MenuItems.Add("-");
                 trayMenu.MenuItems.Add("Exit", OnExit);
@@ -62,11 +62,8 @@ namespace OverwatchTracker
                 trayIcon.Icon = Properties.Resources.Idle;
                 trayIcon.ContextMenu = trayMenu;
                 trayIcon.Visible = true;
-                trayIcon.DoubleClick += new EventHandler(openMatchHistory);
-            }
-            catch
-            {
-            }
+                trayIcon.DoubleClick += new EventHandler(OpenMatchHistory);
+            }catch { }
         }
 
         protected override void OnLoad(EventArgs e)
@@ -77,11 +74,11 @@ namespace OverwatchTracker
             base.OnLoad(e);
         }
 
-        public void trayPopup(string title, string text, int timeout)
+        public void TrayPopup(string title, string text, int timeout)
         {
             if (InvokeRequired)
             {
-                this.Invoke(new Action<string, string, int>(trayPopup), new object[] { title, text, timeout });
+                this.Invoke(new Action<string, string, int>(TrayPopup), new object[] { title, text, timeout });
                 return;
             }
             Functions.DebugMessage(title);
@@ -92,7 +89,7 @@ namespace OverwatchTracker
         {
             Application.Exit();
         }
-        private void toggleUpload(object sender, EventArgs e)
+        private void ToggleUpload(object sender, EventArgs e)
         {
             if (trayMenu.MenuItems[3].Checked)
             {
@@ -105,7 +102,7 @@ namespace OverwatchTracker
             Vars.settings.uploadScreenshot = trayMenu.MenuItems[3].Checked;
             Settings.Save();
         }
-        private void toggleWindows(object sender, EventArgs e)
+        private void ToggleWindows(object sender, EventArgs e)
         {
             if (trayMenu.MenuItems[4].Checked)
             {
@@ -132,7 +129,7 @@ namespace OverwatchTracker
             Vars.settings.startWithWindows = trayMenu.MenuItems[4].Checked;
             Settings.Save();
         }
-        private void toggleAudio(object sender, EventArgs e)
+        private void ToggleAudio(object sender, EventArgs e)
         {
             if (trayMenu.MenuItems[5].Checked)
             {
@@ -145,24 +142,21 @@ namespace OverwatchTracker
             Vars.settings.playAudioOnSuccess = trayMenu.MenuItems[5].Checked;
             Settings.Save();
         }
-        private void openMatchHistory(object sender, EventArgs e)
+        private void OpenMatchHistory(object sender, EventArgs e)
         {
-            if(Vars.publicId.Equals(String.Empty))
+            if(Vars.settings.publicToken.Equals(String.Empty))
             {
-                string token = Server.getToken(false);
-                if (token.Contains("success"))
-                {
-                    Vars.publicId = token.Replace("success", "");
-                    Functions.DebugMessage("Retrieved publicId: " + Vars.publicId);
-                }
+                Server.FetchTokens();
             }
-            if (!Vars.publicId.Equals(String.Empty))
+            if (Vars.settings.publicToken.Equals(String.Empty))
             {
-                Process.Start(Vars.host + "/" + Vars.publicId + "?login=" + Vars.settings.privateToken);
+                // no publicToken fetched, popup browser so user can create one
+                Process.Start(Vars.host + "/new-account/?privateToken=" + Vars.settings.privateToken);
             }
             else
             {
-                Process.Start(Vars.host + "/new-account/?privateToken=" + Vars.settings.privateToken);
+                // publicToken successfully fetched, login instead with their privateToken
+                Process.Start(Vars.host + "/" + Vars.settings.publicToken + "?login=" + Vars.settings.privateToken);
             }
         }
 

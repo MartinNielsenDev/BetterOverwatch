@@ -35,11 +35,11 @@ namespace OverwatchTracker
             }
             return String.Empty;
         }
-        public static Bitmap captureRegion(Bitmap frame, int x, int y, int width, int height)
+        public static Bitmap CaptureRegion(Bitmap frame, int x, int y, int width, int height)
         {
             return frame.Clone(new Rectangle(x, y, width, height), PixelFormat.Format32bppArgb /*bmp.PixelFormat*/);
         }
-        public static Bitmap adjustColors(Bitmap b, short radius, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true)
+        public static Bitmap AdjustColors(Bitmap b, short radius, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true)
         {
             EuclideanColorFiltering filter = new EuclideanColorFiltering();
             filter.CenterColor = new AForge.Imaging.RGB(red, green, blue);
@@ -53,7 +53,7 @@ namespace OverwatchTracker
 
             return b;
         }
-        public static void adjustContrast(Bitmap image, float Value, bool invertColors = false)
+        public static void AdjustContrast(Bitmap image, float Value, bool invertColors = false)
         {
             BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, image.PixelFormat);
             int Width = image.Width;
@@ -116,7 +116,7 @@ namespace OverwatchTracker
 
             image.UnlockBits(data);
         }
-        public static double compareStrings(string s, string t)
+        public static double CompareStrings(string s, string t)
         {
             s = s.ToLower();
             t = t.ToLower();
@@ -144,7 +144,7 @@ namespace OverwatchTracker
 
             return Math.Floor(Convert.ToDouble(big - d[n, m]) / Convert.ToDouble(big) * 100);
         }
-        public static string checkMaps(string input)
+        public static string CheckMaps(string input)
         {
             for (int i = 0; i < Vars.maps.Length; i++)
             {
@@ -156,7 +156,7 @@ namespace OverwatchTracker
                 }
                 else
                 {
-                    double percent = compareStrings(input, map);
+                    double percent = CompareStrings(input, map);
 
                     if (percent >= 60)
                     {
@@ -166,7 +166,7 @@ namespace OverwatchTracker
             }
             return String.Empty;
         }
-        public static string bitmapToText(Bitmap frame, int x, int y, int width, int height, bool contrastFirst = false, short radius = 110, int network = 0, bool invertColors = false, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true)
+        public static string BitmapToText(Bitmap frame, int x, int y, int width, int height, bool contrastFirst = false, short radius = 110, int network = 0, bool invertColors = false, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true)
         {
             string output = String.Empty;
             try
@@ -175,16 +175,16 @@ namespace OverwatchTracker
 
                 if (contrastFirst)
                 {
-                    adjustContrast(result, 255f);
-                    result = adjustColors(result, radius, red, green, blue, fillOutside);
+                    AdjustContrast(result, 255f);
+                    result = AdjustColors(result, radius, red, green, blue, fillOutside);
                 }
                 else
                 {
-                    result = adjustColors(result, radius, red, green, blue, fillOutside);
-                    adjustContrast(result, 255f, invertColors);
+                    result = AdjustColors(result, radius, red, green, blue, fillOutside);
+                    AdjustContrast(result, 255f, invertColors);
                 }
 
-                output = getTextFromImage(result, network);
+                output = FetchTextFromImage(result, network);
                 result.Dispose();
 
             }
@@ -227,7 +227,7 @@ namespace OverwatchTracker
 
             return upScaled;
         }
-        public static int[,] labelImage(Bitmap image, out int labelCount)
+        public static int[,] LabelImage(Bitmap image, out int labelCount)
         {
             BitmapData bitmapData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, image.PixelFormat);
             int nrow = image.Height;
@@ -362,9 +362,9 @@ namespace OverwatchTracker
 
             return label;
         }
-        public static List<Bitmap> getConnectedComponentLabels(Bitmap image)
+        public static List<Bitmap> GetConnectedComponentLabels(Bitmap image)
         {
-            int[,] labels = labelImage(image, out int labelCount);
+            int[,] labels = LabelImage(image, out int labelCount);
             List<Bitmap> bitmaps = new List<Bitmap>();
 
             if (labelCount > 0)
@@ -437,7 +437,7 @@ namespace OverwatchTracker
 
             return bitmaps;
         }
-        public static bool isProcessOpen(string name)
+        public static bool IsProcessOpen(string name)
         {
             foreach (Process clsProcess in Process.GetProcesses())
             {
@@ -448,7 +448,7 @@ namespace OverwatchTracker
             }
             return false;
         }
-        public static byte[] imageToBytes(Image img)
+        public static byte[] ImageToBytes(Image img)
         {
             using (var ms = new MemoryStream())
             {
@@ -456,7 +456,7 @@ namespace OverwatchTracker
                 return ms.ToArray();
             }
         }
-        public static Bitmap reduceImageSize(Bitmap imgPhoto, int Percent)
+        public static Bitmap ReduceImageSize(Bitmap imgPhoto, int Percent)
         {
             float nPercent = ((float)Percent / 100);
 
@@ -495,11 +495,11 @@ namespace OverwatchTracker
                 }
             }
         }
-        public static string getBattletag()
+        public static string FetchBattleTag()
         {
             if (Vars.isAdmin)
             {
-                string myString = Memory.getString("Battle.net", "battle.net.dll", new IntPtr[] { (IntPtr)Vars.blizzardAppOffset, (IntPtr)0x28, (IntPtr)0x10, (IntPtr)0x8, (IntPtr)0x84, (IntPtr)0x0 }, 18);
+                string myString = Memory.FetchString("Battle.net", "battle.net.dll", new IntPtr[] { (IntPtr)Vars.blizzardAppOffset, (IntPtr)0x28, (IntPtr)0x10, (IntPtr)0x8, (IntPtr)0x84, (IntPtr)0x0 }, 18);
                 if (myString.Contains("#"))
                 {
                     string[] splits = myString.Split(Convert.ToChar("#"));
@@ -518,7 +518,7 @@ namespace OverwatchTracker
             }
             return "PLAYER-0000";
         }
-        public static string getLetterFromImage(OCRNetwork network, Bitmap image, int networkId)
+        public static string FetchLetterFromImage(OCRNetwork network, Bitmap image, int networkId)
         {
             double[] input = OCRNetwork.CharToDoubleArray(image, Vars.matrix);
 
@@ -538,34 +538,34 @@ namespace OverwatchTracker
             }
             return String.Empty;
         }
-        public static string getTextFromImage(Bitmap image, int network)
+        public static string FetchTextFromImage(Bitmap image, int network)
         {
             string text = String.Empty;
             try
             {
-                List<Bitmap> bitmaps = getConnectedComponentLabels(image);
+                List<Bitmap> bitmaps = GetConnectedComponentLabels(image);
 
                 for (int i = 0; i < bitmaps.Count; i++)
                 {
                     if (network == 0)
                     {
-                        text += getLetterFromImage(Vars.mapsNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(Vars.mapsNeuralNetwork, bitmaps[i], network);
                     }
                     else if (network == 1)
                     {
-                        text += getLetterFromImage(Vars.digitsNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(Vars.digitsNeuralNetwork, bitmaps[i], network);
                     }
                     else if (network == 2)
                     {
-                        text += getLetterFromImage(Vars.mainMenuNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(Vars.mainMenuNeuralNetwork, bitmaps[i], network);
                     }
                     else if (network == 3) // stats
                     {
-                        text += getLetterFromImage(Vars.blizzardNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(Vars.blizzardNeuralNetwork, bitmaps[i], network);
                     }
                     else if (network == 4) // hero names
                     {
-                        text += getLetterFromImage(Vars.heroNamesNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(Vars.heroNamesNeuralNetwork, bitmaps[i], network);
                     }
                     bitmaps[i].Dispose();
                 }
@@ -576,7 +576,7 @@ namespace OverwatchTracker
             }
             return text;
         }
-        public static int getTimeDeduction(bool getNextDeduction = false)
+        public static int GetTimeDeduction(bool getNextDeduction = false)
         {
             int offset = 10; // amount of extra seconds to offset the slowdown time and showing "Round complete" etc..
             int accumulatedResult = 0;
@@ -606,20 +606,20 @@ namespace OverwatchTracker
             }
             return accumulatedResult * 1000;
         }
-        public static void playSound()
+        public static void PlaySound()
         {
             if (Vars.settings.playAudioOnSuccess)
             {
                 Vars.audio.Play();
             }
         }
-        public static void setVolume(int vol)
+        public static void SetVolume(int vol)
         {
             int NewVolume = ((ushort.MaxValue / 100) * vol);
             uint NewVolumeAllChannels = (((uint)NewVolume & 0x0000ffff) | ((uint)NewVolume << 16));
             waveOutSetVolume(IntPtr.Zero, NewVolumeAllChannels);
         }
-        public static string secondsToMinutes(double secs)
+        public static string SecondsToMinutes(double secs)
         {
             double mins = Math.Floor(secs / 60);
             secs -= (mins * 60);
@@ -641,7 +641,8 @@ namespace OverwatchTracker
                     string date = DateTime.Now.ToString("dd/MM/yy HH:mm:ss");
                     File.AppendAllText(Path.Combine(Vars.configPath, "debug.log"), String.Format("[{0}] {1}", date, msg + "\r\n"));
                 }
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
