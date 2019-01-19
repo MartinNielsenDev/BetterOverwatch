@@ -15,6 +15,7 @@ namespace OverwatchTracker
         [DllImport("User32.dll")]
         public static extern short GetAsyncKeyState(int vKey);
         public static ContextMenu contextMenu;
+        private static AdminPromptForm adminPromptForm;
         public static Thread uploaderThread;
         private static Mutex mutex = new Mutex(true, "74bf6260-c133-4d69-ad9c-efc607887c97");
         private static DesktopDuplicator desktopDuplicator;
@@ -96,15 +97,11 @@ namespace OverwatchTracker
                     return;
                 }
                 Directory.CreateDirectory(Vars.configPath);
-                if (!Vars.isAdmin)
-                {
-                    new AdminPromptForm().Show();
-                }
                 Vars.settings = new Settings();
                 Settings.Load();
                 Settings.Save();
-                // load settings first, create GameData() object, then
                 Vars.gameData = new GameData();
+                adminPromptForm = new AdminPromptForm();
                 contextMenu = new ContextMenu { TopMost = true };
                 
                 if (!Settings.VerifyUser())
@@ -124,6 +121,10 @@ namespace OverwatchTracker
             {
                 MessageBox.Show("startUp error: " + e.ToString() + "\r\n\r\nReport this on the discord server");
                 Environment.Exit(0);
+            }
+            if (!Vars.isAdmin)
+            {
+                adminPromptForm.Show();
             }
             Application.Run(contextMenu);
         }
