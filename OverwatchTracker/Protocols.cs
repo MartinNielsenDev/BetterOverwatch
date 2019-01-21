@@ -417,6 +417,7 @@ namespace OverwatchTracker
         }
         private static void ResetGame()
         {
+            Vars.gameData = new GameData();
             Program.contextMenu.trayIcon.Text = "Ready to record, enter a competitive game to begin";
             Program.contextMenu.trayIcon.Icon = Properties.Resources.IconActive;
         }
