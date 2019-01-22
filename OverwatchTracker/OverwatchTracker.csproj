@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>OverwatchTracker</RootNamespace>
     <AssemblyName>OverwatchTracker</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
@@ -160,6 +160,9 @@
     <Compile Include="Vars.cs" />
     <EmbeddedResource Include="AdminPromptForm.resx">
       <DependentUpon>AdminPromptForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ContextMenu.resx">
+      <DependentUpon>ContextMenu.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

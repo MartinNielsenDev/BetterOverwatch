@@ -123,7 +123,6 @@ namespace OverwatchTracker
             Vars.gameData.endsr = currentSkillRating;
             if (Vars.settings.uploadScreenshot && Vars.gameData.playerlistimage != null)
             {
-                // convert bitmap to base64 so server can decode it
                 playerlistimagebase64 = Convert.ToBase64String(Functions.ImageToBytes(Functions.ReduceImageSize(Vars.gameData.playerlistimage, 70)));
             }
             Debug.WriteLine(JsonConvert.SerializeObject(this, Formatting.Indented));

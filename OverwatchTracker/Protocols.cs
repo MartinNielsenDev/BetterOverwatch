@@ -51,12 +51,8 @@ namespace OverwatchTracker
 
                         if (Vars.gameData.gameState >= 2)
                         {
-                            if (!IsValidGame())
-                            {
-                                return;
-                            }
+                            if (!IsValidGame()) return;
                             Server.UploadGame(Vars.gameData.GetData());
-                            Vars.gameData = new GameData(Vars.gameData.currentSkillRating);
                             ResetGame();
                         }
                         Program.contextMenu.trayIcon.Text = "Ready to record, enter a competitive game to begin";
@@ -417,7 +413,7 @@ namespace OverwatchTracker
         }
         private static void ResetGame()
         {
-            Vars.gameData = new GameData();
+            Vars.gameData = new GameData(Vars.gameData.currentSkillRating);
             Program.contextMenu.trayIcon.Text = "Ready to record, enter a competitive game to begin";
             Program.contextMenu.trayIcon.Icon = Properties.Resources.IconActive;
         }

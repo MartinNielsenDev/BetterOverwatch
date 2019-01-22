@@ -6,8 +6,14 @@ namespace OverwatchTracker
 {
     class Settings
     {
+        /// <summary>
+        /// Used by the server to authenticate the user on the website, this is essentially a password.
+        /// </summary>
         [JsonProperty("privateToken")]
         public string privateToken { get; set; } = "";
+        /// <summary>
+        /// This will be the user's permanent link on the website, to share their profile with others, this can be changed.
+        /// </summary>
         [JsonProperty("publicToken")]
         public string publicToken { get; set; } = "";
         [JsonProperty("uploadScreenshot")]

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -9,8 +7,6 @@ namespace OverwatchTracker
 {
     public partial class AdminPromptForm : Form
     {
-        [DllImport("user32.dll")]
-        public static extern UInt32 SendMessage(IntPtr hWnd, UInt32 msg, UInt32 wParam, UInt32 lParam);
         private const int BCM_SETSHIELD = (0x1600 + 0x000C);
 
         public AdminPromptForm()
@@ -20,7 +16,8 @@ namespace OverwatchTracker
 
         private void AdminPromptForm_Load(object sender, EventArgs e)
         {
-            SendMessage(button1.Handle, BCM_SETSHIELD, 0, 0xFFFFFFFF);
+            Program.SendMessage(button1.Handle, BCM_SETSHIELD, 0, 0xFFFFFFFF);
+            System.Media.SystemSounds.Asterisk.Play();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -34,7 +31,7 @@ namespace OverwatchTracker
             while (restartAsAdminThread.ThreadState == System.Threading.ThreadState.Background)
             {
                 Console.WriteLine(restartAsAdminThread.ThreadState);
-                Thread.Sleep(100);
+                Thread.Sleep(500);
             }
 
             Application.Exit();

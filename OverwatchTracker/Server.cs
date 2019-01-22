@@ -8,6 +8,7 @@ using System.Threading;
 using System.Text;
 using System.Xml;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace OverwatchTracker
 {
@@ -18,7 +19,7 @@ namespace OverwatchTracker
         {
             if (autoUpdaterTimer.ElapsedMilliseconds >= 600000)
             {
-                NewestVersion(false);
+                NewestVersionV2(firstRun: false);
                 autoUpdaterTimer.Restart();
             }
         }
@@ -44,13 +45,13 @@ namespace OverwatchTracker
                 {
                     webClient.DownloadFile(url, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"overwatchtracker\overwatchtracker.exe"));
                     return true;
-                }catch { }
+                }
+                catch { }
             }
             return false;
         }
-        public static bool NewestVersion(bool firstRun = true)
+        public static void FetchBlizzardAppOffset()
         {
-            Debug.WriteLine("checking newest version");
             try
             {
                 string serverResponse;
@@ -64,28 +65,46 @@ namespace OverwatchTracker
 
                 foreach (XmlNode xmlNode in xmlNodeList)
                 {
-                    string serverVersion = xmlNode.SelectSingleNode("version").InnerText;
+                    Vars.blizzardAppOffset = Convert.ToInt32(xmlNode.SelectSingleNode("blizzardapp").InnerText, 16);
+                    Console.WriteLine(Vars.blizzardAppOffset);
+                }
+            }catch { }
+        }
+        public static bool NewestVersionV2(bool firstRun)
+        {
+            try
+            {
+                string serverResponse;
+                using (WebClient client = new WebClient())
+                {
+                    client.Headers.Add("User-Agent", "Mozilla/5.0");
+                    serverResponse = client.DownloadString("https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
+                }
+                GitHub.Json json = JsonConvert.DeserializeObject<GitHub.Json>(serverResponse);
+                if (json.tag_name.Length == 7 && json.assets.Count > 0)
+                {
+                    DateTime serverDate = DateTime.ParseExact(json.tag_name, "yy.MMdd", null);
+                    DateTime thisDate = DateTime.ParseExact(Vars.version, "yy.MMdd", null);
 
-                    if (serverVersion.Length >= 6)
+                    if ((thisDate - serverDate).TotalSeconds < 0)
                     {
-                        DateTime serverDate = DateTime.ParseExact(serverVersion, "yy.MMdd", null);
-                        DateTime thisDate = DateTime.ParseExact(Vars.version, "yy.MMdd", null);
-
-                        if ((thisDate - serverDate).TotalSeconds < 0)
-                        {
-                            Functions.DebugMessage("New update required: v" + serverVersion);
-                            UpdateNotificationForm updateForm = new UpdateNotificationForm();
-                            updateForm.label2.Text = "Current Version: " + Vars.version;
-                            updateForm.label3.Text = "Newest Version: " + serverVersion;
-                            updateForm.textBox1.Text = xmlNode.SelectSingleNode("changelog").InnerText;
-                            updateForm.urlToDownload = xmlNode.SelectSingleNode("url").InnerText;
-                            Application.Run(updateForm);
-                            return false;
-                        }
-                        Vars.blizzardAppOffset = Convert.ToInt32(xmlNode.SelectSingleNode("blizzardapp").InnerText, 16);
+                        Functions.DebugMessage("New update required: v" + json.tag_name);
+                        UpdateNotificationForm updateForm = new UpdateNotificationForm();
+                        updateForm.label2.Text = "Current Version: " + Vars.version;
+                        updateForm.label3.Text = "Newest Version: " + json.tag_name;
+                        updateForm.textBox1.Text = json.body;
+                        updateForm.urlToDownload = json.assets[0].browser_download_url;
+                        Application.Run(updateForm);
+                        return false;
                     }
                 }
-                return true;
+                else
+                {
+                    if (firstRun)
+                    {
+                        MessageBox.Show("Failed to fetch update information through https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest\r\n\r\nPlease manually update if there are any issues", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
             }
             catch
             {
@@ -94,15 +113,15 @@ namespace OverwatchTracker
                     Functions.DebugMessage("error while validating version");
                     MessageBox.Show("Error while validating version", "Overwatch Tracker v" + Vars.version, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-                return false;
             }
+            return true;
         }
         public static void UploadGame(string gameData)
         {
             Functions.DebugMessage("Uploading GameData...");
             Program.uploaderThread = new Thread(() =>
             {
-                for (var i = 1; i <= 10; i++)
+                for (int i = 1; i <= 10; i++)
                 {
                     if (GameUploader(gameData))
                     {
@@ -125,7 +144,7 @@ namespace OverwatchTracker
                     });
                     ServerOutput result = JsonConvert.DeserializeObject<ServerOutput>(Encoding.Default.GetString(response));
 
-                    if(result.success)
+                    if (result.success)
                     {
                         Functions.DebugMessage("Successfully uploaded game");
                         return true;
@@ -135,7 +154,8 @@ namespace OverwatchTracker
                         Functions.DebugMessage("Failed to upload game, message: " + result.message);
                     }
                 }
-            } catch { }
+            }
+            catch { }
             return false;
         }
         public static bool FetchTokens()
@@ -163,7 +183,8 @@ namespace OverwatchTracker
                         MessageBox.Show("Failed to fetch tokens, message: " + result.message, "Overwatch Tracker error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
-            }catch { }
+            }
+            catch { }
             return false;
         }
     }
@@ -177,5 +198,22 @@ namespace OverwatchTracker
         public string privateToken { get; set; }
         [JsonProperty("publicToken")]
         public string publicToken { get; set; }
+    }
+    class GitHub
+    {
+        public class Json
+        {
+            [JsonProperty("tag_name")]
+            public string tag_name { get; set; }
+            [JsonProperty("body")]
+            public string body { get; set; }
+            [JsonProperty("assets")]
+            public List<Assets> assets { get; set; }
+        }
+        public class Assets
+        {
+            [JsonProperty("browser_download_url")]
+            public string browser_download_url { get; set; }
+        }
     }
 }

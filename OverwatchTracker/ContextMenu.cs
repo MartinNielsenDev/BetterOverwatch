@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using System.Diagnostics;
 using Microsoft.Win32;
+using System.IO;
 
 namespace OverwatchTracker
 {
@@ -25,6 +26,7 @@ namespace OverwatchTracker
 
                 for(int i = 0; i < currentGame.MenuItems.Count; i++) { currentGame.MenuItems[i].Enabled = false; }
                 MenuItem debugTools = new MenuItem("Debug tools");
+                debugTools.MenuItems.Add("Open logs", OpenLogs);
                 debugTools.MenuItems.Add(currentGame);
                 
                 trayMenu.MenuItems.Add("Overwatch Tracker v" + Vars.version);
@@ -65,7 +67,6 @@ namespace OverwatchTracker
                 trayIcon.DoubleClick += new EventHandler(OpenMatchHistory);
             }catch { }
         }
-
         protected override void OnLoad(EventArgs e)
         {
             Visible = false;
@@ -73,7 +74,6 @@ namespace OverwatchTracker
 
             base.OnLoad(e);
         }
-
         public void TrayPopup(string title, string text, int timeout)
         {
             if (InvokeRequired)
@@ -84,10 +84,13 @@ namespace OverwatchTracker
             Functions.DebugMessage(title);
             trayIcon.ShowBalloonTip(timeout, title, text, ToolTipIcon.None);
         }
-
         private void OnExit(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+        private void OpenLogs(object sender, EventArgs e)
+        {
+            Process.Start(Path.Combine(Vars.configPath, "debug.log"));
         }
         private void ToggleUpload(object sender, EventArgs e)
         {
@@ -159,7 +162,6 @@ namespace OverwatchTracker
                 Process.Start(Vars.host + "/" + Vars.settings.publicToken + "?login=" + Vars.settings.privateToken);
             }
         }
-
         protected override void Dispose(bool isDisposing)
         {
             if (isDisposing)
@@ -168,6 +170,19 @@ namespace OverwatchTracker
             }
 
             base.Dispose(isDisposing);
+        }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            // 
+            // ContextMenu
+            // 
+            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Name = "ContextMenu";
+            this.TopMost = true;
+            this.ResumeLayout(false);
+
         }
     }
 }

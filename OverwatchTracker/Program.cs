@@ -12,7 +12,9 @@ namespace OverwatchTracker
 {
     class Program
     {
-        [DllImport("User32.dll")]
+        [DllImport("user32.dll")]
+        public static extern uint SendMessage(IntPtr hWnd, uint msg, uint wParam, uint lParam);
+        [DllImport("user32.dll")]
         public static extern short GetAsyncKeyState(int vKey);
         public static ContextMenu contextMenu;
         private static AdminPromptForm adminPromptForm;
@@ -23,92 +25,57 @@ namespace OverwatchTracker
         static void Main()
         {
             Functions.DebugMessage("Starting Overwatch Tracker version " + Vars.version);
-            
+
             if (!mutex.WaitOne(TimeSpan.Zero, true))
             {
                 Functions.DebugMessage("Overwatch Tracker is already running...");
                 return;
             }
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler((s, a) =>
+            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler((s, assembly) =>
             {
-                if (a.Name.Contains("Newtonsoft.Json,"))
+                if (assembly.Name.Contains("Newtonsoft.Json,"))
                 {
-                    using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("OverwatchTracker.dlls.Newtonsoft.Json.dll"))
-                    {
-                        byte[] assemblyData = new byte[stream.Length];
-
-                        stream.Read(assemblyData, 0, assemblyData.Length);
-                        return Assembly.Load(assemblyData);
-                    }
+                    return LoadAssembly("OverwatchTracker.dlls.Newtonsoft.Json.dll");
                 }
-                if (a.Name.Contains("AForge.Imaging,"))
+                if (assembly.Name.Contains("AForge.Imaging,"))
                 {
-                    using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("OverwatchTracker.dlls.AForge.Imaging.dll"))
-                    {
-                        byte[] assemblyData = new byte[stream.Length];
-
-                        stream.Read(assemblyData, 0, assemblyData.Length);
-                        return Assembly.Load(assemblyData);
-                    }
+                    return LoadAssembly("OverwatchTracker.dlls.AForge.Imaging.dll");
                 }
-                if (a.Name.Contains("SharpDX.Direct3D11,"))
+                if (assembly.Name.Contains("SharpDX.Direct3D11,"))
                 {
-                    using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("OverwatchTracker.dlls.SharpDX.Direct3D11.dll"))
-                    {
-                        byte[] assemblyData = new byte[stream.Length];
-
-                        stream.Read(assemblyData, 0, assemblyData.Length);
-                        return Assembly.Load(assemblyData);
-                    }
+                    return LoadAssembly("OverwatchTracker.dlls.SharpDX.Direct3D11.dll");
                 }
-                if (a.Name.Contains("SharpDX.DXGI,"))
+                if (assembly.Name.Contains("SharpDX.DXGI,"))
                 {
-                    using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("OverwatchTracker.dlls.SharpDX.DXGI.dll"))
-                    {
-                        byte[] assemblyData = new byte[stream.Length];
-
-                        stream.Read(assemblyData, 0, assemblyData.Length);
-                        return Assembly.Load(assemblyData);
-                    }
+                    return LoadAssembly("OverwatchTracker.dlls.SharpDX.DXGI.dll");
                 }
-                if (a.Name.Contains("SharpDX,"))
+                if (assembly.Name.Contains("SharpDX,"))
                 {
-                    using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("OverwatchTracker.dlls.SharpDX.dll"))
-                    {
-                        byte[] assemblyData = new byte[stream.Length];
-
-                        stream.Read(assemblyData, 0, assemblyData.Length);
-                        return Assembly.Load(assemblyData);
-                    }
+                    return LoadAssembly("OverwatchTracker.dlls.SharpDX.dll");
                 }
                 return null;
             });
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls;
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
             try
             {
                 using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
                 {
                     Vars.isAdmin = new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
                 }
-                if (!Server.NewestVersion())
-                {
-                    return;
-                }
+                if (!Server.NewestVersionV2(firstRun: true)) return;
+                Server.FetchBlizzardAppOffset();
                 Directory.CreateDirectory(Vars.configPath);
                 Vars.settings = new Settings();
                 Settings.Load();
                 Settings.Save();
                 Vars.gameData = new GameData();
                 adminPromptForm = new AdminPromptForm();
-                contextMenu = new ContextMenu { TopMost = true };
-                
-                if (!Settings.VerifyUser())
-                {
-                    return;
-                }
-                
+                contextMenu = new ContextMenu();
+
+                if (!Settings.VerifyUser()) return;
+
                 Thread captureDesktopThread = new Thread(CaptureDesktop)
                 {
                     IsBackground = true
@@ -120,7 +87,7 @@ namespace OverwatchTracker
             catch (Exception e)
             {
                 MessageBox.Show("startUp error: " + e.ToString() + "\r\n\r\nReport this on the discord server");
-                Environment.Exit(0);
+                Application.Exit();
             }
             if (!Vars.isAdmin)
             {
@@ -225,8 +192,9 @@ namespace OverwatchTracker
                                             {
                                                 frame = desktopDuplicator.GetLatestFrame();
                                                 Vars.gameData.playerlistimage = new Bitmap(Functions.CaptureRegion(frame.DesktopImage, 0, 110, 1920, 700));
-                                            } catch { }
-                                            
+                                            }
+                                            catch { }
+
                                         }
                                         Vars.loopDelay = 500;
                                         Vars.gameData.gameState = Vars.STATUS_RECORDING;
@@ -278,6 +246,16 @@ namespace OverwatchTracker
                         Vars.frameTimer.Restart();
                     }
                 }
+            }
+        }
+        private static Assembly LoadAssembly(string resource)
+        {
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource))
+            {
+                byte[] assemblyData = new byte[stream.Length];
+
+                stream.Read(assemblyData, 0, assemblyData.Length);
+                return Assembly.Load(assemblyData);
             }
         }
     }
