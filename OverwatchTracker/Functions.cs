@@ -166,6 +166,20 @@ namespace OverwatchTracker
             }
             return String.Empty;
         }
+        public static bool CheckStats(string elimsText, string damageText, string objKillsText, string healingText, string deathsText, double time)
+        {
+            int seconds = Convert.ToInt32(Math.Floor(time / 1000));
+
+            if(int.TryParse(elimsText, out int elims) && (elims / seconds) * 60 < 7 &&
+                int.TryParse(damageText, out int damage) && (damage / seconds) * 60 < 2000 &&
+                int.TryParse(objKillsText, out int objKills) && (objKills / seconds) * 60 < 7 &&
+                int.TryParse(healingText, out int healing) && (healing / seconds) * 60 < 2000 &&
+                int.TryParse(deathsText, out int deaths) && (deaths / seconds) * 60 < 7)
+            {
+                return true;
+            }
+            return false;
+        }
         public static string BitmapToText(Bitmap frame, int x, int y, int width, int height, bool contrastFirst = false, short radius = 110, int network = 0, bool invertColors = false, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true)
         {
             string output = String.Empty;

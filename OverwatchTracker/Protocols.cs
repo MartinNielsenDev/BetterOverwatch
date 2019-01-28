@@ -91,7 +91,9 @@ namespace OverwatchTracker
                                     Vars.statsCheck[4].Equals(deathsText))
                                 {
                                     if (Vars.statsTimer.ElapsedMilliseconds > 30000 &&
-                                        !(elimsText == "0" && damageText == "0" && objKillsText == "0" && healingText == "0" && deathsText == "0"))
+                                        !(elimsText == "0" && damageText == "0" && objKillsText == "0" && healingText == "0" && deathsText == "0") &&
+                                        Vars.gameTimer.ElapsedMilliseconds - Functions.GetTimeDeduction() > 30000 &&
+                                        Functions.CheckStats(elimsText, damageText, objKillsText, healingText, deathsText, Vars.gameTimer.ElapsedMilliseconds - Functions.GetTimeDeduction()))
                                     {
                                         Vars.gameData.statsRecorded.Add(new StatsData(elimsText, damageText, objKillsText, healingText, deathsText, Vars.gameTimer.ElapsedMilliseconds - Functions.GetTimeDeduction()));
 

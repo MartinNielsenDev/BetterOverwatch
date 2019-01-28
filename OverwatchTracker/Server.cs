@@ -81,6 +81,7 @@ namespace OverwatchTracker
                     serverResponse = client.DownloadString("https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
                 }
                 GitHub.Json json = JsonConvert.DeserializeObject<GitHub.Json>(serverResponse);
+
                 if (json.tag_name.Length == 7 && json.assets.Count > 0)
                 {
                     DateTime serverDate = DateTime.ParseExact(json.tag_name, "yy.MMdd", null);
@@ -127,7 +128,7 @@ namespace OverwatchTracker
                     {
                         break;
                     }
-                    Thread.Sleep(500);
+                    Thread.Sleep(1);
                 }
             });
             Program.uploaderThread.Start();
