@@ -1,5 +1,6 @@
 # Overwatch Match Tracker
 [![Build status](https://ci.appveyor.com/api/projects/status/94bxngssk039i80q?svg=true)](https://ci.appveyor.com/project/MartinNielsenDev/overwatchtracker)
+[![Latest Release](https://img.shields.io/github/release/martinnielsendev/overwatchtracker.svg)](https://github.com/MartinNielsenDev/OverwatchTracker/releases)
 
 Official website at http://owtracker.info/
 
@@ -30,7 +31,7 @@ The Tracker works by looking at the game screen and applying computer vision the
 All processing is done locally through this application, the server only displays the data that the tracker sends nicely for you.
 
 ## Examples
-![games](http://owtracker.info/images/games.jpg)
-![detailed-game](http://owtracker.info/images/detailed-game.jpg)
+![games](http://owtracker.info/images/games.png)
+![detailed-game](http://owtracker.info/images/detailed-game.png)
 
 Live demo on my profile: http://owtracker.info/Avoid
