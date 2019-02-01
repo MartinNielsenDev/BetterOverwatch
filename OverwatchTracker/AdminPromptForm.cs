@@ -30,7 +30,6 @@ namespace OverwatchTracker
 
             while (restartAsAdminThread.ThreadState == System.Threading.ThreadState.Background)
             {
-                Console.WriteLine(restartAsAdminThread.ThreadState);
                 Thread.Sleep(1);
             }
 

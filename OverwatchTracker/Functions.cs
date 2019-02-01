@@ -656,10 +656,7 @@ namespace OverwatchTracker
                     File.AppendAllText(Path.Combine(Vars.configPath, "debug.log"), String.Format("[{0}] {1}", date, msg + "\r\n"));
                 }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
+            catch { }
             Debug.WriteLine(msg);
         }
     }

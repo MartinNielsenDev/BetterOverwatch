@@ -95,7 +95,7 @@
             this.updateButton.Location = new System.Drawing.Point(327, 324);
             this.updateButton.Name = "updateButton";
             this.updateButton.Size = new System.Drawing.Size(80, 30);
-            this.updateButton.TabIndex = 2;
+            this.updateButton.TabIndex = 1;
             this.updateButton.Text = "Update";
             this.updateButton.UseVisualStyleBackColor = true;
             this.updateButton.Click += new System.EventHandler(this.updateButton_Click);
@@ -107,7 +107,7 @@
             this.cancelButton.Location = new System.Drawing.Point(413, 324);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(80, 30);
-            this.cancelButton.TabIndex = 3;
+            this.cancelButton.TabIndex = 2;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);

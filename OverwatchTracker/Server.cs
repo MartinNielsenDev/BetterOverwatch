@@ -38,7 +38,6 @@ namespace OverwatchTracker
                 foreach (XmlNode xmlNode in xmlNodeList)
                 {
                     Vars.blizzardAppOffset = Convert.ToInt32(xmlNode.SelectSingleNode("blizzardapp").InnerText, 16);
-                    Console.WriteLine(Vars.blizzardAppOffset);
                 }
             }catch { }
         }
@@ -196,7 +195,6 @@ namespace OverwatchTracker
         }
         public bool IsNewerThan(Versioning version)
         {
-            Console.WriteLine($"{this.major}.{this.minor}.{this.patch}");
             if (this.major > version.major)
             {
                 return true;

@@ -21,6 +21,7 @@ namespace OverwatchTracker
         }
         private void UpdateNoficationForm_Load(object sender, EventArgs e)
         {
+            updateButton.Focus();
             this.Deactivate += (s, a) => WindowFlasher.FlashWindowEx(this.Handle, WindowFlasher.FLASHW_TRAY);
             this.Activated += (s, a) => WindowFlasher.FlashWindowEx(this.Handle, WindowFlasher.FLASHW_STOP);
             SystemSounds.Asterisk.Play();

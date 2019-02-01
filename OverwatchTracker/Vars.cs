@@ -9,7 +9,7 @@ namespace OverwatchTracker
     {
         public static SoundPlayer audio = new SoundPlayer(Properties.Resources.success);
         public const int matrix = 10;
-        public static string version = "1.0.0";
+        public static string version = "1.0.1";
         public static bool isAdmin = false;
         public static int blizzardAppOffset = 0;
         public static string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "overwatchtracker");
