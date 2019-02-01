@@ -28,110 +28,134 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.changeLogTextBox = new System.Windows.Forms.TextBox();
+            this.titleLabel = new System.Windows.Forms.Label();
+            this.installedVersionLabel = new System.Windows.Forms.Label();
+            this.updateVersionLabel = new System.Windows.Forms.Label();
+            this.changeLogLabel = new System.Windows.Forms.Label();
+            this.updateButton = new System.Windows.Forms.Button();
+            this.cancelButton = new System.Windows.Forms.Button();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.titleSubLabel = new System.Windows.Forms.Label();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
-            // textBox1
+            // changeLogTextBox
             // 
-            this.textBox1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(12, 109);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(380, 155);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.TabStop = false;
+            this.changeLogTextBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.changeLogTextBox.Location = new System.Drawing.Point(12, 138);
+            this.changeLogTextBox.Multiline = true;
+            this.changeLogTextBox.Name = "changeLogTextBox";
+            this.changeLogTextBox.ReadOnly = true;
+            this.changeLogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.changeLogTextBox.Size = new System.Drawing.Size(481, 177);
+            this.changeLogTextBox.TabIndex = 0;
+            this.changeLogTextBox.TabStop = false;
             // 
-            // label1
+            // titleLabel
             // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(12, 7);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(380, 37);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Overwatch Tracker";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.titleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.titleLabel.Location = new System.Drawing.Point(76, 13);
+            this.titleLabel.Name = "titleLabel";
+            this.titleLabel.Size = new System.Drawing.Size(300, 18);
+            this.titleLabel.TabIndex = 1;
+            this.titleLabel.Text = "New Tracker update is available!";
             // 
-            // label2
+            // installedVersionLabel
             // 
-            this.label2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(13, 46);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(379, 17);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "Current Version: ";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.installedVersionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.installedVersionLabel.Location = new System.Drawing.Point(12, 73);
+            this.installedVersionLabel.Name = "installedVersionLabel";
+            this.installedVersionLabel.Size = new System.Drawing.Size(210, 15);
+            this.installedVersionLabel.TabIndex = 0;
+            this.installedVersionLabel.Text = "Installed version: ";
             // 
-            // label3
+            // updateVersionLabel
             // 
-            this.label3.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(12, 66);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(380, 17);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "Newest Version: ";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.updateVersionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.updateVersionLabel.Location = new System.Drawing.Point(12, 91);
+            this.updateVersionLabel.Name = "updateVersionLabel";
+            this.updateVersionLabel.Size = new System.Drawing.Size(210, 15);
+            this.updateVersionLabel.TabIndex = 0;
+            this.updateVersionLabel.Text = "Update version: ";
             // 
-            // label4
+            // changeLogLabel
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(13, 93);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(58, 13);
-            this.label4.TabIndex = 4;
-            this.label4.Text = "Changelog";
+            this.changeLogLabel.AutoSize = true;
+            this.changeLogLabel.Location = new System.Drawing.Point(12, 122);
+            this.changeLogLabel.Name = "changeLogLabel";
+            this.changeLogLabel.Size = new System.Drawing.Size(61, 13);
+            this.changeLogLabel.TabIndex = 4;
+            this.changeLogLabel.Text = "Change log";
             // 
-            // button1
+            // updateButton
             // 
-            this.button1.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.button1.Location = new System.Drawing.Point(12, 270);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(115, 36);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Update";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.updateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.updateButton.Cursor = System.Windows.Forms.Cursors.Default;
+            this.updateButton.Location = new System.Drawing.Point(327, 324);
+            this.updateButton.Name = "updateButton";
+            this.updateButton.Size = new System.Drawing.Size(80, 30);
+            this.updateButton.TabIndex = 2;
+            this.updateButton.Text = "Update";
+            this.updateButton.UseVisualStyleBackColor = true;
+            this.updateButton.Click += new System.EventHandler(this.updateButton_Click);
             // 
-            // button2
+            // cancelButton
             // 
-            this.button2.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.button2.Location = new System.Drawing.Point(277, 270);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(115, 36);
-            this.button2.TabIndex = 3;
-            this.button2.Text = "Exit";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.cancelButton.Cursor = System.Windows.Forms.Cursors.Default;
+            this.cancelButton.Location = new System.Drawing.Point(413, 324);
+            this.cancelButton.Name = "cancelButton";
+            this.cancelButton.Size = new System.Drawing.Size(80, 30);
+            this.cancelButton.TabIndex = 3;
+            this.cancelButton.Text = "Cancel";
+            this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::OverwatchTracker.Properties.Resources.IconDownload;
+            this.pictureBox1.Location = new System.Drawing.Point(12, 13);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(60, 50);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox1.TabIndex = 5;
+            this.pictureBox1.TabStop = false;
+            // 
+            // titleSubLabel
+            // 
+            this.titleSubLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.titleSubLabel.Location = new System.Drawing.Point(79, 34);
+            this.titleSubLabel.Name = "titleSubLabel";
+            this.titleSubLabel.Size = new System.Drawing.Size(300, 15);
+            this.titleSubLabel.TabIndex = 6;
+            this.titleSubLabel.Text = "Overwatch Tracker  v";
             // 
             // UpdateNotificationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(404, 318);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
+            this.ClientSize = new System.Drawing.Size(505, 364);
+            this.Controls.Add(this.titleSubLabel);
+            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.cancelButton);
+            this.Controls.Add(this.updateButton);
+            this.Controls.Add(this.changeLogLabel);
+            this.Controls.Add(this.updateVersionLabel);
+            this.Controls.Add(this.installedVersionLabel);
+            this.Controls.Add(this.titleLabel);
+            this.Controls.Add(this.changeLogTextBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = global::OverwatchTracker.Properties.Resources.Idle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "UpdateNotificationForm";
-            this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Update Available!";
+            this.Text = "Update Available";
             this.TopMost = true;
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.UpdateNotificationForm_FormClosing);
             this.Load += new System.EventHandler(this.UpdateNoficationForm_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -139,12 +163,14 @@
 
         #endregion
 
-        public System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label1;
-        public System.Windows.Forms.Label label2;
-        public System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        public System.Windows.Forms.TextBox changeLogTextBox;
+        private System.Windows.Forms.Label titleLabel;
+        public System.Windows.Forms.Label installedVersionLabel;
+        public System.Windows.Forms.Label updateVersionLabel;
+        private System.Windows.Forms.Label changeLogLabel;
+        private System.Windows.Forms.Button updateButton;
+        private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        public System.Windows.Forms.Label titleSubLabel;
     }
 }

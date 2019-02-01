@@ -55,8 +55,6 @@ namespace OverwatchTracker
                 }
                 return null;
             });
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
             System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
             try
             {
@@ -64,7 +62,9 @@ namespace OverwatchTracker
                 {
                     Vars.isAdmin = new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
                 }
-                if (!Server.NewestVersionV2(firstRun: true)) return;
+                if (!Server.CheckNewestVersion()) return;
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
                 Server.FetchBlizzardAppOffset();
                 Directory.CreateDirectory(Vars.configPath);
                 Vars.settings = new Settings();

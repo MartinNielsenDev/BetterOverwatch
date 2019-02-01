@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Collections.Specialized;
@@ -7,8 +6,8 @@ using System.Net;
 using System.Threading;
 using System.Text;
 using System.Xml;
-using Newtonsoft.Json;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace OverwatchTracker
 {
@@ -17,38 +16,11 @@ namespace OverwatchTracker
         public static Stopwatch autoUpdaterTimer = new Stopwatch();
         public static void AutoUpdater()
         {
-            if (autoUpdaterTimer.ElapsedMilliseconds >= 600000)
+            if (autoUpdaterTimer.ElapsedMilliseconds / 1000 >= 600)
             {
-                NewestVersionV2(firstRun: false);
+                CheckNewestVersion();
                 autoUpdaterTimer.Restart();
             }
-        }
-        public static void OpenUpdate()
-        {
-            string argument = "/C choice /C Y /N /D Y /T 4 & Del /F /Q \"{0}\" & choice /C Y /N /D Y /T 2 & Move /Y \"{1}\" \"{2}\" & Start \"\" /D \"{3}\" \"{4}\" {5}";
-            string tempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"overwatchtracker\overwatchtracker.exe");
-            string currentPath = Application.ExecutablePath;
-
-            ProcessStartInfo Info = new ProcessStartInfo();
-            Info.Arguments = String.Format(argument, currentPath, tempPath, currentPath, Path.GetDirectoryName(currentPath), Path.GetFileName(currentPath), "");
-            Info.WindowStyle = ProcessWindowStyle.Hidden;
-            Info.CreateNoWindow = true;
-            Info.FileName = "cmd.exe";
-            Process.Start(Info);
-            Application.Exit();
-        }
-        public static bool DownloadUpdate(string url)
-        {
-            using (WebClient webClient = new WebClient())
-            {
-                try
-                {
-                    webClient.DownloadFile(url, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"overwatchtracker\overwatchtracker.exe"));
-                    return true;
-                }
-                catch { }
-            }
-            return false;
         }
         public static void FetchBlizzardAppOffset()
         {
@@ -70,7 +42,7 @@ namespace OverwatchTracker
                 }
             }catch { }
         }
-        public static bool NewestVersionV2(bool firstRun)
+        public static bool CheckNewestVersion()
         {
             try
             {
@@ -78,43 +50,30 @@ namespace OverwatchTracker
                 using (WebClient client = new WebClient())
                 {
                     client.Headers.Add("User-Agent", "Mozilla/5.0");
-                    serverResponse = client.DownloadString("https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
+                    serverResponse = client.DownloadString(Vars.gitHubApiUrl);
                 }
                 GitHub.Json json = JsonConvert.DeserializeObject<GitHub.Json>(serverResponse);
 
-                if (json.tag_name.Length == 7 && json.assets.Count > 0)
+                if (json.tag_name.Split('.').Length == 3 && json.assets.Count > 0)
                 {
-                    DateTime serverDate = DateTime.ParseExact(json.tag_name, "yy.MMdd", null);
-                    DateTime thisDate = DateTime.ParseExact(Vars.version, "yy.MMdd", null);
+                    Versioning thisVersion = new Versioning(Vars.version);
+                    Versioning serverVersion = new Versioning(json.tag_name);
 
-                    if ((thisDate - serverDate).TotalSeconds < 0)
+                    if (serverVersion.IsNewerThan(thisVersion))
                     {
                         Functions.DebugMessage("New update required: v" + json.tag_name);
                         UpdateNotificationForm updateForm = new UpdateNotificationForm();
-                        updateForm.label2.Text = "Current Version: " + Vars.version;
-                        updateForm.label3.Text = "Newest Version: " + json.tag_name;
-                        updateForm.textBox1.Text = json.body;
-                        updateForm.urlToDownload = json.assets[0].browser_download_url;
+                        updateForm.installedVersionLabel.Text += Vars.version;
+                        updateForm.updateVersionLabel.Text += json.tag_name;
+                        updateForm.titleSubLabel.Text += json.tag_name;
+                        updateForm.changeLogTextBox.Text = json.body;
+                        updateForm.downloadUrl = json.assets[0].browser_download_url;
+                        updateForm.downloadSize = json.assets[0].size;
                         Application.Run(updateForm);
                         return false;
                     }
                 }
-                else
-                {
-                    if (firstRun)
-                    {
-                        MessageBox.Show("Failed to fetch update information through https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest\r\n\r\nPlease manually update if there are any issues", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
-            catch
-            {
-                if (firstRun)
-                {
-                    Functions.DebugMessage("error while validating version");
-                    MessageBox.Show("Error while validating version", "Overwatch Tracker v" + Vars.version, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+            } catch { }
             return true;
         }
         public static void UploadGame(string gameData)
@@ -215,6 +174,46 @@ namespace OverwatchTracker
         {
             [JsonProperty("browser_download_url")]
             public string browser_download_url { get; set; }
+            [JsonProperty("size")]
+            public int size { get; set; }
+        }
+    }
+    class Versioning {
+        public int major = 0;
+        public int minor = 0;
+        public int patch = 0;
+
+        public Versioning(string rawVersion)
+        {
+            string[] versions = rawVersion.Split('.');
+
+            if(versions.Length == 3)
+            {
+                int.TryParse(versions[0], out this.major);
+                int.TryParse(versions[1], out this.minor);
+                int.TryParse(versions[2], out this.patch);
+            }
+        }
+        public bool IsNewerThan(Versioning version)
+        {
+            Console.WriteLine($"{this.major}.{this.minor}.{this.patch}");
+            if (this.major > version.major)
+            {
+                return true;
+            }
+            else if (this.major == version.major)
+            {
+                if (this.minor > version.minor)
+                {
+                    return true;
+                }
+                else if(this.minor == version.minor && this.patch > version.patch)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

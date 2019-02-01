@@ -9,7 +9,7 @@ namespace OverwatchTracker
     {
         public static SoundPlayer audio = new SoundPlayer(Properties.Resources.success);
         public const int matrix = 10;
-        public static string version = "19.0122";
+        public static string version = "1.0.0";
         public static bool isAdmin = false;
         public static int blizzardAppOffset = 0;
         public static string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "overwatchtracker");
@@ -17,6 +17,7 @@ namespace OverwatchTracker
         public static Settings settings;
         public static bool overwatchRunning = false;
         public static string host = "http://owtracker.info";
+        public static string gitHubApiUrl = "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest";
         public static string[] maps = { "Hanamura", "Horizon Lunar Colony", "Temple of Anubis", "Volskaya Industries", "Blizzard World", "Eichenwalde", "Hollywood", "King's Row", "Numbani", "Ilios", "Lijiang Tower", "Nepal", "Oasis", "Dorado", "Junkertown", "Route 66", "Watchpoint Gibraltar", "Rialto" };
         public static string[] heroNames = { "DOOMFIST", "GENJI", "MCCREE", "PHARAH", "REAPER", "SOLDIERis", "SOMBRA", "TRACER", "BABTION", "HANZO", "JUNKRAT", "MEI", "TORBJORN", "WIDOWMAKER", "DVA", "ORISA", "REINHARDT", "ROGDHOG", "WINSTON", "ZARYA", "ANA", "ARIGITTE", "LUCIO", "MERCY", "MDIRA", "SYMMETRR", "ZENYATTA", "WNECKINGBAL", "AGNE" };
         public static string[] heroNamesReal = { "Doomfist", "Genji", "McCree", "Pharah", "Reaper", "Soldier: 76", "Sombra", "Tracer", "Bastion", "Hanzo", "Junkrat", "Mei", "Torbjörn", "Widowmaker", "D.va", "Orisa", "Reinhardt", "Roadhog", "Winston", "Zarya", "Ana", "Brigitte", "Lúcio", "Mercy", "Moira", "Symmetra", "Zenyatta", "Wrecking Ball", "Ashe" };
