@@ -86,7 +86,7 @@ namespace OverwatchTracker
                     {
                         break;
                     }
-                    Thread.Sleep(1);
+                    Thread.Sleep(500);
                 }
             });
             Program.uploaderThread.Start();

@@ -159,7 +159,7 @@ namespace OverwatchTracker
                             try
                             {
                                 Protocols.CheckMainMenu(frame.DesktopImage);
-
+ 
                                 if (Vars.gameData.gameState != Vars.STATUS_INGAME)
                                 {
                                     string quickPlayText = Functions.BitmapToText(frame.DesktopImage, 476, 644, 80, 40, contrastFirst: false, radius: 140, network: 0, invertColors: true);

@@ -158,7 +158,7 @@ namespace OverwatchTracker
                         Vars.gameData.map = mapText;
                         Program.contextMenu.currentGame.MenuItems[2].Text = "Map: " + mapText;
                         Functions.DebugMessage("Recognized map: '" + mapText + "'");
-                        if (mapText.Equals("Ilios") || mapText.Equals("Lijiang Tower") || mapText.Equals("Nepal") | mapText.Equals("Oasis")) // checks if the map is KOTH
+                        if (mapText.Equals("Ilios") || mapText.Equals("Lijiang Tower") || mapText.Equals("Nepal") || mapText.Equals("Oasis") || mapText.Equals("Busan")) // checks if the map is KOTH
                         {
                             Vars.gameData.iskoth = true;
                         }
