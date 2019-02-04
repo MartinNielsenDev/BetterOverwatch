@@ -1,4 +1,4 @@
-﻿namespace OverwatchTracker
+﻿namespace BetterOverwatch
 {
     partial class AdminPromptForm
     {
@@ -43,7 +43,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(298, 46);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Overwatch Tracker requires administrator privileges to automatically detect your " +
+            this.label1.Text = "Better Overwatch requires administrator privileges to automatically detect your " +
     "battletag";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 

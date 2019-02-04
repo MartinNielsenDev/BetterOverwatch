@@ -7,7 +7,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace OverwatchTracker
+namespace BetterOverwatch
 {
     public partial class UpdateNotificationForm : Form
     {
@@ -19,12 +19,12 @@ namespace OverwatchTracker
         {
             InitializeComponent();
         }
-        private void UpdateNoficationForm_Load(object sender, EventArgs e)
+        private void UpdateNotificationForm_Shown(object sender, EventArgs e)
         {
-            updateButton.Focus();
             this.Deactivate += (s, a) => WindowFlasher.FlashWindowEx(this.Handle, WindowFlasher.FLASHW_TRAY);
             this.Activated += (s, a) => WindowFlasher.FlashWindowEx(this.Handle, WindowFlasher.FLASHW_STOP);
             SystemSounds.Asterisk.Play();
+            updateButton.Focus();
         }
         private void updateButton_Click(object sender, EventArgs e)
         {

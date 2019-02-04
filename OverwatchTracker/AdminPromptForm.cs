@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace OverwatchTracker
+namespace BetterOverwatch
 {
     public partial class AdminPromptForm : Form
     {

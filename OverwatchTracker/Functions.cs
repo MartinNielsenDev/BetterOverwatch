@@ -11,7 +11,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using AForge.Imaging.Filters;
 
-namespace OverwatchTracker
+namespace BetterOverwatch
 {
     class Functions
     {
@@ -534,7 +534,7 @@ namespace OverwatchTracker
         }
         public static string FetchLetterFromImage(OCRNetwork network, Bitmap image, int networkId)
         {
-            double[] input = OCRNetwork.CharToDoubleArray(image, Vars.matrix);
+            double[] input = OCRNetwork.CharToDoubleArray(image, OCRNetworkData.matrix);
 
             for (int i = 0; i < network.InputNodesCount; i++)
             {
@@ -563,23 +563,23 @@ namespace OverwatchTracker
                 {
                     if (network == 0)
                     {
-                        text += FetchLetterFromImage(Vars.mapsNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(OCRNetworkData.mapsNeuralNetwork, bitmaps[i], network);
                     }
                     else if (network == 1)
                     {
-                        text += FetchLetterFromImage(Vars.digitsNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(OCRNetworkData.digitsNeuralNetwork, bitmaps[i], network);
                     }
                     else if (network == 2)
                     {
-                        text += FetchLetterFromImage(Vars.mainMenuNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(OCRNetworkData.mainMenuNeuralNetwork, bitmaps[i], network);
                     }
                     else if (network == 3) // stats
                     {
-                        text += FetchLetterFromImage(Vars.blizzardNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(OCRNetworkData.blizzardNeuralNetwork, bitmaps[i], network);
                     }
                     else if (network == 4) // hero names
                     {
-                        text += FetchLetterFromImage(Vars.heroNamesNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(OCRNetworkData.heroNamesNeuralNetwork, bitmaps[i], network);
                     }
                     bitmaps[i].Dispose();
                 }

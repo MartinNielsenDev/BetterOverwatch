@@ -3,7 +3,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-namespace OverwatchTracker
+namespace BetterOverwatch
 {
     class Memory
     {

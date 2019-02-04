@@ -2,7 +2,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace OverwatchTracker
+namespace BetterOverwatch
 {
     class Settings
     {
@@ -25,11 +25,7 @@ namespace OverwatchTracker
 
         public static void Load()
         {
-            Vars.mapsNeuralNetwork.LoadFromArray(Vars.mapsNeuralNetworkData);
-            Vars.digitsNeuralNetwork.LoadFromArray(Vars.digitsNeuralNetworkData);
-            Vars.mainMenuNeuralNetwork.LoadFromArray(Vars.mainMenuNeuralNetworkData);
-            Vars.blizzardNeuralNetwork.LoadFromArray(Vars.blizzardNeuralNetworkData);
-            Vars.heroNamesNeuralNetwork.LoadFromArray(Vars.heroNamesNeuralNetworkData);
+            OCRNetworkData.LoadOCRNetworkData();
             Functions.SetVolume(10);
 
             try

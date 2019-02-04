@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-namespace OverwatchTracker
+namespace BetterOverwatch
 {
     class Protocols
     {
@@ -47,6 +47,7 @@ namespace OverwatchTracker
                         Vars.gameTimer.Stop();
                         Vars.srCheck[0] = "";
                         Vars.srCheck[1] = "";
+                        Vars.srCheckIndex = 0;
                         Vars.gameData.currentSkillRating = srText;
 
                         if (Vars.gameData.gameState >= 2)
@@ -95,7 +96,15 @@ namespace OverwatchTracker
                                         Vars.gameTimer.ElapsedMilliseconds - Functions.GetTimeDeduction() > 30000 &&
                                         Functions.CheckStats(elimsText, damageText, objKillsText, healingText, deathsText, Vars.gameTimer.ElapsedMilliseconds - Functions.GetTimeDeduction()))
                                     {
-                                        Vars.gameData.statsRecorded.Add(new StatsData(elimsText, damageText, objKillsText, healingText, deathsText, Vars.gameTimer.ElapsedMilliseconds - Functions.GetTimeDeduction()));
+                                        Vars.gameData.statsRecorded.Add(
+                                            new StatsData(
+                                                elimsText, 
+                                                damageText, 
+                                                objKillsText, 
+                                                healingText, 
+                                                deathsText, 
+                                                Vars.gameTimer.ElapsedMilliseconds - Functions.GetTimeDeduction()
+                                                ));
 
                                         Vars.statsTimer.Restart();
                                         Vars.statsCheck[0] = "";

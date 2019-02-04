@@ -1,4 +1,4 @@
-﻿namespace OverwatchTracker
+﻿namespace BetterOverwatch
 {
     partial class UpdateNotificationForm
     {
@@ -82,7 +82,7 @@
             // changeLogLabel
             // 
             this.changeLogLabel.AutoSize = true;
-            this.changeLogLabel.Location = new System.Drawing.Point(12, 122);
+            this.changeLogLabel.Location = new System.Drawing.Point(12, 120);
             this.changeLogLabel.Name = "changeLogLabel";
             this.changeLogLabel.Size = new System.Drawing.Size(61, 13);
             this.changeLogLabel.TabIndex = 4;
@@ -95,7 +95,7 @@
             this.updateButton.Location = new System.Drawing.Point(327, 324);
             this.updateButton.Name = "updateButton";
             this.updateButton.Size = new System.Drawing.Size(80, 30);
-            this.updateButton.TabIndex = 1;
+            this.updateButton.TabIndex = 0;
             this.updateButton.Text = "Update";
             this.updateButton.UseVisualStyleBackColor = true;
             this.updateButton.Click += new System.EventHandler(this.updateButton_Click);
@@ -107,14 +107,14 @@
             this.cancelButton.Location = new System.Drawing.Point(413, 324);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(80, 30);
-            this.cancelButton.TabIndex = 2;
+            this.cancelButton.TabIndex = 1;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Image = global::OverwatchTracker.Properties.Resources.IconDownload;
+            this.pictureBox1.Image = global::BetterOverwatch.Properties.Resources.IconDownload;
             this.pictureBox1.Location = new System.Drawing.Point(12, 13);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(60, 50);
@@ -129,7 +129,7 @@
             this.titleSubLabel.Name = "titleSubLabel";
             this.titleSubLabel.Size = new System.Drawing.Size(300, 15);
             this.titleSubLabel.TabIndex = 6;
-            this.titleSubLabel.Text = "Overwatch Tracker  v";
+            this.titleSubLabel.Text = "Better Overwatch  v";
             // 
             // UpdateNotificationForm
             // 
@@ -146,7 +146,7 @@
             this.Controls.Add(this.titleLabel);
             this.Controls.Add(this.changeLogTextBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Icon = global::OverwatchTracker.Properties.Resources.Idle;
+            this.Icon = global::BetterOverwatch.Properties.Resources.Idle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "UpdateNotificationForm";
@@ -154,7 +154,7 @@
             this.Text = "Update Available";
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.UpdateNotificationForm_FormClosing);
-            this.Load += new System.EventHandler(this.UpdateNoficationForm_Load);
+            this.Shown += new System.EventHandler(this.UpdateNotificationForm_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

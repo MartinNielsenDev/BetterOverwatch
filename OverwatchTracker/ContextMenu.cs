@@ -4,7 +4,7 @@ using System.Diagnostics;
 using Microsoft.Win32;
 using System.IO;
 
-namespace OverwatchTracker
+namespace BetterOverwatch
 {
     public class ContextMenu : Form
     {
@@ -29,7 +29,7 @@ namespace OverwatchTracker
                 debugTools.MenuItems.Add("Open logs", OpenLogs);
                 debugTools.MenuItems.Add(currentGame);
                 
-                trayMenu.MenuItems.Add("Overwatch Tracker v" + Vars.version);
+                trayMenu.MenuItems.Add("Better Overwatch v" + Vars.initalize.Version);
                 trayMenu.MenuItems.Add("Login", OpenMatchHistory);
                 trayMenu.MenuItems.Add("-");
                 trayMenu.MenuItems.Add("Upload screenshot of player list", ToggleUpload);
@@ -154,12 +154,12 @@ namespace OverwatchTracker
             if (Vars.settings.publicToken.Equals(String.Empty))
             {
                 // no publicToken fetched, popup browser so user can create one
-                Process.Start(Vars.host + "/new-account/?privateToken=" + Vars.settings.privateToken);
+                Process.Start(Vars.initalize.Host + "/new-account/?privateToken=" + Vars.settings.privateToken);
             }
             else
             {
                 // publicToken successfully fetched, login instead with their privateToken
-                Process.Start(Vars.host + "/" + Vars.settings.publicToken + "?login=" + Vars.settings.privateToken);
+                Process.Start(Vars.initalize.Host + "/" + Vars.settings.publicToken + "?login=" + Vars.settings.privateToken);
             }
         }
         protected override void Dispose(bool isDisposing)

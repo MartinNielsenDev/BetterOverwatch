@@ -9,8 +9,33 @@ using System.Xml;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace OverwatchTracker
+namespace BetterOverwatch
 {
+    class Initalize
+    {
+        private string version = "";
+        private string host = "";
+        private string gitHubHost = "";
+
+        public Initalize(string version, string host, string gitHubHost)
+        {
+            this.version = version;
+            this.host = host;
+            this.gitHubHost = gitHubHost;
+        }
+        public string Version
+        {
+            get { return version; }
+        }
+        public string Host
+        {
+            get { return host; }
+        }
+        public string GitHubHost
+        {
+            get { return gitHubHost; }
+        }
+    }
     class Server
     {
         public static Stopwatch autoUpdaterTimer = new Stopwatch();
@@ -29,7 +54,7 @@ namespace OverwatchTracker
                 string serverResponse;
                 using (var client = new WebClient())
                 {
-                    serverResponse = client.DownloadString(Vars.host + "/api/version.xml");
+                    serverResponse = client.DownloadString("http://api." + Vars.initalize.Host + "/version.xml");
                 }
                 XmlDocument xmlTest = new XmlDocument();
                 xmlTest.LoadXml(serverResponse);
@@ -39,7 +64,8 @@ namespace OverwatchTracker
                 {
                     Vars.blizzardAppOffset = Convert.ToInt32(xmlNode.SelectSingleNode("blizzardapp").InnerText, 16);
                 }
-            }catch { }
+            }
+            catch { }
         }
         public static bool CheckNewestVersion()
         {
@@ -49,20 +75,20 @@ namespace OverwatchTracker
                 using (WebClient client = new WebClient())
                 {
                     client.Headers.Add("User-Agent", "Mozilla/5.0");
-                    serverResponse = client.DownloadString(Vars.gitHubApiUrl);
+                    serverResponse = client.DownloadString(Vars.initalize.GitHubHost);
                 }
                 GitHub.Json json = JsonConvert.DeserializeObject<GitHub.Json>(serverResponse);
 
                 if (json.tag_name.Split('.').Length == 3 && json.assets.Count > 0)
                 {
-                    Versioning thisVersion = new Versioning(Vars.version);
+                    Versioning thisVersion = new Versioning(Vars.initalize.Version);
                     Versioning serverVersion = new Versioning(json.tag_name);
 
                     if (serverVersion.IsNewerThan(thisVersion))
                     {
                         Functions.DebugMessage("New update required: v" + json.tag_name);
                         UpdateNotificationForm updateForm = new UpdateNotificationForm();
-                        updateForm.installedVersionLabel.Text += Vars.version;
+                        updateForm.installedVersionLabel.Text += Vars.initalize.Version;
                         updateForm.updateVersionLabel.Text += json.tag_name;
                         updateForm.titleSubLabel.Text += json.tag_name;
                         updateForm.changeLogTextBox.Text = json.body;
@@ -72,13 +98,14 @@ namespace OverwatchTracker
                         return false;
                     }
                 }
-            } catch { }
+            }
+            catch { }
             return true;
         }
         public static void UploadGame(string gameData)
         {
             Functions.DebugMessage("Uploading GameData...");
-            Program.uploaderThread = new Thread(() =>
+            new Thread(() =>
             {
                 for (int i = 1; i <= 10; i++)
                 {
@@ -88,8 +115,7 @@ namespace OverwatchTracker
                     }
                     Thread.Sleep(500);
                 }
-            });
-            Program.uploaderThread.Start();
+            }).Start();
         }
         public static bool GameUploader(string gameData)
         {
@@ -97,7 +123,7 @@ namespace OverwatchTracker
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues(Vars.host + "/api/v2/upload-game/", new NameValueCollection()
+                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/v2/upload-game/", new NameValueCollection()
                     {
                         { "gameData", gameData }
                     });
@@ -123,7 +149,7 @@ namespace OverwatchTracker
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues(Vars.host + "/api/v2/fetch-token/", new NameValueCollection()
+                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/v2/fetch-token/", new NameValueCollection()
                     {
                         { "privateToken", Vars.settings.privateToken },
                         { "publicToken", Vars.gameData.battletag }
@@ -139,7 +165,7 @@ namespace OverwatchTracker
                     else
                     {
                         Functions.DebugMessage("Failed to fetch tokens, message: " + result.message);
-                        MessageBox.Show("Failed to fetch tokens, message: " + result.message, "Overwatch Tracker error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Failed to fetch tokens, message: " + result.message, "Better Overwatch error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -177,7 +203,8 @@ namespace OverwatchTracker
             public int size { get; set; }
         }
     }
-    class Versioning {
+    class Versioning
+    {
         public int major = 0;
         public int minor = 0;
         public int patch = 0;
@@ -186,7 +213,7 @@ namespace OverwatchTracker
         {
             string[] versions = rawVersion.Split('.');
 
-            if(versions.Length == 3)
+            if (versions.Length == 3)
             {
                 int.TryParse(versions[0], out this.major);
                 int.TryParse(versions[1], out this.minor);
@@ -205,7 +232,7 @@ namespace OverwatchTracker
                 {
                     return true;
                 }
-                else if(this.minor == version.minor && this.patch > version.patch)
+                else if (this.minor == version.minor && this.patch > version.patch)
                 {
                     return true;
                 }

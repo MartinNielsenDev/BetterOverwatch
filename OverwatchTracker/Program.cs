@@ -8,7 +8,7 @@ using System.Security.Principal;
 using System.Runtime.InteropServices;
 using DesktopDuplication;
 
-namespace OverwatchTracker
+namespace BetterOverwatch
 {
     class Program
     {
@@ -18,40 +18,43 @@ namespace OverwatchTracker
         public static extern short GetAsyncKeyState(int vKey);
         public static ContextMenu contextMenu;
         private static AdminPromptForm adminPromptForm;
-        public static Thread uploaderThread;
-        private static Mutex mutex = new Mutex(true, "74bf6260-c133-4d69-ad9c-efc607887c97");
         private static DesktopDuplicator desktopDuplicator;
+        private static Mutex mutex = new Mutex(true, "74bf6260-c133-4d69-ad9c-efc607887c97");
         [STAThread]
         static void Main()
         {
-            Functions.DebugMessage("Starting Overwatch Tracker version " + Vars.version);
+            Vars.initalize = new Initalize(
+                version: "1.0.3",
+                host: "betteroverwatch.com",
+                gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
+            Functions.DebugMessage("Starting Better Overwatch version " + Vars.initalize.Version);
 
             if (!mutex.WaitOne(TimeSpan.Zero, true))
             {
-                Functions.DebugMessage("Overwatch Tracker is already running...");
+                Functions.DebugMessage("Better Overwatch is already running...");
                 return;
             }
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler((s, assembly) =>
             {
                 if (assembly.Name.Contains("Newtonsoft.Json,"))
                 {
-                    return LoadAssembly("OverwatchTracker.dlls.Newtonsoft.Json.dll");
+                    return LoadAssembly("BetterOverwatch.dlls.Newtonsoft.Json.dll");
                 }
                 if (assembly.Name.Contains("AForge.Imaging,"))
                 {
-                    return LoadAssembly("OverwatchTracker.dlls.AForge.Imaging.dll");
+                    return LoadAssembly("BetterOverwatch.dlls.AForge.Imaging.dll");
                 }
                 if (assembly.Name.Contains("SharpDX.Direct3D11,"))
                 {
-                    return LoadAssembly("OverwatchTracker.dlls.SharpDX.Direct3D11.dll");
+                    return LoadAssembly("BetterOverwatch.dlls.SharpDX.Direct3D11.dll");
                 }
                 if (assembly.Name.Contains("SharpDX.DXGI,"))
                 {
-                    return LoadAssembly("OverwatchTracker.dlls.SharpDX.DXGI.dll");
+                    return LoadAssembly("BetterOverwatch.dlls.SharpDX.DXGI.dll");
                 }
                 if (assembly.Name.Contains("SharpDX,"))
                 {
-                    return LoadAssembly("OverwatchTracker.dlls.SharpDX.dll");
+                    return LoadAssembly("BetterOverwatch.dlls.SharpDX.dll");
                 }
                 return null;
             });
@@ -63,6 +66,7 @@ namespace OverwatchTracker
                     Vars.isAdmin = new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
                 }
                 if (!Server.CheckNewestVersion()) return;
+
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Server.FetchBlizzardAppOffset();
@@ -76,13 +80,9 @@ namespace OverwatchTracker
 
                 if (!Settings.VerifyUser()) return;
 
-                Thread captureDesktopThread = new Thread(CaptureDesktop)
-                {
-                    IsBackground = true
-                };
-                captureDesktopThread.Start();
+                new Thread(CaptureDesktop) { IsBackground = true }.Start();
                 Server.autoUpdaterTimer.Start();
-                Functions.DebugMessage("> Success - Overwatch Tracker started without fail");
+                Functions.DebugMessage("> Success - Better Overwatch started without fail");
             }
             catch (Exception e)
             {
