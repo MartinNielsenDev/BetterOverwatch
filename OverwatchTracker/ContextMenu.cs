@@ -154,12 +154,12 @@ namespace BetterOverwatch
             if (Vars.settings.publicToken.Equals(String.Empty))
             {
                 // no publicToken fetched, popup browser so user can create one
-                Process.Start(Vars.initalize.Host + "/new-account/?privateToken=" + Vars.settings.privateToken);
+                Process.Start("http://" + Vars.initalize.Host + "/new-account/?privateToken=" + Vars.settings.privateToken);
             }
             else
             {
                 // publicToken successfully fetched, login instead with their privateToken
-                Process.Start(Vars.initalize.Host + "/" + Vars.settings.publicToken + "?login=" + Vars.settings.privateToken);
+                Process.Start("http://" + Vars.initalize.Host + "/" + Vars.settings.publicToken + "?login=" + Vars.settings.privateToken);
             }
         }
         protected override void Dispose(bool isDisposing)
