@@ -16,7 +16,7 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
+    <PublishUrl>publish</PublishUrl>
     <Install>false</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -27,8 +27,9 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationVersion>1.0.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <!--->targetplatformversion>10.0</targetplatformversion-->
   </PropertyGroup>
@@ -87,40 +88,14 @@
     <TargetZone>LocalIntranet</TargetZone>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateManifests>false</GenerateManifests>
+    <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <DelaySign>false</DelaySign>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="AForge.Imaging">
-      <HintPath>dlls\AForge.Imaging.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>dlls\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>dlls\SharpDX.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="SharpDX.Direct3D11">
-      <HintPath>dlls\SharpDX.Direct3D11.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.DXGI">
-      <HintPath>dlls\SharpDX.DXGI.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
+  <PropertyGroup>
+    <StartupObject>BetterOverwatch.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="AdminPromptForm.cs">
       <SubType>Form</SubType>
@@ -196,17 +171,17 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="dlls\AForge.Imaging.dll" />
-    <EmbeddedResource Include="dlls\SharpDX.Direct3D11.dll" />
-    <EmbeddedResource Include="dlls\SharpDX.dll" />
-    <EmbeddedResource Include="dlls\SharpDX.DXGI.dll" />
+    <EmbeddedResource Include="Resources\AForge.Imaging.dll" />
+    <EmbeddedResource Include="Resources\SharpDX.Direct3D11.dll" />
+    <EmbeddedResource Include="Resources\SharpDX.dll" />
+    <EmbeddedResource Include="Resources\SharpDX.DXGI.dll" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\IconActive.ico" />
     <None Include="Resources\IconRecord.ico" />
     <None Include="Resources\IconVisitMenu.ico" />
     <None Include="Resources\Idle.ico" />
-    <EmbeddedResource Include="dlls\Newtonsoft.Json.dll" />
+    <EmbeddedResource Include="Resources\Newtonsoft.Json.dll" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\success.wav" />
@@ -220,6 +195,34 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\IconDownload.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\System.dll" />
+    <EmbeddedResource Include="Resources\System.Drawing.dll" />
+    <EmbeddedResource Include="Resources\System.Windows.Forms.dll" />
+    <EmbeddedResource Include="Resources\System.Xml.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="AForge.Imaging">
+      <HintPath>Resources\AForge.Imaging.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Resources\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX">
+      <HintPath>Resources\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>Resources\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI">
+      <HintPath>Resources\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

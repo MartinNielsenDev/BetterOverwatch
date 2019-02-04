@@ -56,9 +56,9 @@ namespace BetterOverwatch
                 {
                     serverResponse = client.DownloadString("http://api." + Vars.initalize.Host + "/version.xml");
                 }
-                XmlDocument xmlTest = new XmlDocument();
-                xmlTest.LoadXml(serverResponse);
-                XmlNodeList xmlNodeList = xmlTest.SelectNodes("update");
+                XmlDocument xmlDocument = new XmlDocument();
+                xmlDocument.LoadXml(serverResponse);
+                XmlNodeList xmlNodeList = xmlDocument.SelectNodes("update");
 
                 foreach (XmlNode xmlNode in xmlNodeList)
                 {

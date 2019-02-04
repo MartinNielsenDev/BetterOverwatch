@@ -24,7 +24,7 @@ namespace BetterOverwatch
         static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.0.3",
+                version: "1.0.4",
                 host: "betteroverwatch.com",
                 gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
             Functions.DebugMessage("Starting Better Overwatch version " + Vars.initalize.Version);
@@ -38,23 +38,39 @@ namespace BetterOverwatch
             {
                 if (assembly.Name.Contains("Newtonsoft.Json,"))
                 {
-                    return LoadAssembly("BetterOverwatch.dlls.Newtonsoft.Json.dll");
+                    return LoadAssembly("BetterOverwatch.Resources.Newtonsoft.Json.dll");
                 }
                 if (assembly.Name.Contains("AForge.Imaging,"))
                 {
-                    return LoadAssembly("BetterOverwatch.dlls.AForge.Imaging.dll");
+                    return LoadAssembly("BetterOverwatch.Resources.AForge.Imaging.dll");
                 }
                 if (assembly.Name.Contains("SharpDX.Direct3D11,"))
                 {
-                    return LoadAssembly("BetterOverwatch.dlls.SharpDX.Direct3D11.dll");
+                    return LoadAssembly("BetterOverwatch.Resources.SharpDX.Direct3D11.dll");
                 }
                 if (assembly.Name.Contains("SharpDX.DXGI,"))
                 {
-                    return LoadAssembly("BetterOverwatch.dlls.SharpDX.DXGI.dll");
+                    return LoadAssembly("BetterOverwatch.Resources.SharpDX.DXGI.dll");
                 }
                 if (assembly.Name.Contains("SharpDX,"))
                 {
-                    return LoadAssembly("BetterOverwatch.dlls.SharpDX.dll");
+                    return LoadAssembly("BetterOverwatch.Resources.SharpDX.dll");
+                }
+                if (assembly.Name.Contains("System,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.System.dll");
+                }
+                if (assembly.Name.Contains("System.Drawing,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.System.Drawing.dll");
+                }
+                if (assembly.Name.Contains("System.Windows.Forms,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.System.Windows.Forms.dll");
+                }
+                if (assembly.Name.Contains("System.Xml,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.System.Xml.dll");
                 }
                 return null;
             });
