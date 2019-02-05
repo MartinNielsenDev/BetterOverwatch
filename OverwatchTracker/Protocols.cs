@@ -38,7 +38,7 @@ namespace BetterOverwatch
                     }
                     if (Vars.srCheck[0].Equals(srText) && Vars.srCheck[1].Equals(srText))
                     {
-                        if (!Vars.gameData.currentSkillRating.Equals(srText) || Vars.gameData.gameState >= Vars.STATUS_FINISHED)
+                        if (!Vars.gameData.currentRating.Equals(srText) || Vars.gameData.gameState >= Vars.STATUS_FINISHED)
                         {
                             Functions.PlaySound();
                             Program.contextMenu.currentGame.MenuItems[1].Text = "Skill rating: " + srText;
@@ -48,7 +48,7 @@ namespace BetterOverwatch
                         Vars.srCheck[0] = "";
                         Vars.srCheck[1] = "";
                         Vars.srCheckIndex = 0;
-                        Vars.gameData.currentSkillRating = srText;
+                        Vars.gameData.currentRating = srText;
 
                         if (Vars.gameData.gameState >= 2)
                         {
@@ -141,12 +141,12 @@ namespace BetterOverwatch
                     if (Vars.gameData.gameState == Vars.STATUS_FINISHED || Vars.gameData.gameState == Vars.STATUS_WAITFORUPLOAD) // a game finished
                     {
                         Server.UploadGame(Vars.gameData.GetData());
-                        Vars.gameData = new GameData(Vars.gameData.currentSkillRating);
+                        Vars.gameData = new GameData(Vars.gameData.currentRating);
                         ResetGame();
                     }
                     Vars.getInfoTimeout.Restart();
                     Vars.gameData.gameState = Vars.STATUS_INGAME;
-                    Vars.gameData.startsr = Vars.gameData.currentSkillRating;
+                    Vars.gameData.startRating = Vars.gameData.currentRating;
 
                     Functions.DebugMessage("Recognized competitive game");
                 }
@@ -154,7 +154,7 @@ namespace BetterOverwatch
         }
         public static void CheckMap(Bitmap frame)
         {
-            if (Vars.gameData.map.Equals(String.Empty))
+            if (Vars.gameData.mapInfo.Equals(String.Empty))
             {
                 string mapText = Functions.BitmapToText(frame, 915, 945, 780, 85);
 
@@ -164,16 +164,16 @@ namespace BetterOverwatch
 
                     if (!mapText.Equals(String.Empty))
                     {
-                        Vars.gameData.map = mapText;
+                        Vars.gameData.mapInfo.mapName = mapText;
                         Program.contextMenu.currentGame.MenuItems[2].Text = "Map: " + mapText;
                         Functions.DebugMessage("Recognized map: '" + mapText + "'");
                         if (mapText.Equals("Ilios") || mapText.Equals("Lijiang Tower") || mapText.Equals("Nepal") || mapText.Equals("Oasis") || mapText.Equals("Busan")) // checks if the map is KOTH
                         {
-                            Vars.gameData.iskoth = true;
+                            Vars.gameData.mapInfo.isKoth = true;
                         }
                         else
                         {
-                            Vars.gameData.iskoth = false;
+                            Vars.gameData.mapInfo.isKoth = false;
                         }
                         Vars.roundTimer.Restart();
                         Vars.gameTimer.Restart();
@@ -184,7 +184,7 @@ namespace BetterOverwatch
         }
         public static void CheckTeamsSkillRating(Bitmap frame)
         {
-            if (Vars.gameData.team1sr.Equals(String.Empty))
+            if (Vars.gameData.team1Rating.Equals(String.Empty))
             {
                 string team1SR = Functions.BitmapToText(frame, 545, 220, 245, 70, contrastFirst: false, radius: 90, network: 1);
                 team1SR = Regex.Match(team1SR, "[0-9]+").ToString();
@@ -199,7 +199,7 @@ namespace BetterOverwatch
                         {
                             Vars.team1Check[0] = "";
                             Vars.team1Check[1] = "";
-                            Vars.gameData.team1sr = team1SR;
+                            Vars.gameData.team1Rating = team1SR;
                             Functions.DebugMessage("Recognized team 1 SR: '" + team1SR + "'");
                         }
                         else
@@ -214,7 +214,7 @@ namespace BetterOverwatch
                     }
                 }
             }
-            if (Vars.gameData.team2sr.Equals(String.Empty))
+            if (Vars.gameData.team2Rating.Equals(String.Empty))
             {
                 string team2SR = Functions.BitmapToText(frame, 1135, 220, 245, 70, contrastFirst: false, radius: 90, network: 1);
                 team2SR = Regex.Match(team2SR, "[0-9]+").ToString();
@@ -230,7 +230,7 @@ namespace BetterOverwatch
                         {
                             Vars.team2Check[0] = "";
                             Vars.team2Check[1] = "";
-                            Vars.gameData.team2sr = team2SR;
+                            Vars.gameData.team2Rating = team2SR;
                             Functions.DebugMessage("Recognized team 2 SR: '" + team2SR + "'");
                         }
                         else
@@ -245,17 +245,17 @@ namespace BetterOverwatch
                     }
                 }
             }
-            if (!Vars.gameData.team1sr.Equals(String.Empty) && !Vars.gameData.team1sr.Equals(String.Empty))
+            if (!Vars.gameData.team1Rating.Equals(String.Empty) && !Vars.gameData.team1Rating.Equals(String.Empty))
             {
-                Program.contextMenu.currentGame.MenuItems[3].Text = "Team ratings: " + Vars.gameData.team1sr + " | " + Vars.gameData.team2sr;
+                Program.contextMenu.currentGame.MenuItems[3].Text = "Team ratings: " + Vars.gameData.team1Rating + " | " + Vars.gameData.team2Rating;
             }
-            else if (!Vars.gameData.team1sr.Equals(String.Empty))
+            else if (!Vars.gameData.team1Rating.Equals(String.Empty))
             {
-                Program.contextMenu.currentGame.MenuItems[3].Text = "Team ratings: " + Vars.gameData.team1sr + " | -";
+                Program.contextMenu.currentGame.MenuItems[3].Text = "Team ratings: " + Vars.gameData.team1Rating + " | -";
             }
-            else if (!Vars.gameData.team2sr.Equals(String.Empty))
+            else if (!Vars.gameData.team2Rating.Equals(String.Empty))
             {
-                Program.contextMenu.currentGame.MenuItems[3].Text = "Team ratings: - | " + Vars.gameData.team2sr;
+                Program.contextMenu.currentGame.MenuItems[3].Text = "Team ratings: - | " + Vars.gameData.team2Rating;
             }
         }
         public static void CheckMainMenu(Bitmap frame)
@@ -278,9 +278,9 @@ namespace BetterOverwatch
                     Vars.gameTimer.Stop();
                     Vars.heroTimer.Stop();
 
-                    for (int i = 0; i < Vars.gameData.heroesPlayed.Count; i++)
+                    for (int i = 0; i < Vars.gameData.heroPlayed.Count; i++)
                     {
-                        Vars.gameData.heroesTimePlayed[i].Stop();
+                        Vars.gameData.heroTimePlayed[i].Stop();
                     }
                 }
             }
@@ -292,48 +292,48 @@ namespace BetterOverwatch
 
             if (!heroText.Equals(String.Empty))
             {
-                for (int i = 0; i < Vars.heroNames.Length; i++)
+                for (int h = 0; h < Vars.heroNames.Length; h++)
                 {
                     if (heroText.Equals("UVR") || heroText.Equals("OVR")) { heroText = "DVA"; }
-                    double accuracy = Functions.CompareStrings(heroText, Vars.heroNames[i]);
+                    double accuracy = Functions.CompareStrings(heroText, Vars.heroNames[h]);
 
                     if (accuracy >= 70)
                     {
                         heroDetected = true;
-                        if (Vars.gameData.currentHero != i)
+                        if (Vars.gameData.currentHero != h)
                         {
                             bool timerCreated = false;
 
-                            for (int e = 0; e < Vars.gameData.heroesPlayed.Count; e++)
+                            for (int t = 0; t < Vars.gameData.heroPlayed.Count; t++)
                             {
                                 if (Vars.gameData.currentHero != -1)
                                 {
-                                    if (Vars.gameData.currentHero == Vars.gameData.heroesPlayed[e])
+                                    if (Vars.gameData.currentHero == Vars.gameData.heroPlayed[t])
                                     {
-                                        Vars.gameData.heroesTimePlayed[e].Stop();
-                                        Functions.DebugMessage("Stopped timer for hero " + (e + 1));
+                                        Vars.gameData.heroTimePlayed[t].Stop();
+                                        Functions.DebugMessage("Stopped timer for hero " + (t + 1));
                                     }
                                 }
-                                if (i == Vars.gameData.heroesPlayed[e])
+                                if (h == Vars.gameData.heroPlayed[t])
                                 {
-                                    Vars.gameData.heroesTimePlayed[e].Start();
-                                    Functions.DebugMessage("Resumed timer for hero " + (e + 1));
+                                    Vars.gameData.heroTimePlayed[t].Start();
+                                    Functions.DebugMessage("Resumed timer for hero " + (t + 1));
                                     timerCreated = true;
                                 }
                             }
                             if (!timerCreated)
                             {
-                                Functions.DebugMessage("First time on hero " + (i + 1) + ", creating timer");
-                                Vars.gameData.heroesPlayed.Add(i);
-                                Vars.gameData.heroesTimePlayed.Add(new Stopwatch());
-                                Vars.gameData.heroesTimePlayed[Vars.gameData.heroesTimePlayed.Count - 1].Start();
+                                Functions.DebugMessage("First time on hero " + (h + 1) + ", creating timer");
+                                Vars.gameData.heroPlayed.Add(h);
+                                Vars.gameData.heroTimePlayed.Add(new Stopwatch());
+                                Vars.gameData.heroTimePlayed[Vars.gameData.heroTimePlayed.Count - 1].Start();
                             }
                             if (!Vars.heroTimer.IsRunning)
                             {
                                 Vars.heroTimer.Restart();
                             }
-                            Vars.gameData.currentHero = i;
-                            Program.contextMenu.currentGame.MenuItems[4].Text = "Last Hero: " + Vars.heroNamesReal[i];
+                            Vars.gameData.currentHero = h;
+                            Program.contextMenu.currentGame.MenuItems[4].Text = "Last Hero: " + Vars.heroNamesReal[h];
                             break;
                         }
                     }
@@ -374,9 +374,9 @@ namespace BetterOverwatch
                     Vars.gameTimer.Stop();
                     Vars.heroTimer.Stop();
 
-                    for (int i = 0; i < Vars.gameData.heroesPlayed.Count; i++)
+                    for (int i = 0; i < Vars.gameData.heroPlayed.Count; i++)
                     {
-                        Vars.gameData.heroesTimePlayed[i].Stop();
+                        Vars.gameData.heroTimePlayed[i].Stop();
                     }
                     Thread.Sleep(500);
                 }
@@ -384,7 +384,7 @@ namespace BetterOverwatch
         }
         public static void CheckGameScore(Bitmap frame)
         {
-            if (Vars.gameData.team1score.Equals(String.Empty) && Vars.gameData.team1score.Equals(String.Empty))
+            if (Vars.gameData.team1Score.Equals(String.Empty) && Vars.gameData.team1Score.Equals(String.Empty))
             {
                 Thread.Sleep(1000); //hackfix, wait 1 second just in case
                 string scoreTextLeft = Functions.BitmapToText(frame, 800, 560, 95, 135, contrastFirst: false, radius: 45, network: 1);
@@ -399,8 +399,8 @@ namespace BetterOverwatch
 
                     if (team1 >= 0 && team1 <= 6 && team2 >= 0 && team2 <= 6)
                     {
-                        Vars.gameData.team1score = scoreTextLeft;
-                        Vars.gameData.team2score = scoreTextRight;
+                        Vars.gameData.team1Score = scoreTextLeft;
+                        Vars.gameData.team2Score = scoreTextRight;
                         Vars.loopDelay = 250;
                         Functions.DebugMessage("Recognized team score Team 1:" + scoreTextLeft + " Team 2:" + scoreTextRight);
                         Program.contextMenu.currentGame.MenuItems[5].Text = "Final score: " + scoreTextLeft + " | " + scoreTextRight;
@@ -424,7 +424,7 @@ namespace BetterOverwatch
         }
         private static void ResetGame()
         {
-            Vars.gameData = new GameData(Vars.gameData.currentSkillRating);
+            Vars.gameData = new GameData(Vars.gameData.currentRating);
             Program.contextMenu.trayIcon.Text = "Ready to record, enter a competitive game to begin";
             Program.contextMenu.trayIcon.Icon = Properties.Resources.IconActive;
         }

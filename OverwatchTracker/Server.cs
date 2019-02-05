@@ -52,7 +52,7 @@ namespace BetterOverwatch
             try
             {
                 string serverResponse;
-                using (var client = new WebClient())
+                using (WebClient client = new WebClient())
                 {
                     serverResponse = client.DownloadString("http://api." + Vars.initalize.Host + "/version.xml");
                 }
@@ -109,11 +109,8 @@ namespace BetterOverwatch
             {
                 for (int i = 1; i <= 10; i++)
                 {
-                    if (GameUploader(gameData))
-                    {
-                        break;
-                    }
-                    Thread.Sleep(500);
+                    if (GameUploader(gameData)) break;
+                    Thread.Sleep(1000);
                 }
             }).Start();
         }
@@ -123,7 +120,7 @@ namespace BetterOverwatch
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/v2/upload-game/", new NameValueCollection()
+                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/upload-game/", new NameValueCollection()
                     {
                         { "gameData", gameData }
                     });
@@ -149,10 +146,10 @@ namespace BetterOverwatch
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/v2/fetch-token/", new NameValueCollection()
+                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/fetch-token/", new NameValueCollection()
                     {
                         { "privateToken", Vars.settings.privateToken },
-                        { "publicToken", Vars.gameData.battletag }
+                        { "publicToken", Vars.gameData.battleTag }
                     });
                     ServerOutput result = JsonConvert.DeserializeObject<ServerOutput>(Encoding.Default.GetString(response));
                     if (result.success)
@@ -237,7 +234,6 @@ namespace BetterOverwatch
                     return true;
                 }
             }
-
             return false;
         }
     }

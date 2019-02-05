@@ -7,6 +7,7 @@ using System.IO;
 using System.Security.Principal;
 using System.Runtime.InteropServices;
 using DesktopDuplication;
+using System.Net;
 
 namespace BetterOverwatch
 {
@@ -24,7 +25,7 @@ namespace BetterOverwatch
         static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.0.4",
+                version: "1.0.5",
                 host: "betteroverwatch.com",
                 gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
             Functions.DebugMessage("Starting Better Overwatch version " + Vars.initalize.Version);
@@ -74,7 +75,7 @@ namespace BetterOverwatch
                 }
                 return null;
             });
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             try
             {
                 using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
@@ -175,7 +176,7 @@ namespace BetterOverwatch
                             try
                             {
                                 Protocols.CheckMainMenu(frame.DesktopImage);
- 
+
                                 if (Vars.gameData.gameState != Vars.STATUS_INGAME)
                                 {
                                     string quickPlayText = Functions.BitmapToText(frame.DesktopImage, 476, 644, 80, 40, contrastFirst: false, radius: 140, network: 0, invertColors: true);
@@ -196,18 +197,18 @@ namespace BetterOverwatch
                                     Protocols.CheckMap(frame.DesktopImage);
                                     Protocols.CheckTeamsSkillRating(frame.DesktopImage);
 
-                                    if (!Vars.gameData.team1sr.Equals(String.Empty) &&
-                                        !Vars.gameData.team2sr.Equals(String.Empty) &&
-                                        !Vars.gameData.map.Equals(String.Empty) ||
-                                        !Vars.gameData.map.Equals(String.Empty) && Vars.getInfoTimeout.ElapsedMilliseconds >= 4000)
+                                    if (!Vars.gameData.team1Rating.Equals(String.Empty) &&
+                                        !Vars.gameData.team2Rating.Equals(String.Empty) &&
+                                        !Vars.gameData.mapInfo.Equals(String.Empty) ||
+                                        !Vars.gameData.mapInfo.Equals(String.Empty) && Vars.getInfoTimeout.ElapsedMilliseconds >= 4000)
                                     {
-                                        if (Vars.gameData.playerlistimage == null)
+                                        if (Vars.gameData.playerListImage == null)
                                         {
                                             Thread.Sleep(2000);
                                             try
                                             {
                                                 frame = desktopDuplicator.GetLatestFrame();
-                                                Vars.gameData.playerlistimage = new Bitmap(Functions.CaptureRegion(frame.DesktopImage, 0, 110, 1920, 700));
+                                                Vars.gameData.playerListImage = new Bitmap(Functions.CaptureRegion(frame.DesktopImage, 0, 110, 1920, 700));
                                             }
                                             catch { }
 

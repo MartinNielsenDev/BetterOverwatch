@@ -33,7 +33,7 @@ namespace BetterOverwatch
                 string json;
                 if (File.Exists(Path.Combine(Vars.configPath, "settings.json")))
                 {
-                    Functions.DebugMessage("Loading 'settings.json'");
+                    Functions.DebugMessage("Loading settings.json");
                     json = File.ReadAllText(Path.Combine(Vars.configPath, "settings.json"));
                     if ((json.Replace("\r", String.Empty).Replace("\n", String.Empty) != String.Empty) && json.Length > 0)
                     {

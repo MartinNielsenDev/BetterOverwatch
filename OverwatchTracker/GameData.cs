@@ -21,7 +21,7 @@ namespace BetterOverwatch
         [JsonProperty("time")]
         public int time { get; set; }
 
-        public StatsData(string elims = "0", string damage = "0", string objective = "0", string healing = "0", string deaths = "0", double t = 0)
+        public StatsData(string elims, string damage, string objective, string healing, string deaths, double t)
         {
             playerElims = elims;
             playerDamage = damage;
@@ -38,95 +38,111 @@ namespace BetterOverwatch
     }
     class GameData
     {
-        public GameData(string currentSkillRating = "")
+        public GameData(string currentRating = "")
         {
             // need to save previous current skill rating since the GameData object is disposed and recreated
-            // every game
-            this.currentSkillRating = currentSkillRating;
+            this.currentRating = currentRating;
         }
         [JsonIgnore]
         public int gameState = Vars.STATUS_IDLE;
         [JsonIgnore]
         public int currentHero = -1;
         [JsonIgnore]
-        public string currentSkillRating = String.Empty;
+        public string currentRating = String.Empty;
         [JsonIgnore]
-        public List<Stopwatch> heroesTimePlayed = new List<Stopwatch>();
+        public List<Stopwatch> heroTimePlayed = new List<Stopwatch>();
         [JsonIgnore]
-        public List<int> heroesPlayed = new List<int>();
+        public List<int> heroPlayed = new List<int>();
         [JsonIgnore]
-        public Bitmap playerlistimage = null;
-        [JsonProperty("battletag")]
-        public string battletag { get; set; } = Functions.FetchBattleTag();
-        [JsonProperty("heroes")]
-        public string heroes { get; set; } = "";
-        [JsonProperty("startsr")]
-        public string startsr { get; set; } = "";
-        [JsonProperty("endsr")]
-        public string endsr { get; set; } = "";
-        [JsonProperty("map")]
-        public string map { get; set; } = "";
-        [JsonProperty("iskoth")]
-        public bool iskoth { get; set; } = false;
-        [JsonProperty("team1sr")]
-        public string team1sr { get; set; } = "";
-        [JsonProperty("team2sr")]
-        public string team2sr { get; set; } = "";
-        [JsonProperty("team1score")]
-        public string team1score { get; set; } = "";
-        [JsonProperty("team2score")]
-        public string team2score { get; set; } = "";
+        public Bitmap playerListImage = null;
+
+        [JsonProperty("mapInfo")]
+        public MapInfo mapInfo = new MapInfo();
+        [JsonProperty("startRating")]
+        public string startRating = "";
+        [JsonProperty("endRating")]
+        public string endRating = "";
+        [JsonProperty("team1Rating")]
+        public string team1Rating = "";
+        [JsonProperty("team2Rating")]
+        public string team2Rating = "";
+        [JsonProperty("team1Score")]
+        public string team1Score = "";
+        [JsonProperty("team2Score")]
+        public string team2Score = "";
         [JsonProperty("duration")]
-        public string duration { get; set; } = "";
-        [JsonProperty("playerlistimagebase64")]
-        public string playerlistimagebase64 { get; set; } = "";
-        [JsonProperty("privateToken")]
-        public string privateToken { get; set; } = Vars.settings.privateToken;
+        public string duration = "";
+        [JsonProperty("playerListImageBase64")]
+        public string playerListImageBase64 = "";
+        [JsonProperty("heroes")]
+        private List<Hero> heroes = new List<Hero>();
         [JsonProperty("statsRecorded")]
         public List<StatsData> statsRecorded = new List<StatsData>();
+        [JsonProperty("battleTag")]
+        public string battleTag = Functions.FetchBattleTag();
+        [JsonProperty("privateToken")]
+        private string privateToken = Vars.settings.privateToken;
 
         public string GetData()
         {
-            string heroesPlayed = String.Empty;
-
-            if (Vars.gameData.heroesPlayed.Count > 0)
+            if (this.heroPlayed.Count > 0)
             {
-                for (int i = 0; i < Vars.gameData.heroesPlayed.Count; i++)
+                for (int i = 0; i < (this.heroPlayed.Count > 3 ? 3 : this.heroPlayed.Count); i++)
                 {
-                    if (i >= 3)
-                    {
-                        break;
-                    }
-                    long biggestValue = 0;
-                    int biggestValueIndex = 0;
+                    long mostPlayed = 0;
+                    int mostPlayedIndex = 0;
 
-                    for (int e = 0; e < Vars.gameData.heroesPlayed.Count; e++)
+                    for (int h = 0; h < this.heroPlayed.Count; h++)
                     {
-                        if (Vars.gameData.heroesPlayed[e] > -1)
+                        if (this.heroPlayed[h] > -1)
                         {
-                            if (Vars.gameData.heroesTimePlayed[e].ElapsedMilliseconds / 1000 > biggestValue)
+                            if (this.heroTimePlayed[h].ElapsedMilliseconds / 1000 > mostPlayed)
                             {
-                                biggestValue = Vars.gameData.heroesTimePlayed[e].ElapsedMilliseconds / 1000;
-                                biggestValueIndex = e;
+                                mostPlayed = this.heroTimePlayed[h].ElapsedMilliseconds / 1000;
+                                mostPlayedIndex = h;
                             }
                         }
                     }
-                    if (Vars.gameData.heroesTimePlayed[biggestValueIndex].ElapsedMilliseconds > 10000)
+                    if (this.heroTimePlayed[mostPlayedIndex].ElapsedMilliseconds > 6000)
                     {
-                        heroesPlayed += Vars.gameData.heroesPlayed[biggestValueIndex] + " " + Math.Round(Convert.ToDouble(Vars.gameData.heroesTimePlayed[biggestValueIndex].ElapsedMilliseconds / 1000) / Convert.ToDouble(Vars.heroTimer.ElapsedMilliseconds / 1000) * 100, 1).ToString().Replace(",", ".") + ",";
+                        this.heroes.Add(
+                            new Hero(
+                                this.heroPlayed[mostPlayedIndex].ToString(),
+                                Math.Round(Convert.ToDouble(this.heroTimePlayed[mostPlayedIndex].ElapsedMilliseconds / 1000) / Convert.ToDouble(Vars.heroTimer.ElapsedMilliseconds / 1000) * 100, 0).ToString()
+                                ));
                     }
-                    Vars.gameData.heroesPlayed[biggestValueIndex] = -1;
+                    this.heroPlayed[mostPlayedIndex] = -1;
                 }
-                Vars.gameData.heroes = heroesPlayed;
             }
-            Vars.gameData.duration = Math.Floor(Convert.ToDouble(Vars.gameTimer.ElapsedMilliseconds / 1000)).ToString();
-            Vars.gameData.endsr = currentSkillRating;
-            if (Vars.settings.uploadScreenshot && Vars.gameData.playerlistimage != null)
+            this.duration = Math.Floor(Convert.ToDouble(Vars.gameTimer.ElapsedMilliseconds / 1000)).ToString();
+            this.endRating = currentRating;
+
+            if (Vars.settings.uploadScreenshot && this.playerListImage != null)
             {
-                playerlistimagebase64 = Convert.ToBase64String(Functions.ImageToBytes(Functions.ReduceImageSize(Vars.gameData.playerlistimage, 70)));
+                this.playerListImageBase64 = Convert.ToBase64String(Functions.ImageToBytes(Functions.ReduceImageSize(this.playerListImage, 70)));
             }
             Debug.WriteLine(JsonConvert.SerializeObject(this, Formatting.Indented));
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
+    }
+    class Hero
+    {
+        [JsonProperty("heroIndex")]
+        private string heroIndex { get; }
+        [JsonProperty("heroPercentPlayed")]
+        private string heroPercentPlayed { get;}
+
+        public Hero(string heroIndex, string heroPercentPlayed)
+        {
+            this.heroIndex = heroIndex;
+            this.heroPercentPlayed = heroPercentPlayed;
+        }
+    }
+    class MapInfo
+    {
+        [JsonProperty("mapName")]
+        public string mapName = "";
+        [JsonProperty("isKoth")]
+        public bool isKoth = false;
     }
 }

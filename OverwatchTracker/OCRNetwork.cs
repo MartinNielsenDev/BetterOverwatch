@@ -45,28 +45,29 @@ namespace BetterOverwatch
         }
         public static double[] CharToDoubleArray(Bitmap image, int aArrayDim)
         {
-            BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, image.PixelFormat);
+            BitmapData imageData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, image.PixelFormat);
+            int imageFormatSize = Image.GetPixelFormatSize(imageData.PixelFormat);
             double[] result = new double[aArrayDim * aArrayDim];
-            double xStep = (double)image.Width / (double)aArrayDim;
-            double yStep = (double)image.Height / (double)aArrayDim;
+            double xScale = (double)image.Width / (double)aArrayDim;
+            double yScale = (double)image.Height / (double)aArrayDim;
             
             unsafe
             {
-                byte* rgb = (byte*)data.Scan0;
+                byte* imageDataMemory = (byte*)imageData.Scan0;
 
                 for (int x = 0; x < image.Width; ++x)
                 {
                     for (int y = 0; y < image.Height; ++y)
                     {
-                        int i = (int)((x / xStep));
-                        int e = (int)(y / yStep);
-                        int pos = (y * data.Stride) + (x * Image.GetPixelFormatSize(data.PixelFormat) / 8);
+                        int xResult = (int)(x / xScale);
+                        int yResult = (int)(y / yScale);
+                        int positionInMemory = (y * imageData.Stride) + (x * imageFormatSize / 8);
 
-                        result[e * i + e] += Math.Sqrt(rgb[pos] * rgb[pos] + rgb[pos + 2] * rgb[pos + 2] + rgb[pos + 1] * rgb[pos + 1]);
+                        result[yResult * xResult + yResult] += Math.Sqrt(imageDataMemory[positionInMemory] * imageDataMemory[positionInMemory] + imageDataMemory[positionInMemory + 2] * imageDataMemory[positionInMemory + 2] + imageDataMemory[positionInMemory + 1] * imageDataMemory[positionInMemory + 1]);
                     }
                 }
             }
-            image.UnlockBits(data);
+            image.UnlockBits(imageData);
 
             return Scale(result);
         }
@@ -74,7 +75,9 @@ namespace BetterOverwatch
         {
             double res = double.NegativeInfinity;
             foreach (double d in src)
+            {
                 if (d > res) res = d;
+            }
             return res;
         }
         private static double[] Scale(double[] src)
@@ -83,7 +86,9 @@ namespace BetterOverwatch
             if (max != 0)
             {
                 for (int i = 0; i < src.Length; i++)
+                {
                     src[i] = src[i] / max;
+                }
             }
             return src;
         }

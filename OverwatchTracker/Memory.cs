@@ -71,7 +71,7 @@ namespace BetterOverwatch
                     process.Dispose();
 
                     if (memoryBytes.Length > 0 && memoryBytes[0] != 0 && memoryBytes[1] != 0)
-                        return Encoding.Default.GetString(memoryBytes);
+                        return Encoding.UTF8.GetString(memoryBytes);
                 }
             }catch{ }
 

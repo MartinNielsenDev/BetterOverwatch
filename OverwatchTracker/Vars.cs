@@ -22,6 +22,6 @@ namespace BetterOverwatch
         public static int loopDelay = 250;
         public static string[] srCheck = { "", "" }, team1Check = { "", "" }, team2Check = { "", "" }, statsCheck = { "", "", "", "", "" };
         public static int srCheckIndex = 0, team1CheckIndex = 0, team2CheckIndex = 0, statsCheckIndex = 0, roundsCompleted = 0;
-        public static Stopwatch frameTimer = new Stopwatch(), gameTimer = new Stopwatch(), roundTimer = new Stopwatch(), heroTimer = new Stopwatch(), getInfoTimeout = new Stopwatch(), statsTimer = new Stopwatch(), testTimer = new Stopwatch();
+        public static Stopwatch frameTimer = new Stopwatch(), gameTimer = new Stopwatch(), roundTimer = new Stopwatch(), heroTimer = new Stopwatch(), getInfoTimeout = new Stopwatch(), statsTimer = new Stopwatch();
     }
 }

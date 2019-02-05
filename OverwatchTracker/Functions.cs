@@ -597,7 +597,7 @@ namespace BetterOverwatch
 
             if (!getNextDeduction || Vars.roundsCompleted == 0)
             {
-                if (Vars.gameData.iskoth)
+                if (Vars.gameData.mapInfo.isKoth)
                     accumulatedResult += 70;
                 else
                     accumulatedResult += 100;
@@ -608,7 +608,7 @@ namespace BetterOverwatch
                 if (getNextDeduction)
                     i = Vars.roundsCompleted;
 
-                if (Vars.gameData.iskoth)
+                if (Vars.gameData.mapInfo.isKoth)
                     accumulatedResult += 40 + offset;
                 else if (i == 1)
                     accumulatedResult += 100;
