@@ -162,11 +162,15 @@ namespace BetterOverwatch
                     else
                     {
                         Functions.DebugMessage("Failed to fetch tokens, message: " + result.message);
-                        MessageBox.Show("Failed to fetch tokens, message: " + result.message, "Better Overwatch error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Failed to fetch tokens\r\n\r\nError Message: " + result.message, "Better Overwatch error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
-            catch { }
+            catch (WebException wex)
+            {
+                MessageBox.Show("Failed to fetch tokens\r\n\r\nError Message: " + wex.Message, "Better Overwatch error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Functions.DebugMessage("Failed to fetch tokens, message: " + wex.Message);
+            }
             return false;
         }
     }

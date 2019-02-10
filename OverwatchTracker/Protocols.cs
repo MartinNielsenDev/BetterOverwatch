@@ -154,7 +154,7 @@ namespace BetterOverwatch
         }
         public static void CheckMap(Bitmap frame)
         {
-            if (Vars.gameData.mapInfo.Equals(String.Empty))
+            if (Vars.gameData.mapInfo.mapName.Equals(String.Empty))
             {
                 string mapText = Functions.BitmapToText(frame, 915, 945, 780, 85);
 
@@ -415,6 +415,7 @@ namespace BetterOverwatch
             {
                 if (Vars.gameData.gameState >= Vars.STATUS_RECORDING)
                 {
+                    Vars.gameData.GetData();
                     Functions.DebugMessage("Invalid game");
                     ResetGame();
                 }

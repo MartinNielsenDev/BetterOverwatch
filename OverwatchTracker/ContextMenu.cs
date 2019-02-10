@@ -168,21 +168,7 @@ namespace BetterOverwatch
             {
                 trayIcon.Dispose();
             }
-
             base.Dispose(isDisposing);
-        }
-
-        private void InitializeComponent()
-        {
-            this.SuspendLayout();
-            // 
-            // ContextMenu
-            // 
-            this.ClientSize = new System.Drawing.Size(284, 261);
-            this.Name = "ContextMenu";
-            this.TopMost = true;
-            this.ResumeLayout(false);
-
         }
     }
 }

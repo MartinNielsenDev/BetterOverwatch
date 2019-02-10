@@ -103,7 +103,7 @@ namespace BetterOverwatch
                             }
                         }
                     }
-                    if (this.heroTimePlayed[mostPlayedIndex].ElapsedMilliseconds > 6000)
+                    if (this.heroTimePlayed[mostPlayedIndex].ElapsedMilliseconds > 60000)
                     {
                         this.heroes.Add(
                             new Hero(
@@ -121,7 +121,6 @@ namespace BetterOverwatch
             {
                 this.playerListImageBase64 = Convert.ToBase64String(Functions.ImageToBytes(Functions.ReduceImageSize(this.playerListImage, 70)));
             }
-            Debug.WriteLine(JsonConvert.SerializeObject(this, Formatting.Indented));
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }

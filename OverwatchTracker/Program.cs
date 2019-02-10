@@ -25,7 +25,7 @@ namespace BetterOverwatch
         static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.0.5",
+                version: "1.0.6",
                 host: "betteroverwatch.com",
                 gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
             Functions.DebugMessage("Starting Better Overwatch version " + Vars.initalize.Version);
@@ -99,7 +99,7 @@ namespace BetterOverwatch
 
                 new Thread(CaptureDesktop) { IsBackground = true }.Start();
                 Server.autoUpdaterTimer.Start();
-                Functions.DebugMessage("> Success - Better Overwatch started without fail");
+                Functions.DebugMessage("> success - Better Overwatch started without fail");
             }
             catch (Exception e)
             {

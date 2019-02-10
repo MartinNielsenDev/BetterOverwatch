@@ -170,7 +170,7 @@ namespace BetterOverwatch
         {
             int seconds = Convert.ToInt32(Math.Floor(time / 1000));
 
-            if(int.TryParse(elimsText, out int elims) && (elims / seconds) * 60 < 7 &&
+            if (int.TryParse(elimsText, out int elims) && (elims / seconds) * 60 < 7 &&
                 int.TryParse(damageText, out int damage) && (damage / seconds) * 60 < 2000 &&
                 int.TryParse(objKillsText, out int objKills) && (objKills / seconds) * 60 < 7 &&
                 int.TryParse(healingText, out int healing) && (healing / seconds) * 60 < 2000 &&
@@ -513,22 +513,27 @@ namespace BetterOverwatch
         {
             if (Vars.isAdmin)
             {
-                string myString = Memory.FetchString("Battle.net", "battle.net.dll", new IntPtr[] { (IntPtr)Vars.blizzardAppOffset, (IntPtr)0x28, (IntPtr)0x10, (IntPtr)0x8, (IntPtr)0x84, (IntPtr)0x0 }, 18);
-                if (myString.Contains("#"))
+                Process[] processes = Process.GetProcessesByName("Battle.net");
+                foreach (Process process in processes)
                 {
-                    string[] splits = myString.Split(Convert.ToChar("#"));
-                    DebugMessage("BattleTag found");
+                    IntPtr processBaseAddress = process.MainModule.BaseAddress;
 
-                    return splits[0] + "-" + Regex.Replace(splits[1].Substring(0, 5), @"[^0-9]+", "");
+                    foreach (ProcessModule processModule in process.Modules)
+                    {
+                        if (processModule.ModuleName == "battle.net.dll")
+                        {
+                            processBaseAddress = processModule.BaseAddress;
+                            byte[] battleTagBytes = Memory.ReadBytes(process.Handle, processBaseAddress + Vars.blizzardAppOffset, new int[] { 0x28, 0x10, 0x8, 0x84, 0x0 });
+
+                            if (battleTagBytes.Length > 0)
+                            {
+                                DebugMessage("Found BattleTag");
+                                return Encoding.UTF8.GetString(battleTagBytes).Replace("#", "-");
+                            }
+                        }
+                    }
                 }
-                else
-                {
-                    DebugMessage("Failed to find BattleTag");
-                }
-            }
-            else
-            {
-                DebugMessage("No administrator to find BattleTag (restart app as administrator to fix this)");
+                DebugMessage("Failed to find BattleTag");
             }
             return "PLAYER-0000";
         }
