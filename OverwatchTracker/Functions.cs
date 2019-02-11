@@ -184,7 +184,7 @@ namespace BetterOverwatch
             }
             return false;
         }
-        public static string BitmapToText(Bitmap frame, int x, int y, int width, int height, bool contrastFirst = false, short radius = 110, int network = 0, bool invertColors = false, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true)
+        public static string BitmapToText(Bitmap frame, int x, int y, int width, int height, bool contrastFirst = false, short radius = 110, Network network = 0, bool invertColors = false, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true)
         {
             string output = String.Empty;
             try
@@ -201,7 +201,7 @@ namespace BetterOverwatch
                     result = AdjustColors(result, radius, red, green, blue, fillOutside);
                     AdjustContrast(result, 255f, invertColors);
                 }
-
+                result.Save(@"C:\users\mani\Desktop\test2.png");
                 output = FetchTextFromImage(result, network);
                 result.Dispose();
 
@@ -541,9 +541,9 @@ namespace BetterOverwatch
             }
             return "PLAYER-0000";
         }
-        public static string FetchLetterFromImage(OCRNetwork network, Bitmap image, int networkId)
+        public static string FetchLetterFromImage(BackPropNetwork network, Bitmap image, Network networkId)
         {
-            double[] input = OCRNetwork.CharToDoubleArray(image, OCRNetworkData.matrix);
+            double[] input = BackPropNetwork.CharToDoubleArray(image);
 
             for (int i = 0; i < network.InputNodesCount; i++)
             {
@@ -551,17 +551,17 @@ namespace BetterOverwatch
             }
             network.Run();
 
-            if (networkId == 0 || networkId == 4)
+            if (networkId == Network.Maps || networkId == Network.HeroNames)
             {
                 return Convert.ToChar('A' + network.BestNodeIndex).ToString();
             }
-            else if (networkId == 1 || networkId == 2 || networkId == 3)
+            else if (networkId == Network.TeamSkillRating || networkId == Network.SkillRating || networkId == Network.Stats)
             {
                 return network.BestNodeIndex.ToString();
             }
             return String.Empty;
         }
-        public static string FetchTextFromImage(Bitmap image, int network)
+        public static string FetchTextFromImage(Bitmap image, Network network)
         {
             string text = String.Empty;
             try
@@ -570,25 +570,25 @@ namespace BetterOverwatch
 
                 for (int i = 0; i < bitmaps.Count; i++)
                 {
-                    if (network == 0)
+                    if (network == Network.Maps)
                     {
-                        text += FetchLetterFromImage(OCRNetworkData.mapsNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(BetterOverwatchNetworks.mapsNN, bitmaps[i], network);
                     }
-                    else if (network == 1)
+                    else if (network == Network.TeamSkillRating)
                     {
-                        text += FetchLetterFromImage(OCRNetworkData.digitsNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(BetterOverwatchNetworks.teamSkillRatingNN, bitmaps[i], network);
                     }
-                    else if (network == 2)
+                    else if (network == Network.SkillRating)
                     {
-                        text += FetchLetterFromImage(OCRNetworkData.mainMenuNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(BetterOverwatchNetworks.skillRatingNN, bitmaps[i], network);
                     }
-                    else if (network == 3) // stats
+                    else if (network == Network.Stats)
                     {
-                        text += FetchLetterFromImage(OCRNetworkData.blizzardNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(BetterOverwatchNetworks.statsNN, bitmaps[i], network);
                     }
-                    else if (network == 4) // hero names
+                    else if (network == Network.HeroNames)
                     {
-                        text += FetchLetterFromImage(OCRNetworkData.heroNamesNeuralNetwork, bitmaps[i], network);
+                        text += FetchLetterFromImage(BetterOverwatchNetworks.heroNamesNN, bitmaps[i], network);
                     }
                     bitmaps[i].Dispose();
                 }

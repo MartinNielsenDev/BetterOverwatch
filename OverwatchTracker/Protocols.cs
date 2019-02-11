@@ -11,12 +11,12 @@ namespace BetterOverwatch
     {
         public static void CheckPlayMenu(Bitmap frame)
         {
-            string srText = Functions.BitmapToText(frame, 1100, 444, 100, 40, contrastFirst: true, radius: 110, network: 2); // GROUP CHECK
+            string srText = Functions.BitmapToText(frame, 1100, 444, 100, 40, contrastFirst: true, radius: 110, network: Network.SkillRating); // GROUP CHECK
             srText = Regex.Match(srText, "[0-9]+").ToString();
 
             if (srText.Length < 4)
             {
-                srText = srText = Functions.BitmapToText(frame, 1100, 504, 100, 32, contrastFirst: true, radius: 110, network: 2); // SOLO CHECK
+                srText = srText = Functions.BitmapToText(frame, 1100, 504, 100, 32, contrastFirst: true, radius: 110, network: Network.SkillRating); // SOLO CHECK
                 srText = Regex.Match(srText, "[0-9]+").ToString();
             }
             if (srText.Length > 4)
@@ -70,23 +70,23 @@ namespace BetterOverwatch
         public static void CheckStats(Bitmap frame)
         {
             short threshold = 110;
-            string elimsText = Functions.BitmapToText(frame, 130, 895, 40, 22, contrastFirst: false, radius: threshold, network: 3);
+            string elimsText = Functions.BitmapToText(frame, 130, 895, 40, 22, contrastFirst: false, radius: threshold, network: Network.Stats);
 
             if (!elimsText.Equals(String.Empty))
             {
-                string damageText = Functions.BitmapToText(frame, 130, 957, 80, 22, contrastFirst: false, radius: threshold, network: 3);
+                string damageText = Functions.BitmapToText(frame, 130, 957, 80, 22, contrastFirst: false, radius: threshold, network: Network.Stats);
 
                 if (!damageText.Equals(String.Empty))
                 {
-                    string objKillsText = Functions.BitmapToText(frame, 375, 895, 40, 22, contrastFirst: false, radius: threshold, network: 3);
+                    string objKillsText = Functions.BitmapToText(frame, 375, 895, 40, 22, contrastFirst: false, radius: threshold, network: Network.Stats);
 
                     if (!objKillsText.Equals(String.Empty))
                     {
-                        string healingText = Functions.BitmapToText(frame, 375, 957, 80, 22, contrastFirst: false, radius: threshold, network: 3);
+                        string healingText = Functions.BitmapToText(frame, 375, 957, 80, 22, contrastFirst: false, radius: threshold, network: Network.Stats);
 
                         if (!healingText.Equals(String.Empty))
                         {
-                            string deathsText = Functions.BitmapToText(frame, 625, 957, 40, 22, contrastFirst: false, radius: threshold, network: 3);
+                            string deathsText = Functions.BitmapToText(frame, 625, 957, 40, 22, contrastFirst: false, radius: threshold, network: Network.Stats);
 
                             if (!deathsText.Equals(String.Empty))
                             {
@@ -193,7 +193,7 @@ namespace BetterOverwatch
         {
             if (Vars.gameData.team1Rating.Equals(String.Empty))
             {
-                string team1SR = Functions.BitmapToText(frame, 545, 220, 245, 70, contrastFirst: false, radius: 90, network: 1);
+                string team1SR = Functions.BitmapToText(frame, 545, 220, 245, 70, contrastFirst: false, radius: 90, network: Network.TeamSkillRating);
                 team1SR = Regex.Match(team1SR, "[0-9]+").ToString();
 
                 if (!team1SR.Equals(String.Empty) && team1SR.Length >= 4) // TEAM 1 SR
@@ -223,7 +223,7 @@ namespace BetterOverwatch
             }
             if (Vars.gameData.team2Rating.Equals(String.Empty))
             {
-                string team2SR = Functions.BitmapToText(frame, 1135, 220, 245, 70, contrastFirst: false, radius: 90, network: 1);
+                string team2SR = Functions.BitmapToText(frame, 1135, 220, 245, 70, contrastFirst: false, radius: 90, network: Network.TeamSkillRating);
                 team2SR = Regex.Match(team2SR, "[0-9]+").ToString();
 
                 if (!team2SR.Equals(String.Empty) && team2SR.Length >= 4) // TEAM 1 SR
@@ -274,10 +274,7 @@ namespace BetterOverwatch
                 if (menuText.Equals("PRAY"))
                 {
                     Functions.DebugMessage("Recognized main menu");
-                    if (!IsValidGame())
-                    {
-                        return;
-                    }
+                    if (!IsValidGame()) return;
                     Vars.loopDelay = 250;
                     Program.trayMenu.ChangeTray("Visit play menu to upload last game", Properties.Resources.IconVisitMenu);
                     Vars.gameData.state = State.Finished;
@@ -294,7 +291,7 @@ namespace BetterOverwatch
         public static bool CheckHeroPlayed(Bitmap frame)
         {
             bool heroDetected = false;
-            string heroText = Functions.BitmapToText(frame, 955, 834, 170, 35, contrastFirst: false, radius: 200, network: 4);
+            string heroText = Functions.BitmapToText(frame, 955, 834, 170, 35, contrastFirst: false, radius: 200, network: Network.HeroNames);
 
             if (!heroText.Equals(String.Empty))
             {
@@ -392,8 +389,8 @@ namespace BetterOverwatch
             if (Vars.gameData.team1Score.Equals(String.Empty) && Vars.gameData.team1Score.Equals(String.Empty))
             {
                 Thread.Sleep(1000); //hackfix, wait 1 second just in case
-                string scoreTextLeft = Functions.BitmapToText(frame, 800, 560, 95, 135, contrastFirst: false, radius: 45, network: 1);
-                string scoreTextRight = Functions.BitmapToText(frame, 1000, 560, 95, 135, contrastFirst: false, radius: 45, network: 1);
+                string scoreTextLeft = Functions.BitmapToText(frame, 800, 560, 95, 135, contrastFirst: false, radius: 45, network: Network.TeamSkillRating);
+                string scoreTextRight = Functions.BitmapToText(frame, 1000, 560, 95, 135, contrastFirst: false, radius: 45, network: Network.TeamSkillRating);
                 scoreTextLeft = Regex.Match(scoreTextLeft, "[0-9]+").ToString();
                 scoreTextRight = Regex.Match(scoreTextRight, "[0-9]+").ToString();
 

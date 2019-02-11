@@ -32,4 +32,12 @@ namespace BetterOverwatch
         Finished = 3,
         WaitForUpload = 4
     }
+    enum Network
+    {
+        Maps = 0,
+        TeamSkillRating = 1,
+        SkillRating = 2,
+        Stats = 3,
+        HeroNames = 4
+    }
 }

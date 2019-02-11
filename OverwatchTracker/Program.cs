@@ -38,6 +38,10 @@ namespace BetterOverwatch
                 {
                     return LoadAssembly("BetterOverwatch.Resources.Newtonsoft.Json.dll");
                 }
+                if (assembly.Name.Contains("NeuralNetwork,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.NeuralNetwork.dll");
+                }
                 if (assembly.Name.Contains("AForge.Imaging,"))
                 {
                     return LoadAssembly("BetterOverwatch.Resources.AForge.Imaging.dll");
@@ -124,7 +128,7 @@ namespace BetterOverwatch
             }
             while (true)
             {
-                if (!Functions.activeWindowTitle().Equals("Overwatch"))
+                if (!Functions.activeWindowTitle().Equals("Overwatch") && 1 == 2)
                 {
                     if (!Vars.overwatchRunning)
                     {

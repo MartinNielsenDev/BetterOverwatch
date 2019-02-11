@@ -29,7 +29,7 @@ namespace BetterOverwatch
                 for (int i = 0; i < currentGame.MenuItems.Count; i++) currentGame.MenuItems[i].Enabled = false;
                 MenuItem debugTools = new MenuItem("Tools");
                 debugTools.MenuItems.Add("Open logs", OpenLogs);
-                debugTools.MenuItems.Add("Open Last Game JSON", FetchJSON);
+                debugTools.MenuItems.Add("Export Last Game", FetchJSON);
                 debugTools.MenuItems.Add(currentGame);
 
                 trayMenu.MenuItems.Add("Better Overwatch v" + Vars.initalize.Version);
@@ -95,31 +95,13 @@ namespace BetterOverwatch
             {
                 TrayPopup("No game was found", 3000);
             }
-            /*
-            ToastContent content = new ToastContent()
-            {
-                Launch = "app-defined-string",
-
-                Visual = new ToastVisual()
-                {
-                    BindingGeneric = new ToastBindingGeneric()
-                    {
-                        Children =
-                        {
-                            new AdaptiveText()
-                            {
-                                Text = "Conf Room 2001 / Building 135"
-                            }
-                        }
-                    }
-                }
-            };
-            ToastNotificationManager
-            */
         }
         private void OpenLogs(object sender, EventArgs e)
         {
-            Process.Start(Path.Combine(Vars.configPath, "debug.log"));
+            if (File.Exists(Path.Combine(Vars.configPath, "debug.log")))
+            {
+                Process.Start(Path.Combine(Vars.configPath, "debug.log"));
+            }
         }
         private void ToggleUpload(object sender, EventArgs e)
         {
@@ -196,26 +178,26 @@ namespace BetterOverwatch
     {
 #pragma warning disable 0169
         [JsonProperty("mapInfo")]
-        private MapInfo mapInfo;
+        private readonly MapInfo mapInfo;
         [JsonProperty("startRating")]
-        private string startRating;
+        private readonly string startRating;
         [JsonProperty("endRating")]
-        private string endRating;
+        private readonly string endRating;
         [JsonProperty("team1Rating")]
-        private string team1Rating;
+        private readonly string team1Rating;
         [JsonProperty("team2Rating")]
-        private string team2Rating;
+        private readonly string team2Rating;
         [JsonProperty("team1Score")]
-        private string team1Score;
+        private readonly string team1Score;
         [JsonProperty("team2Score")]
-        private string team2Score;
+        private readonly string team2Score;
         [JsonProperty("duration")]
-        private string duration;
+        private readonly string duration;
         [JsonProperty("heroes")]
-        private List<HeroPlayed> heroes;
+        private readonly List<HeroPlayed> heroes;
         [JsonProperty("statsRecorded")]
-        private List<Stats> statsRecorded;
+        private readonly List<Stats> statsRecorded;
         [JsonProperty("battleTag")]
-        private string battleTag;
+        private readonly string battleTag;
     }
 }

@@ -23,7 +23,7 @@ namespace BetterOverwatch
 
         public static void Load()
         {
-            OCRNetworkData.LoadOCRNetworkData();
+            BetterOverwatchNetworks.Load();
             Functions.SetVolume(10);
 
             try
