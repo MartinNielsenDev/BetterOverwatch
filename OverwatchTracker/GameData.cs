@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace BetterOverwatch
 {
-    class StatsData
+    class Stats
     {
         [JsonProperty("playerElims")]
         public string playerElims { get; set; }
@@ -21,7 +21,7 @@ namespace BetterOverwatch
         [JsonProperty("time")]
         public int time { get; set; }
 
-        public StatsData(string elims, string damage, string objective, string healing, string deaths, double t)
+        public Stats(string elims, string damage, string objective, string healing, string deaths, double t)
         {
             playerElims = elims;
             playerDamage = damage;
@@ -36,15 +36,15 @@ namespace BetterOverwatch
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }
-    class GameData
+    class Game
     {
-        public GameData(string currentRating = "")
+        public Game(string currentRating = "")
         {
-            // need to save previous current skill rating since the GameData object is disposed and recreated
+            // need to save previous current skill rating since the Game object is disposed then recreated
             this.currentRating = currentRating;
         }
         [JsonIgnore]
-        public int gameState = Vars.STATUS_IDLE;
+        public State state = State.Idle;
         [JsonIgnore]
         public int currentHero = -1;
         [JsonIgnore]
@@ -75,13 +75,13 @@ namespace BetterOverwatch
         [JsonProperty("playerListImageBase64")]
         public string playerListImageBase64 = "";
         [JsonProperty("heroes")]
-        private List<Hero> heroes = new List<Hero>();
+        private List<HeroPlayed> heroes = new List<HeroPlayed>();
         [JsonProperty("statsRecorded")]
-        public List<StatsData> statsRecorded = new List<StatsData>();
+        public List<Stats> stats = new List<Stats>();
         [JsonProperty("battleTag")]
-        public string battleTag = Functions.FetchBattleTag();
+        public readonly string battleTag = Functions.FetchBattleTag();
         [JsonProperty("privateToken")]
-        private string privateToken = Vars.settings.privateToken;
+        private readonly string privateToken = Vars.settings.privateToken;
 
         public string GetData()
         {
@@ -103,10 +103,10 @@ namespace BetterOverwatch
                             }
                         }
                     }
-                    if (this.heroTimePlayed[mostPlayedIndex].ElapsedMilliseconds > 6000)
+                    if (this.heroTimePlayed[mostPlayedIndex].ElapsedMilliseconds > 60000)
                     {
                         this.heroes.Add(
-                            new Hero(
+                            new HeroPlayed(
                                 this.heroPlayed[mostPlayedIndex].ToString(),
                                 Math.Round(Convert.ToDouble(this.heroTimePlayed[mostPlayedIndex].ElapsedMilliseconds / 1000) / Convert.ToDouble(Vars.heroTimer.ElapsedMilliseconds / 1000) * 100, 0).ToString()
                                 ));
@@ -121,18 +121,18 @@ namespace BetterOverwatch
             {
                 this.playerListImageBase64 = Convert.ToBase64String(Functions.ImageToBytes(Functions.ReduceImageSize(this.playerListImage, 70)));
             }
-            Debug.WriteLine(JsonConvert.SerializeObject(this, Formatting.Indented));
+
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }
-    class Hero
+    class HeroPlayed
     {
         [JsonProperty("heroIndex")]
         private string heroIndex { get; }
         [JsonProperty("heroPercentPlayed")]
         private string heroPercentPlayed { get;}
 
-        public Hero(string heroIndex, string heroPercentPlayed)
+        public HeroPlayed(string heroIndex, string heroPercentPlayed)
         {
             this.heroIndex = heroIndex;
             this.heroPercentPlayed = heroPercentPlayed;

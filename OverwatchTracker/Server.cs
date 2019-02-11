@@ -13,9 +13,9 @@ namespace BetterOverwatch
 {
     class Initalize
     {
-        private string version = "";
-        private string host = "";
-        private string gitHubHost = "";
+        private readonly string version = "";
+        private readonly string host = "";
+        private readonly string gitHubHost = "";
 
         public Initalize(string version, string host, string gitHubHost)
         {
@@ -107,7 +107,7 @@ namespace BetterOverwatch
             Functions.DebugMessage("Uploading GameData...");
             new Thread(() =>
             {
-                for (int i = 1; i <= 10; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     if (GameUploader(gameData)) break;
                     Thread.Sleep(1000);

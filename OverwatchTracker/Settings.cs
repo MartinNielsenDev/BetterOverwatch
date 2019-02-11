@@ -10,18 +10,16 @@ namespace BetterOverwatch
         /// Used by the server to authenticate the user on the website, this is essentially a password.
         /// </summary>
         [JsonProperty("privateToken")]
-        public string privateToken { get; set; } = "";
+        public string privateToken = "";
         /// <summary>
         /// This will be the user's permanent link on the website, to share their profile with others, this can be changed.
         /// </summary>
         [JsonProperty("publicToken")]
-        public string publicToken { get; set; } = "";
+        public string publicToken = "";
         [JsonProperty("uploadScreenshot")]
-        public bool uploadScreenshot { get; set; } = true;
+        public bool uploadScreenshot = true;
         [JsonProperty("startWithWindows")]
-        public bool startWithWindows { get; set; } = true;
-        [JsonProperty("playAudioOnSuccess")]
-        public bool playAudioOnSuccess { get; set; } = true;
+        public bool startWithWindows = true;
 
         public static void Load()
         {
@@ -33,7 +31,6 @@ namespace BetterOverwatch
                 string json;
                 if (File.Exists(Path.Combine(Vars.configPath, "settings.json")))
                 {
-                    Functions.DebugMessage("Loading settings.json");
                     json = File.ReadAllText(Path.Combine(Vars.configPath, "settings.json"));
                     if ((json.Replace("\r", String.Empty).Replace("\n", String.Empty) != String.Empty) && json.Length > 0)
                     {
@@ -51,7 +48,6 @@ namespace BetterOverwatch
         {
             if (Server.FetchTokens())
             {
-                Functions.DebugMessage("privateToken verified");
                 Save();
                 return true;
             }

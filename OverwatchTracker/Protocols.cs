@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Text.RegularExpressions;
@@ -38,10 +39,10 @@ namespace BetterOverwatch
                     }
                     if (Vars.srCheck[0].Equals(srText) && Vars.srCheck[1].Equals(srText))
                     {
-                        if (!Vars.gameData.currentRating.Equals(srText) || Vars.gameData.gameState >= Vars.STATUS_FINISHED)
+                        if (!Vars.gameData.currentRating.Equals(srText) || Vars.gameData.state >= State.Finished)
                         {
                             Functions.PlaySound();
-                            Program.contextMenu.currentGame.MenuItems[1].Text = "Skill rating: " + srText;
+                            Program.trayMenu.currentGame.MenuItems[1].Text = "Skill rating: " + srText;
                             Functions.DebugMessage("Recognized sr: '" + srText + "'");
                         }
                         Vars.gameTimer.Stop();
@@ -50,14 +51,18 @@ namespace BetterOverwatch
                         Vars.srCheckIndex = 0;
                         Vars.gameData.currentRating = srText;
 
-                        if (Vars.gameData.gameState >= 2)
+                        if (Vars.gameData.state == State.Recording ||
+                            Vars.gameData.state == State.Finished ||
+                            Vars.gameData.state == State.WaitForUpload
+                            )
                         {
                             if (!IsValidGame()) return;
-                            Server.UploadGame(Vars.gameData.GetData());
+                            string game = Vars.gameData.GetData();
+                            Vars.lastGameJSON = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<CleanedGame>(game), Formatting.Indented);
+                            Server.UploadGame(game);
                             ResetGame();
                         }
-                        Program.contextMenu.trayIcon.Text = "Ready to record, enter a competitive game to begin";
-                        Program.contextMenu.trayIcon.Icon = Properties.Resources.IconActive;
+                        Program.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Properties.Resources.IconActive);
                     }
                 }
             }
@@ -96,8 +101,8 @@ namespace BetterOverwatch
                                         Vars.gameTimer.ElapsedMilliseconds - Functions.GetTimeDeduction() > 30000 &&
                                         Functions.CheckStats(elimsText, damageText, objKillsText, healingText, deathsText, Vars.gameTimer.ElapsedMilliseconds - Functions.GetTimeDeduction()))
                                     {
-                                        Vars.gameData.statsRecorded.Add(
-                                            new StatsData(
+                                        Vars.gameData.stats.Add(
+                                            new Stats(
                                                 elimsText, 
                                                 damageText, 
                                                 objKillsText, 
@@ -138,14 +143,16 @@ namespace BetterOverwatch
 
                 if (percent >= 70)
                 {
-                    if (Vars.gameData.gameState == Vars.STATUS_FINISHED || Vars.gameData.gameState == Vars.STATUS_WAITFORUPLOAD) // a game finished
+                    if (Vars.gameData.state == State.Finished || Vars.gameData.state == State.WaitForUpload) // a game finished
                     {
-                        Server.UploadGame(Vars.gameData.GetData());
-                        Vars.gameData = new GameData(Vars.gameData.currentRating);
+                        string game = Vars.gameData.GetData();
+                        Vars.lastGameJSON = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<CleanedGame>(game), Formatting.Indented);
+                        Server.UploadGame(game);
+                        Vars.gameData = new Game(Vars.gameData.currentRating);
                         ResetGame();
                     }
                     Vars.getInfoTimeout.Restart();
-                    Vars.gameData.gameState = Vars.STATUS_INGAME;
+                    Vars.gameData.state = State.Ingame;
                     Vars.gameData.startRating = Vars.gameData.currentRating;
 
                     Functions.DebugMessage("Recognized competitive game");
@@ -165,7 +172,7 @@ namespace BetterOverwatch
                     if (!mapText.Equals(String.Empty))
                     {
                         Vars.gameData.mapInfo.mapName = mapText;
-                        Program.contextMenu.currentGame.MenuItems[2].Text = "Map: " + mapText;
+                        Program.trayMenu.currentGame.MenuItems[2].Text = "Map: " + mapText;
                         Functions.DebugMessage("Recognized map: '" + mapText + "'");
                         if (mapText.Equals("Ilios") || mapText.Equals("Lijiang Tower") || mapText.Equals("Nepal") || mapText.Equals("Oasis") || mapText.Equals("Busan")) // checks if the map is KOTH
                         {
@@ -247,15 +254,15 @@ namespace BetterOverwatch
             }
             if (!Vars.gameData.team1Rating.Equals(String.Empty) && !Vars.gameData.team1Rating.Equals(String.Empty))
             {
-                Program.contextMenu.currentGame.MenuItems[3].Text = "Team ratings: " + Vars.gameData.team1Rating + " | " + Vars.gameData.team2Rating;
+                Program.trayMenu.currentGame.MenuItems[3].Text = "Team ratings: " + Vars.gameData.team1Rating + " | " + Vars.gameData.team2Rating;
             }
             else if (!Vars.gameData.team1Rating.Equals(String.Empty))
             {
-                Program.contextMenu.currentGame.MenuItems[3].Text = "Team ratings: " + Vars.gameData.team1Rating + " | -";
+                Program.trayMenu.currentGame.MenuItems[3].Text = "Team ratings: " + Vars.gameData.team1Rating + " | -";
             }
             else if (!Vars.gameData.team2Rating.Equals(String.Empty))
             {
-                Program.contextMenu.currentGame.MenuItems[3].Text = "Team ratings: - | " + Vars.gameData.team2Rating;
+                Program.trayMenu.currentGame.MenuItems[3].Text = "Team ratings: - | " + Vars.gameData.team2Rating;
             }
         }
         public static void CheckMainMenu(Bitmap frame)
@@ -272,9 +279,8 @@ namespace BetterOverwatch
                         return;
                     }
                     Vars.loopDelay = 250;
-                    Program.contextMenu.trayIcon.Text = "Visit play menu to upload last game";
-                    Program.contextMenu.trayIcon.Icon = Properties.Resources.IconVisitMenu;
-                    Vars.gameData.gameState = Vars.STATUS_FINISHED;
+                    Program.trayMenu.ChangeTray("Visit play menu to upload last game", Properties.Resources.IconVisitMenu);
+                    Vars.gameData.state = State.Finished;
                     Vars.gameTimer.Stop();
                     Vars.heroTimer.Stop();
 
@@ -333,7 +339,7 @@ namespace BetterOverwatch
                                 Vars.heroTimer.Restart();
                             }
                             Vars.gameData.currentHero = h;
-                            Program.contextMenu.currentGame.MenuItems[4].Text = "Last Hero: " + Vars.heroNamesReal[h];
+                            Program.trayMenu.currentGame.MenuItems[4].Text = "Last Hero: " + Vars.heroNamesReal[h];
                             break;
                         }
                     }
@@ -368,9 +374,8 @@ namespace BetterOverwatch
                     {
                         return;
                     }
-                    Program.contextMenu.trayIcon.Text = "Visit play menu to upload last game";
-                    Program.contextMenu.trayIcon.Icon = Properties.Resources.IconVisitMenu;
-                    Vars.gameData.gameState = Vars.STATUS_FINISHED;
+                    Program.trayMenu.ChangeTray("Visit play menu to upload last game", Properties.Resources.IconVisitMenu);
+                    Vars.gameData.state = State.Finished;
                     Vars.gameTimer.Stop();
                     Vars.heroTimer.Stop();
 
@@ -403,8 +408,8 @@ namespace BetterOverwatch
                         Vars.gameData.team2Score = scoreTextRight;
                         Vars.loopDelay = 250;
                         Functions.DebugMessage("Recognized team score Team 1:" + scoreTextLeft + " Team 2:" + scoreTextRight);
-                        Program.contextMenu.currentGame.MenuItems[5].Text = "Final score: " + scoreTextLeft + " | " + scoreTextRight;
-                        Vars.gameData.gameState = Vars.STATUS_WAITFORUPLOAD;
+                        Program.trayMenu.currentGame.MenuItems[5].Text = "Final score: " + scoreTextLeft + " | " + scoreTextRight;
+                        Vars.gameData.state = State.WaitForUpload;
                     }
                 }
             }
@@ -413,7 +418,7 @@ namespace BetterOverwatch
         {
             if (Vars.gameTimer.ElapsedMilliseconds / 1000 < 300)
             {
-                if (Vars.gameData.gameState >= Vars.STATUS_RECORDING)
+                if (Vars.gameData.state >= State.Recording)
                 {
                     Functions.DebugMessage("Invalid game");
                     ResetGame();
@@ -424,9 +429,8 @@ namespace BetterOverwatch
         }
         private static void ResetGame()
         {
-            Vars.gameData = new GameData(Vars.gameData.currentRating);
-            Program.contextMenu.trayIcon.Text = "Ready to record, enter a competitive game to begin";
-            Program.contextMenu.trayIcon.Icon = Properties.Resources.IconActive;
+            Vars.gameData = new Game(Vars.gameData.currentRating);
+            Program.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Properties.Resources.IconActive);
         }
     }
 }

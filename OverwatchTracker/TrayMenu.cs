@@ -1,19 +1,22 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Drawing;
 using Microsoft.Win32;
-using System.IO;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace BetterOverwatch
 {
-    public class ContextMenu : Form
+    public class TrayMenu : Form
     {
         public MenuItem currentGame = new MenuItem("Last Game");
         public NotifyIcon trayIcon = new NotifyIcon();
-        public System.Windows.Forms.ContextMenu trayMenu = new System.Windows.Forms.ContextMenu();
-        private RegistryKey reg = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
+        public ContextMenu trayMenu = new ContextMenu();
+        private readonly RegistryKey registry = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
 
-        public ContextMenu()
+        public TrayMenu()
         {
             try
             {
@@ -23,27 +26,23 @@ namespace BetterOverwatch
                 currentGame.MenuItems.Add("Teams rating: ---- | ----");
                 currentGame.MenuItems.Add("Last Hero: ----");
                 currentGame.MenuItems.Add("Final score: - | -");
-
-                for(int i = 0; i < currentGame.MenuItems.Count; i++) { currentGame.MenuItems[i].Enabled = false; }
-                MenuItem debugTools = new MenuItem("Debug tools");
+                for (int i = 0; i < currentGame.MenuItems.Count; i++) currentGame.MenuItems[i].Enabled = false;
+                MenuItem debugTools = new MenuItem("Tools");
                 debugTools.MenuItems.Add("Open logs", OpenLogs);
+                debugTools.MenuItems.Add("Open Last Game JSON", FetchJSON);
                 debugTools.MenuItems.Add(currentGame);
-                
+
                 trayMenu.MenuItems.Add("Better Overwatch v" + Vars.initalize.Version);
                 trayMenu.MenuItems.Add("Login", OpenMatchHistory);
                 trayMenu.MenuItems.Add("-");
                 trayMenu.MenuItems.Add("Upload screenshot of player list", ToggleUpload);
-                trayMenu.MenuItems.Add("Start when Windows starts", ToggleWindows);
-                trayMenu.MenuItems.Add("Play audio on success", ToggleAudio);
-                trayMenu.MenuItems.Add(debugTools);
+                trayMenu.MenuItems.Add("Start with Windows", ToggleWindows);
                 trayMenu.MenuItems.Add("-");
+                trayMenu.MenuItems.Add(debugTools);
                 trayMenu.MenuItems.Add("Exit", OnExit);
                 trayMenu.MenuItems[0].Enabled = false;
 
-                if (Vars.settings.uploadScreenshot)
-                {
-                    trayMenu.MenuItems[3].Checked = true;
-                }
+                if (Vars.settings.uploadScreenshot) trayMenu.MenuItems[3].Checked = true;
                 if (Vars.settings.startWithWindows)
                 {
                     trayMenu.MenuItems[4].Checked = true;
@@ -51,21 +50,16 @@ namespace BetterOverwatch
                     {
                         if (key != null)
                         {
-                            key.SetValue("OverwatchTracker", "\"" + Application.ExecutablePath.ToString() + "\"");
+                            key.SetValue("BetterOverwatch", "\"" + Application.ExecutablePath.ToString() + "\"");
                         }
                     }
                 }
-                if (Vars.settings.playAudioOnSuccess)
-                {
-                    trayMenu.MenuItems[5].Checked = true;
-                }
-
-                trayIcon.Text = "Waiting for Overwatch, idle...";
-                trayIcon.Icon = Properties.Resources.Idle;
+                ChangeTray("Waiting for Overwatch, idle...", Properties.Resources.Idle);
                 trayIcon.ContextMenu = trayMenu;
                 trayIcon.Visible = true;
                 trayIcon.DoubleClick += new EventHandler(OpenMatchHistory);
-            }catch { }
+            }
+            catch { }
         }
         protected override void OnLoad(EventArgs e)
         {
@@ -74,19 +68,54 @@ namespace BetterOverwatch
 
             base.OnLoad(e);
         }
-        public void TrayPopup(string title, string text, int timeout)
-        {
-            if (InvokeRequired)
-            {
-                this.Invoke(new Action<string, string, int>(TrayPopup), new object[] { title, text, timeout });
-                return;
-            }
-            Functions.DebugMessage(title);
-            trayIcon.ShowBalloonTip(timeout, title, text, ToolTipIcon.None);
-        }
         private void OnExit(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+        private void TrayPopup(string text, int timeout)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<string, int>(TrayPopup), new object[] { text, timeout });
+                return;
+            }
+            trayIcon.ShowBalloonTip(timeout, "Better Overwatch", text, ToolTipIcon.None);
+            Console.WriteLine(Environment.OSVersion.Version);
+        }
+        private void FetchJSON(object sender, EventArgs e)
+        {
+            if (Vars.lastGameJSON.Length > 0)
+            {
+                string path = Path.Combine(Path.GetTempPath(), "lastgame.json");
+                File.AppendAllText(path, Vars.lastGameJSON);
+                Process.Start("notepad.exe", path);
+                TrayPopup("Last game successfully fetched", 3000);
+            }
+            else
+            {
+                TrayPopup("No game was found", 3000);
+            }
+            /*
+            ToastContent content = new ToastContent()
+            {
+                Launch = "app-defined-string",
+
+                Visual = new ToastVisual()
+                {
+                    BindingGeneric = new ToastBindingGeneric()
+                    {
+                        Children =
+                        {
+                            new AdaptiveText()
+                            {
+                                Text = "Conf Room 2001 / Building 135"
+                            }
+                        }
+                    }
+                }
+            };
+            ToastNotificationManager
+            */
         }
         private void OpenLogs(object sender, EventArgs e)
         {
@@ -113,7 +142,7 @@ namespace BetterOverwatch
                 {
                     if (key != null)
                     {
-                        key.DeleteValue("OverwatchTracker");
+                        key.DeleteValue("BetterOverwatch");
                     }
                 }
                 trayMenu.MenuItems[4].Checked = false;
@@ -124,7 +153,7 @@ namespace BetterOverwatch
                 {
                     if (key != null)
                     {
-                        key.SetValue("OverwatchTracker", "\"" + Application.ExecutablePath.ToString() + "\"");
+                        key.SetValue("BetterOverwatch", "\"" + Application.ExecutablePath.ToString() + "\"");
                     }
                 }
                 trayMenu.MenuItems[4].Checked = true;
@@ -132,35 +161,26 @@ namespace BetterOverwatch
             Vars.settings.startWithWindows = trayMenu.MenuItems[4].Checked;
             Settings.Save();
         }
-        private void ToggleAudio(object sender, EventArgs e)
-        {
-            if (trayMenu.MenuItems[5].Checked)
-            {
-                trayMenu.MenuItems[5].Checked = false;
-            }
-            else
-            {
-                trayMenu.MenuItems[5].Checked = true;
-            }
-            Vars.settings.playAudioOnSuccess = trayMenu.MenuItems[5].Checked;
-            Settings.Save();
-        }
         private void OpenMatchHistory(object sender, EventArgs e)
         {
-            if(Vars.settings.publicToken.Equals(String.Empty))
+            if (Vars.settings.publicToken.Equals(String.Empty))
             {
                 Server.FetchTokens();
             }
             if (Vars.settings.publicToken.Equals(String.Empty))
             {
-                // no publicToken fetched, popup browser so user can create one
                 Process.Start("http://" + Vars.initalize.Host + "/new-account/?privateToken=" + Vars.settings.privateToken);
             }
             else
             {
-                // publicToken successfully fetched, login instead with their privateToken
                 Process.Start("http://" + Vars.initalize.Host + "/" + Vars.settings.publicToken + "?login=" + Vars.settings.privateToken);
             }
+        }
+        public void ChangeTray(string text, Icon icon)
+        {
+            TrayPopup(text, 5000);
+            trayIcon.Text = text;
+            trayIcon.Icon = icon;
         }
         protected override void Dispose(bool isDisposing)
         {
@@ -171,18 +191,31 @@ namespace BetterOverwatch
 
             base.Dispose(isDisposing);
         }
-
-        private void InitializeComponent()
-        {
-            this.SuspendLayout();
-            // 
-            // ContextMenu
-            // 
-            this.ClientSize = new System.Drawing.Size(284, 261);
-            this.Name = "ContextMenu";
-            this.TopMost = true;
-            this.ResumeLayout(false);
-
-        }
+    }
+    class CleanedGame
+    {
+#pragma warning disable 0169
+        [JsonProperty("mapInfo")]
+        private MapInfo mapInfo;
+        [JsonProperty("startRating")]
+        private string startRating;
+        [JsonProperty("endRating")]
+        private string endRating;
+        [JsonProperty("team1Rating")]
+        private string team1Rating;
+        [JsonProperty("team2Rating")]
+        private string team2Rating;
+        [JsonProperty("team1Score")]
+        private string team1Score;
+        [JsonProperty("team2Score")]
+        private string team2Score;
+        [JsonProperty("duration")]
+        private string duration;
+        [JsonProperty("heroes")]
+        private List<HeroPlayed> heroes;
+        [JsonProperty("statsRecorded")]
+        private List<Stats> statsRecorded;
+        [JsonProperty("battleTag")]
+        private string battleTag;
     }
 }

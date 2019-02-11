@@ -23,6 +23,10 @@ namespace BetterOverwatch
         static extern IntPtr GetForegroundWindow();
         [DllImport("user32.dll")]
         static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+        [DllImport("user32.dll")]
+        public static extern uint SendMessage(IntPtr hWnd, uint msg, uint wParam, uint lParam);
+        [DllImport("user32.dll")]
+        public static extern short GetAsyncKeyState(int vKey);
         public static string activeWindowTitle()
         {
             const int nChars = 256;
@@ -622,10 +626,7 @@ namespace BetterOverwatch
         }
         public static void PlaySound()
         {
-            if (Vars.settings.playAudioOnSuccess)
-            {
-                Vars.audio.Play();
-            }
+            Vars.audio.Play();
         }
         public static void SetVolume(int vol)
         {

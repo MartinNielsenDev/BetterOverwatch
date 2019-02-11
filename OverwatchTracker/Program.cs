@@ -13,11 +13,7 @@ namespace BetterOverwatch
 {
     class Program
     {
-        [DllImport("user32.dll")]
-        public static extern uint SendMessage(IntPtr hWnd, uint msg, uint wParam, uint lParam);
-        [DllImport("user32.dll")]
-        public static extern short GetAsyncKeyState(int vKey);
-        public static ContextMenu contextMenu;
+        public static TrayMenu trayMenu;
         private static AdminPromptForm adminPromptForm;
         private static DesktopDuplicator desktopDuplicator;
         private static Mutex mutex = new Mutex(true, "74bf6260-c133-4d69-ad9c-efc607887c97");
@@ -25,14 +21,15 @@ namespace BetterOverwatch
         static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.0.5",
+                version: "1.0.7",
                 host: "betteroverwatch.com",
-                gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
+                gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest"
+                );
             Functions.DebugMessage("Starting Better Overwatch version " + Vars.initalize.Version);
 
             if (!mutex.WaitOne(TimeSpan.Zero, true))
             {
-                Functions.DebugMessage("Better Overwatch is already running...");
+                MessageBox.Show("Better Overwatch is already running\r\n\r\nYou must close other instances of Better Overwatch if you want to open this one", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler((s, assembly) =>
@@ -91,15 +88,15 @@ namespace BetterOverwatch
                 Vars.settings = new Settings();
                 Settings.Load();
                 Settings.Save();
-                Vars.gameData = new GameData();
+                Vars.gameData = new Game();
                 adminPromptForm = new AdminPromptForm();
-                contextMenu = new ContextMenu();
+                trayMenu = new TrayMenu();
 
                 if (!Settings.VerifyUser()) return;
 
                 new Thread(CaptureDesktop) { IsBackground = true }.Start();
                 Server.autoUpdaterTimer.Start();
-                Functions.DebugMessage("> Success - Better Overwatch started without fail");
+                Functions.DebugMessage("> success - Better Overwatch started without fail");
             }
             catch (Exception e)
             {
@@ -110,7 +107,7 @@ namespace BetterOverwatch
             {
                 adminPromptForm.Show();
             }
-            Application.Run(contextMenu);
+            Application.Run(trayMenu);
         }
         public static void CaptureDesktop()
         {
@@ -133,8 +130,7 @@ namespace BetterOverwatch
                     {
                         if (Functions.IsProcessOpen("Overwatch"))
                         {
-                            contextMenu.trayIcon.Text = "Visit play menu to update your skill rating";
-                            contextMenu.trayIcon.Icon = Properties.Resources.IconVisitMenu;
+                            trayMenu.ChangeTray("Visit play menu to update your skill rating", Properties.Resources.IconVisitMenu);
                             Vars.overwatchRunning = true;
                         }
                         else
@@ -146,8 +142,7 @@ namespace BetterOverwatch
                     {
                         if (!Functions.IsProcessOpen("Overwatch"))
                         {
-                            contextMenu.trayIcon.Text = "Waiting for Overwatch, idle...";
-                            contextMenu.trayIcon.Icon = Properties.Resources.Idle;
+                            trayMenu.ChangeTray("Waiting for Overwatch, idle...", Properties.Resources.Idle);
                             Vars.overwatchRunning = false;
                         }
                     }
@@ -156,7 +151,7 @@ namespace BetterOverwatch
                 else
                 {
                     Thread.Sleep(50);
-                    contextMenu.currentGame.MenuItems[0].Text = "Game elapsed: " + Functions.SecondsToMinutes((int)Math.Floor(Convert.ToDouble(Vars.gameTimer.ElapsedMilliseconds / 1000)));
+                    trayMenu.currentGame.MenuItems[0].Text = "Game elapsed: " + Functions.SecondsToMinutes((int)Math.Floor(Convert.ToDouble(Vars.gameTimer.ElapsedMilliseconds / 1000)));
 
                     if (Vars.frameTimer.ElapsedMilliseconds >= Vars.loopDelay)
                     {
@@ -177,7 +172,7 @@ namespace BetterOverwatch
                             {
                                 Protocols.CheckMainMenu(frame.DesktopImage);
 
-                                if (Vars.gameData.gameState != Vars.STATUS_INGAME)
+                                if (Vars.gameData.state != State.Ingame)
                                 {
                                     string quickPlayText = Functions.BitmapToText(frame.DesktopImage, 476, 644, 80, 40, contrastFirst: false, radius: 140, network: 0, invertColors: true);
 
@@ -187,12 +182,12 @@ namespace BetterOverwatch
                                     }
                                 }
 
-                                if (Vars.gameData.gameState == Vars.STATUS_IDLE || Vars.gameData.gameState == Vars.STATUS_FINISHED || Vars.gameData.gameState == Vars.STATUS_WAITFORUPLOAD)
+                                if (Vars.gameData.state == State.Idle || Vars.gameData.state == State.Finished || Vars.gameData.state == State.WaitForUpload)
                                 {
                                     Protocols.CheckCompetitiveGameEntered(frame.DesktopImage);
                                 }
 
-                                if (Vars.gameData.gameState == Vars.STATUS_INGAME)
+                                if (Vars.gameData.state == State.Ingame)
                                 {
                                     Protocols.CheckMap(frame.DesktopImage);
                                     Protocols.CheckTeamsSkillRating(frame.DesktopImage);
@@ -214,9 +209,8 @@ namespace BetterOverwatch
 
                                         }
                                         Vars.loopDelay = 500;
-                                        Vars.gameData.gameState = Vars.STATUS_RECORDING;
-                                        contextMenu.trayIcon.Text = "Recording... visit the main menu after the game";
-                                        contextMenu.trayIcon.Icon = Properties.Resources.IconRecord;
+                                        Vars.gameData.state = State.Recording;
+                                        trayMenu.ChangeTray("Recording... visit the main menu after the game", Properties.Resources.IconRecord);
                                         Vars.statsTimer.Restart();
                                         Vars.getInfoTimeout.Stop();
                                     }
@@ -225,14 +219,14 @@ namespace BetterOverwatch
                                         Vars.roundTimer.Stop();
                                         Vars.gameTimer.Stop();
                                         Vars.getInfoTimeout.Stop();
-                                        Vars.gameData.gameState = Vars.STATUS_IDLE;
+                                        Vars.gameData.state = State.Idle;
                                         Functions.DebugMessage("Failed to find game");
                                     }
                                 }
 
-                                if (Vars.gameData.gameState == Vars.STATUS_RECORDING)
+                                if (Vars.gameData.state == State.Recording)
                                 {
-                                    if (GetAsyncKeyState(0x09) < 0)
+                                    if (Functions.GetAsyncKeyState(0x09) < 0)
                                     {
                                         Protocols.CheckHeroPlayed(frame.DesktopImage);
                                         if (Vars.roundTimer.ElapsedMilliseconds >= Functions.GetTimeDeduction(getNextDeduction: true))
@@ -248,7 +242,7 @@ namespace BetterOverwatch
                                     Protocols.CheckFinalScore(frame.DesktopImage);
                                 }
 
-                                if (Vars.gameData.gameState == Vars.STATUS_FINISHED)
+                                if (Vars.gameData.state == State.Finished)
                                 {
                                     Protocols.CheckGameScore(frame.DesktopImage);
                                 }

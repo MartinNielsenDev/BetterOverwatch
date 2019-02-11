@@ -31,7 +31,7 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <!--->targetplatformversion>10.0</targetplatformversion-->
+    <targetplatformversion>10.0</targetplatformversion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -104,7 +104,7 @@
       <DependentUpon>AdminPromptForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Protocols.cs" />
-    <Compile Include="ContextMenu.cs">
+    <Compile Include="TrayMenu.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="DesktopDuplication\DesktopDuplicationException.cs" />
@@ -136,9 +136,6 @@
     <EmbeddedResource Include="AdminPromptForm.resx">
       <DependentUpon>AdminPromptForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ContextMenu.resx">
-      <DependentUpon>ContextMenu.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -152,7 +149,9 @@
     <EmbeddedResource Include="UpdateNotificationForm.resx">
       <DependentUpon>UpdateNotificationForm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="app.manifest" />
+    <None Include="app.manifest">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="DesktopDuplication\packages.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

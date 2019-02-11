@@ -16,7 +16,7 @@ namespace BetterOverwatch
 
         private void AdminPromptForm_Load(object sender, EventArgs e)
         {
-            Program.SendMessage(button1.Handle, BCM_SETSHIELD, 0, 0xFFFFFFFF);
+            Functions.SendMessage(button1.Handle, BCM_SETSHIELD, 0, 0xFFFFFFFF);
             System.Media.SystemSounds.Asterisk.Play();
         }
 
