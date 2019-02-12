@@ -21,7 +21,7 @@ namespace BetterOverwatch
         static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.0.7",
+                version: "1.0.8",
                 host: "betteroverwatch.com",
                 gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest"
                 );
@@ -128,7 +128,7 @@ namespace BetterOverwatch
             }
             while (true)
             {
-                if (!Functions.activeWindowTitle().Equals("Overwatch") && 1 == 2)
+                if (!Functions.activeWindowTitle().Equals("Overwatch"))
                 {
                     if (!Vars.overwatchRunning)
                     {
@@ -174,13 +174,11 @@ namespace BetterOverwatch
                         {
                             try
                             {
-                                Protocols.CheckMainMenu(frame.DesktopImage);
-
                                 if (Vars.gameData.state != State.Ingame)
                                 {
-                                    string quickPlayText = Functions.BitmapToText(frame.DesktopImage, 476, 644, 80, 40, contrastFirst: false, radius: 140, network: 0, invertColors: true);
+                                    string quickPlayText = Functions.BitmapToText(frame.DesktopImage, 476, 644, 80, 40, contrastFirst: false, radius: 140, network: Network.Maps, invertColors: true);
 
-                                    if (Functions.CompareStrings(quickPlayText, "PLRY") >= 70)
+                                    if (Functions.CompareStrings(quickPlayText, "PLHY") >= 70)
                                     {
                                         Protocols.CheckPlayMenu(frame.DesktopImage);
                                     }

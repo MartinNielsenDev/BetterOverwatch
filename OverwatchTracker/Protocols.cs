@@ -11,12 +11,12 @@ namespace BetterOverwatch
     {
         public static void CheckPlayMenu(Bitmap frame)
         {
-            string srText = Functions.BitmapToText(frame, 1100, 444, 100, 40, contrastFirst: true, radius: 110, network: Network.SkillRating); // GROUP CHECK
+            string srText = Functions.BitmapToText(frame, 1100, 444, 100, 40, contrastFirst: true, radius: 110, network: Network.Numbers); // GROUP CHECK
             srText = Regex.Match(srText, "[0-9]+").ToString();
 
             if (srText.Length < 4)
             {
-                srText = srText = Functions.BitmapToText(frame, 1100, 504, 100, 32, contrastFirst: true, radius: 110, network: Network.SkillRating); // SOLO CHECK
+                srText = srText = Functions.BitmapToText(frame, 1100, 504, 100, 32, contrastFirst: true, radius: 110, network: Network.Numbers); // SOLO CHECK
                 srText = Regex.Match(srText, "[0-9]+").ToString();
             }
             if (srText.Length > 4)
@@ -70,23 +70,23 @@ namespace BetterOverwatch
         public static void CheckStats(Bitmap frame)
         {
             short threshold = 110;
-            string elimsText = Functions.BitmapToText(frame, 130, 895, 40, 22, contrastFirst: false, radius: threshold, network: Network.Stats);
+            string elimsText = Functions.BitmapToText(frame, 130, 895, 40, 22, contrastFirst: false, radius: threshold, network: Network.Numbers);
 
             if (!elimsText.Equals(String.Empty))
             {
-                string damageText = Functions.BitmapToText(frame, 130, 957, 80, 22, contrastFirst: false, radius: threshold, network: Network.Stats);
+                string damageText = Functions.BitmapToText(frame, 130, 957, 80, 22, contrastFirst: false, radius: threshold, network: Network.Numbers);
 
                 if (!damageText.Equals(String.Empty))
                 {
-                    string objKillsText = Functions.BitmapToText(frame, 375, 895, 40, 22, contrastFirst: false, radius: threshold, network: Network.Stats);
+                    string objKillsText = Functions.BitmapToText(frame, 375, 895, 40, 22, contrastFirst: false, radius: threshold, network: Network.Numbers);
 
                     if (!objKillsText.Equals(String.Empty))
                     {
-                        string healingText = Functions.BitmapToText(frame, 375, 957, 80, 22, contrastFirst: false, radius: threshold, network: Network.Stats);
+                        string healingText = Functions.BitmapToText(frame, 375, 957, 80, 22, contrastFirst: false, radius: threshold, network: Network.Numbers);
 
                         if (!healingText.Equals(String.Empty))
                         {
-                            string deathsText = Functions.BitmapToText(frame, 625, 957, 40, 22, contrastFirst: false, radius: threshold, network: Network.Stats);
+                            string deathsText = Functions.BitmapToText(frame, 625, 957, 40, 22, contrastFirst: false, radius: threshold, network: Network.Numbers);
 
                             if (!deathsText.Equals(String.Empty))
                             {
@@ -110,7 +110,6 @@ namespace BetterOverwatch
                                                 deathsText, 
                                                 Vars.gameTimer.ElapsedMilliseconds - Functions.GetTimeDeduction()
                                                 ));
-
                                         Vars.statsTimer.Restart();
                                         Vars.statsCheck[0] = "";
                                         Vars.statsCheck[1] = "";
@@ -195,7 +194,7 @@ namespace BetterOverwatch
             {
                 string team1SR = Functions.BitmapToText(frame, 545, 220, 245, 70, contrastFirst: false, radius: 90, network: Network.TeamSkillRating);
                 team1SR = Regex.Match(team1SR, "[0-9]+").ToString();
-
+                
                 if (!team1SR.Equals(String.Empty) && team1SR.Length >= 4) // TEAM 1 SR
                 {
                     team1SR = team1SR.Substring(team1SR.Length - 4);
@@ -225,7 +224,7 @@ namespace BetterOverwatch
             {
                 string team2SR = Functions.BitmapToText(frame, 1135, 220, 245, 70, contrastFirst: false, radius: 90, network: Network.TeamSkillRating);
                 team2SR = Regex.Match(team2SR, "[0-9]+").ToString();
-
+                
                 if (!team2SR.Equals(String.Empty) && team2SR.Length >= 4) // TEAM 1 SR
                 {
                     team2SR = team2SR.Substring(team2SR.Length - 4);
@@ -271,7 +270,7 @@ namespace BetterOverwatch
 
             if (!menuText.Equals(String.Empty))
             {
-                if (menuText.Equals("PRAY"))
+                if (menuText.Equals("PLAY"))
                 {
                     Functions.DebugMessage("Recognized main menu");
                     if (!IsValidGame()) return;
@@ -297,7 +296,6 @@ namespace BetterOverwatch
             {
                 for (int h = 0; h < Vars.heroNames.Length; h++)
                 {
-                    if (heroText.Equals("UVR") || heroText.Equals("OVR")) { heroText = "DVA"; }
                     double accuracy = Functions.CompareStrings(heroText, Vars.heroNames[h]);
 
                     if (accuracy >= 70)
@@ -314,19 +312,16 @@ namespace BetterOverwatch
                                     if (Vars.gameData.currentHero == Vars.gameData.heroPlayed[t])
                                     {
                                         Vars.gameData.heroTimePlayed[t].Stop();
-                                        Functions.DebugMessage("Stopped timer for hero " + (t + 1));
                                     }
                                 }
                                 if (h == Vars.gameData.heroPlayed[t])
                                 {
                                     Vars.gameData.heroTimePlayed[t].Start();
-                                    Functions.DebugMessage("Resumed timer for hero " + (t + 1));
                                     timerCreated = true;
                                 }
                             }
                             if (!timerCreated)
                             {
-                                Functions.DebugMessage("First time on hero " + (h + 1) + ", creating timer");
                                 Vars.gameData.heroPlayed.Add(h);
                                 Vars.gameData.heroTimePlayed.Add(new Stopwatch());
                                 Vars.gameData.heroTimePlayed[Vars.gameData.heroTimePlayed.Count - 1].Start();

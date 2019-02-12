@@ -30,17 +30,11 @@ namespace BetterOverwatch
             playerDeaths = deaths;
             time = Convert.ToInt32(Math.Floor(t / 1000));
         }
-        public string GetData()
-        {
-            Debug.WriteLine(JsonConvert.SerializeObject(this, Formatting.Indented));
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
-        }
     }
     class Game
     {
         public Game(string currentRating = "")
         {
-            // need to save previous current skill rating since the Game object is disposed then recreated
             this.currentRating = currentRating;
         }
         [JsonIgnore]

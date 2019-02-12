@@ -80,7 +80,6 @@ namespace BetterOverwatch
                 return;
             }
             trayIcon.ShowBalloonTip(timeout, "Better Overwatch", text, ToolTipIcon.None);
-            Console.WriteLine(Environment.OSVersion.Version);
         }
         private void FetchJSON(object sender, EventArgs e)
         {

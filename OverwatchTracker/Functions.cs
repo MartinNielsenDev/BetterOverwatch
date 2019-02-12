@@ -201,10 +201,8 @@ namespace BetterOverwatch
                     result = AdjustColors(result, radius, red, green, blue, fillOutside);
                     AdjustContrast(result, 255f, invertColors);
                 }
-                result.Save(@"C:\users\mani\Desktop\test2.png");
                 output = FetchTextFromImage(result, network);
                 result.Dispose();
-
             }
             catch (Exception e)
             {
@@ -555,7 +553,7 @@ namespace BetterOverwatch
             {
                 return Convert.ToChar('A' + network.BestNodeIndex).ToString();
             }
-            else if (networkId == Network.TeamSkillRating || networkId == Network.SkillRating || networkId == Network.Stats)
+            else if (networkId == Network.TeamSkillRating || networkId == Network.Numbers)
             {
                 return network.BestNodeIndex.ToString();
             }
@@ -578,13 +576,9 @@ namespace BetterOverwatch
                     {
                         text += FetchLetterFromImage(BetterOverwatchNetworks.teamSkillRatingNN, bitmaps[i], network);
                     }
-                    else if (network == Network.SkillRating)
+                    else if (network == Network.Numbers)
                     {
-                        text += FetchLetterFromImage(BetterOverwatchNetworks.skillRatingNN, bitmaps[i], network);
-                    }
-                    else if (network == Network.Stats)
-                    {
-                        text += FetchLetterFromImage(BetterOverwatchNetworks.statsNN, bitmaps[i], network);
+                        text += FetchLetterFromImage(BetterOverwatchNetworks.numbersNN, bitmaps[i], network);
                     }
                     else if (network == Network.HeroNames)
                     {

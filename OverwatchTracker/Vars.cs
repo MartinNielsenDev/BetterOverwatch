@@ -17,7 +17,7 @@ namespace BetterOverwatch
         public static string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "overwatchtracker");
         public static bool overwatchRunning = false;
         public static string[] maps = { "Hanamura", "Horizon Lunar Colony", "Temple of Anubis", "Volskaya Industries", "Blizzard World", "Eichenwalde", "Hollywood", "King's Row", "Numbani", "Ilios", "Lijiang Tower", "Nepal", "Oasis", "Dorado", "Junkertown", "Route 66", "Watchpoint Gibraltar", "Rialto", "Busan", "Paris" };
-        public static string[] heroNames = { "DOOMFIST", "GENJI", "MCCREE", "PHARAH", "REAPER", "SOLDIERis", "SOMBRA", "TRACER", "BABTION", "HANZO", "JUNKRAT", "MEI", "TORBJORN", "WIDOWMAKER", "DVA", "ORISA", "REINHARDT", "ROGDHOG", "WINSTON", "ZARYA", "ANA", "ARIGITTE", "LUCIO", "MERCY", "MDIRA", "SYMMETRR", "ZENYATTA", "WNECKINGBAL", "AGNE" };
+        public static string[] heroNames = { "GGGMFIST", "GENJI", "MCCREE", "PHARAH", "REAPER", "SOLDIERZS", "SOMBRA", "TRACER", "BASTION", "HANZG", "JUHKRAT", "MEI", "TDRBJGRN", "WIDOWMAKER", "DVA", "ORISA", "REINHARDT", "RGADHOG", "WINSTON", "ZARYA", "AHA", "BRIGITTE", "LUCIO", "MERCY", "MOIRA", "SYMMETRA", "ZENYATTA", "WRECKIHGBAL", "ASHE" };
         public static string[] heroNamesReal = { "Doomfist", "Genji", "McCree", "Pharah", "Reaper", "Soldier: 76", "Sombra", "Tracer", "Bastion", "Hanzo", "Junkrat", "Mei", "Torbjörn", "Widowmaker", "D.va", "Orisa", "Reinhardt", "Roadhog", "Winston", "Zarya", "Ana", "Brigitte", "Lúcio", "Mercy", "Moira", "Symmetra", "Zenyatta", "Wrecking Ball", "Ashe" };
         public static int loopDelay = 250;
         public static string[] srCheck = { "", "" }, team1Check = { "", "" }, team2Check = { "", "" }, statsCheck = { "", "", "", "", "" };
@@ -36,8 +36,7 @@ namespace BetterOverwatch
     {
         Maps = 0,
         TeamSkillRating = 1,
-        SkillRating = 2,
-        Stats = 3,
-        HeroNames = 4
+        Numbers = 2,
+        HeroNames = 3
     }
 }
