@@ -27,7 +27,7 @@ namespace BetterOverwatch
         public static extern uint SendMessage(IntPtr hWnd, uint msg, uint wParam, uint lParam);
         [DllImport("user32.dll")]
         public static extern short GetAsyncKeyState(int vKey);
-        public static string activeWindowTitle()
+        public static string ActiveWindowTitle()
         {
             const int nChars = 256;
             StringBuilder Buff = new StringBuilder(nChars);
@@ -41,7 +41,7 @@ namespace BetterOverwatch
         }
         public static Bitmap CaptureRegion(Bitmap frame, int x, int y, int width, int height)
         {
-            return frame.Clone(new Rectangle(x, y, width, height), PixelFormat.Format32bppArgb /*bmp.PixelFormat*/);
+            return frame.Clone(new Rectangle(x, y, width, height), PixelFormat.Format32bppArgb);
         }
         public static Bitmap AdjustColors(Bitmap b, short radius, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true)
         {
@@ -128,10 +128,8 @@ namespace BetterOverwatch
             int m = t.Length;
             int[,] d = new int[n + 1, m + 1];
 
-            if (n == 0)
-                return m;
-            if (m == 0)
-                return n;
+            if (n == 0) return m;
+            if (m == 0) return n;
             for (int i = 0; i <= n; d[i, 0] = i++) { }
             for (int j = 0; j <= m; d[0, j] = j++) { }
 
@@ -204,10 +202,7 @@ namespace BetterOverwatch
                 output = FetchTextFromImage(result, network);
                 result.Dispose();
             }
-            catch (Exception e)
-            {
-                Functions.DebugMessage("bitmapToText() error:" + e.ToString());
-            }
+            catch { }
             return output;
         }
         private static Bitmap Downscale(Bitmap original)
@@ -371,9 +366,7 @@ namespace BetterOverwatch
                     }
                 }
             }
-            catch
-            {
-            }
+            catch { }
             labelCount = lab;
 
             return label;
@@ -466,7 +459,7 @@ namespace BetterOverwatch
         }
         public static byte[] ImageToBytes(Image img)
         {
-            using (var ms = new MemoryStream())
+            using (MemoryStream ms = new MemoryStream())
             {
                 img.Save(ms, ImageFormat.Png);
                 return ms.ToArray();
@@ -491,25 +484,10 @@ namespace BetterOverwatch
 
             Graphics grPhoto = Graphics.FromImage(bmPhoto);
             grPhoto.InterpolationMode = InterpolationMode.High;
-
             grPhoto.DrawImage(imgPhoto, new Rectangle(destX, destY, destWidth, destHeight), new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight), GraphicsUnit.Pixel);
-
             grPhoto.Dispose();
+
             return bmPhoto;
-        }
-        public static void CopyResource(string resourceName, string file)
-        {
-            using (Stream resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
-            {
-                if (resource == null)
-                {
-                    throw new ArgumentException("No such resource", "resourceName");
-                }
-                using (Stream output = File.OpenWrite(file))
-                {
-                    resource.CopyTo(output);
-                }
-            }
         }
         public static string FetchBattleTag()
         {
@@ -529,8 +507,13 @@ namespace BetterOverwatch
 
                             if (battleTagBytes.Length > 0)
                             {
-                                DebugMessage("Found BattleTag");
-                                return Encoding.UTF8.GetString(battleTagBytes).Replace("#", "-");
+                                string[] battleTagSplit = Encoding.UTF8.GetString(battleTagBytes).Split('#');
+
+                                if (battleTagSplit.Length > 0)
+                                {
+                                    DebugMessage("Found BattleTag");
+                                    return $"{battleTagSplit[0]}-{battleTagSplit[1].Substring(0, 5)}";
+                                }
                             }
                         }
                     }

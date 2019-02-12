@@ -11,26 +11,22 @@ namespace BetterOverwatch
 
         public static byte[] ReadBytes(IntPtr handle, IntPtr address, int[] offsets, int bytesToRead = 256)
         {
-            IntPtr ptrBytesRead;
             byte[] buffer = new byte[bytesToRead];
 
-            ReadProcessMemory(handle, address, buffer, bytesToRead, out ptrBytesRead);
+            ReadProcessMemory(handle, address, buffer, bytesToRead, out IntPtr ptrBytesRead);
 
             for (int i = 0; i < offsets.Length; i++)
             {
                 ReadProcessMemory(handle, new IntPtr(BitConverter.ToInt32(buffer, 0) + offsets[i]), buffer, bytesToRead, out ptrBytesRead);
             }
-            int nulls = 0;
             for (int i = 0; i < buffer.Length; i++)
             {
-                if (nulls == 5)
+                if(buffer[i] == 0)
                 {
-                    byte[] result = new byte[i - 5];
-                    Array.Copy(buffer, result, i - 5);
+                    byte[] result = new byte[i - 1];
+                    Array.Copy(buffer, result, i - 1);
                     return result;
                 }
-                else if (buffer[i] == 0) nulls++;
-                else nulls = 0;
             }
             return new byte[0];
         }

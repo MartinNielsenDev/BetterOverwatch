@@ -359,7 +359,7 @@ namespace BetterOverwatch
 
             if (!finalScoreText.Equals(String.Empty))
             {
-                if (Functions.CompareStrings(finalScoreText, "FINALSCORE") >= 40)
+                if (Functions.CompareStrings(finalScoreText, "FIHNLSCORE") >= 40)
                 {
                     Functions.DebugMessage("Recognized final score");
                     if (!IsValidGame())
@@ -383,7 +383,7 @@ namespace BetterOverwatch
         {
             if (Vars.gameData.team1Score.Equals(String.Empty) && Vars.gameData.team1Score.Equals(String.Empty))
             {
-                Thread.Sleep(1000); //hackfix, wait 1 second just in case
+                Thread.Sleep(2000); //prevent big animation from being captured
                 string scoreTextLeft = Functions.BitmapToText(frame, 800, 560, 95, 135, contrastFirst: false, radius: 45, network: Network.TeamSkillRating);
                 string scoreTextRight = Functions.BitmapToText(frame, 1000, 560, 95, 135, contrastFirst: false, radius: 45, network: Network.TeamSkillRating);
                 scoreTextLeft = Regex.Match(scoreTextLeft, "[0-9]+").ToString();

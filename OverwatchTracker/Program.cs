@@ -5,9 +5,8 @@ using System.Windows.Forms;
 using System.Threading;
 using System.IO;
 using System.Security.Principal;
-using System.Runtime.InteropServices;
-using DesktopDuplication;
 using System.Net;
+using DesktopDuplication;
 
 namespace BetterOverwatch
 {
@@ -21,7 +20,7 @@ namespace BetterOverwatch
         static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.0.8",
+                version: "1.1.0",
                 host: "betteroverwatch.com",
                 gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest"
                 );
@@ -128,7 +127,7 @@ namespace BetterOverwatch
             }
             while (true)
             {
-                if (!Functions.activeWindowTitle().Equals("Overwatch"))
+                if (!Functions.ActiveWindowTitle().Equals("Overwatch"))
                 {
                     if (!Vars.overwatchRunning)
                     {
@@ -208,7 +207,6 @@ namespace BetterOverwatch
                                                 Vars.gameData.playerListImage = new Bitmap(Functions.CaptureRegion(frame.DesktopImage, 0, 110, 1920, 700));
                                             }
                                             catch { }
-
                                         }
                                         Vars.loopDelay = 500;
                                         Vars.gameData.state = State.Recording;
