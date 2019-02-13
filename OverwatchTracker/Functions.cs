@@ -512,7 +512,8 @@ namespace BetterOverwatch
                                 if (battleTagSplit.Length > 0)
                                 {
                                     DebugMessage("Found BattleTag");
-                                    return $"{battleTagSplit[0]}-{battleTagSplit[1].Substring(0, 5)}";
+
+                                    return $"{battleTagSplit[0]}-{battleTagSplit[1].Substring(0, battleTagSplit[1].Length > 4 ? 5 : 4)}";
                                 }
                             }
                         }

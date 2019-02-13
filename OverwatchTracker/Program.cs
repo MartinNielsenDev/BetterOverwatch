@@ -20,7 +20,7 @@ namespace BetterOverwatch
         static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.1.0",
+                version: "1.1.1",
                 host: "betteroverwatch.com",
                 gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest"
                 );
@@ -103,8 +103,9 @@ namespace BetterOverwatch
             }
             catch (Exception e)
             {
-                MessageBox.Show("startUp error: " + e.ToString() + "\r\n\r\nReport this on the discord server");
-                Application.Exit();
+                MessageBox.Show("Startup error: " + e.ToString() + "\r\n\r\nReport this on the discord server");
+                Environment.Exit(0);
+                return;
             }
             if (!Vars.isAdmin)
             {

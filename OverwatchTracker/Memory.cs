@@ -23,8 +23,8 @@ namespace BetterOverwatch
             {
                 if(buffer[i] == 0)
                 {
-                    byte[] result = new byte[i - 1];
-                    Array.Copy(buffer, result, i - 1);
+                    byte[] result = new byte[i];
+                    Array.Copy(buffer, result, i);
                     return result;
                 }
             }
