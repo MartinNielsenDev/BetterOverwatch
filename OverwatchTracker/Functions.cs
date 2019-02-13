@@ -496,6 +496,10 @@ namespace BetterOverwatch
                 Process[] processes = Process.GetProcessesByName("Battle.net");
                 foreach (Process process in processes)
                 {
+                    if(Vars.blizzardAppOffset == 0)
+                    {
+                        if (!Server.FetchBlizzardAppOffset(process.MainModule.FileVersionInfo.FileVersion)) break;
+                    }
                     IntPtr processBaseAddress = process.MainModule.BaseAddress;
 
                     foreach (ProcessModule processModule in process.Modules)
@@ -509,10 +513,9 @@ namespace BetterOverwatch
                             {
                                 string[] battleTagSplit = Encoding.UTF8.GetString(battleTagBytes).Split('#');
 
-                                if (battleTagSplit.Length > 0)
+                                if (battleTagSplit.Length == 2)
                                 {
                                     DebugMessage("Found BattleTag");
-
                                     return $"{battleTagSplit[0]}-{battleTagSplit[1].Substring(0, battleTagSplit[1].Length > 4 ? 5 : 4)}";
                                 }
                             }

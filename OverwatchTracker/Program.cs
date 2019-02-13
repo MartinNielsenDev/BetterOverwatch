@@ -20,7 +20,7 @@ namespace BetterOverwatch
         static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.1.1",
+                version: "1.1.2",
                 host: "betteroverwatch.com",
                 gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest"
                 );
@@ -86,7 +86,6 @@ namespace BetterOverwatch
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Server.FetchBlizzardAppOffset();
                 Directory.CreateDirectory(Vars.configPath);
                 Vars.settings = new Settings();
                 Settings.Load();

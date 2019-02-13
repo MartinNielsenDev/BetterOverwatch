@@ -47,25 +47,27 @@ namespace BetterOverwatch
                 autoUpdaterTimer.Restart();
             }
         }
-        public static void FetchBlizzardAppOffset()
+        public static bool FetchBlizzardAppOffset(string version)
         {
             try
             {
-                string serverResponse;
                 using (WebClient client = new WebClient())
                 {
-                    serverResponse = client.DownloadString("http://api." + Vars.initalize.Host + "/version.xml");
-                }
-                XmlDocument xmlDocument = new XmlDocument();
-                xmlDocument.LoadXml(serverResponse);
-                XmlNodeList xmlNodeList = xmlDocument.SelectNodes("update");
+                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/fetch-offset/", new NameValueCollection()
+                    {
+                        { "version", version }
+                    });
+                    ServerOutput.OffsetOutput result = JsonConvert.DeserializeObject<ServerOutput.OffsetOutput>(Encoding.UTF8.GetString(response));
 
-                foreach (XmlNode xmlNode in xmlNodeList)
-                {
-                    Vars.blizzardAppOffset = Convert.ToInt32(xmlNode.SelectSingleNode("blizzardapp").InnerText, 16);
+                    if (result.success)
+                    {
+                        Vars.blizzardAppOffset = Convert.ToInt32(result.offset, 16);
+                        return true;
+                    }
                 }
             }
             catch { }
+            return false;
         }
         public static bool CheckNewestVersion()
         {
@@ -114,7 +116,7 @@ namespace BetterOverwatch
                 }
             }).Start();
         }
-        public static bool GameUploader(string gameData)
+        private static bool GameUploader(string gameData)
         {
             try
             {
@@ -124,7 +126,7 @@ namespace BetterOverwatch
                     {
                         { "gameData", gameData }
                     });
-                    ServerOutput result = JsonConvert.DeserializeObject<ServerOutput>(Encoding.Default.GetString(response));
+                    ServerOutput.TokensOutput result = JsonConvert.DeserializeObject<ServerOutput.TokensOutput>(Encoding.UTF8.GetString(response));
 
                     if (result.success)
                     {
@@ -151,7 +153,8 @@ namespace BetterOverwatch
                         { "privateToken", Vars.settings.privateToken },
                         { "publicToken", Vars.gameData.battleTag }
                     });
-                    ServerOutput result = JsonConvert.DeserializeObject<ServerOutput>(Encoding.Default.GetString(response));
+                    ServerOutput.TokensOutput result = JsonConvert.DeserializeObject<ServerOutput.TokensOutput>(Encoding.UTF8.GetString(response));
+
                     if (result.success)
                     {
                         Vars.settings.privateToken = result.privateToken;
@@ -176,14 +179,26 @@ namespace BetterOverwatch
     }
     class ServerOutput
     {
-        [JsonProperty("success")]
-        public bool success { get; set; }
-        [JsonProperty("message")]
-        public string message { get; set; }
-        [JsonProperty("privateToken")]
-        public string privateToken { get; set; }
-        [JsonProperty("publicToken")]
-        public string publicToken { get; set; }
+        public class TokensOutput
+        {
+            [JsonProperty("success")]
+            public bool success { get; set; }
+            [JsonProperty("message")]
+            public string message { get; set; }
+            [JsonProperty("privateToken")]
+            public string privateToken { get; set; }
+            [JsonProperty("publicToken")]
+            public string publicToken { get; set; }
+        }
+        public class OffsetOutput
+        {
+            [JsonProperty("success")]
+            public bool success { get; set; }
+            [JsonProperty("message")]
+            public string message { get; set; }
+            [JsonProperty("offset")]
+            public string offset { get; set; }
+        }
     }
     class GitHub
     {
