@@ -43,8 +43,8 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(298, 46);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Better Overwatch requires administrator privileges to automatically detect your " +
-    "battletag";
+            this.label1.Text = "Better Overwatch requires administrator privileges to automatically detect your b" +
+    "attletag";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // button1
@@ -103,8 +103,8 @@
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "AdminPromptForm";
-            this.ShowInTaskbar = false;
             this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Missing privileges";
             this.TopMost = true;

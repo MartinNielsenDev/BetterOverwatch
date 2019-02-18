@@ -8,6 +8,8 @@ using System.Text;
 using System.Xml;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace BetterOverwatch
 {
@@ -142,39 +144,89 @@ namespace BetterOverwatch
             catch { }
             return false;
         }
-        public static bool FetchTokens()
+        public static void VerifyToken()
         {
             try
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/fetch-token/", new NameValueCollection()
+                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/verify-account/", new NameValueCollection()
                     {
-                        { "privateToken", Vars.settings.privateToken },
-                        { "publicToken", Vars.gameData.battleTag }
+                        { "privateToken", Vars.settings.privateToken }
                     });
                     ServerOutput.TokensOutput result = JsonConvert.DeserializeObject<ServerOutput.TokensOutput>(Encoding.UTF8.GetString(response));
 
                     if (result.success)
                     {
                         Vars.settings.privateToken = result.privateToken;
-                        Vars.settings.publicToken = result.publicToken;
-                        Settings.Save();
-                        return true;
+
+                        if (result.publicToken.Length > 0)
+                        {
+                            Vars.settings.publicToken = result.publicToken;
+                        }
+                        if(!result.isLinked)
+                        {
+                            Program.authorizeForm = new AuthorizeForm();
+                            Program.authorizeForm.shouldLink = true;
+                            Program.authorizeForm.textLabel.Text = "You can now link your Battle.net account to your Better Overwatch\r\n\r\nYou will then be able to login to your Better Overwatch from any computer";
+                            Program.authorizeForm.Show();
+                        }
+                        new Thread(Program.CaptureDesktop) { IsBackground = true }.Start();
                     }
                     else
                     {
-                        Functions.DebugMessage("Failed to fetch tokens, message: " + result.message);
-                        MessageBox.Show("Failed to fetch tokens\r\n\r\nError Message: " + result.message, "Better Overwatch error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Program.authorizeForm = new AuthorizeForm();
+                        Program.authorizeForm.Show();
                     }
                 }
             }
-            catch (WebException wex)
+            catch { }
+        }
+        public static async Task StartLocalAuthServer()
+        {
+            try
             {
-                MessageBox.Show("Failed to fetch tokens\r\n\r\nError Message: " + wex.Message, "Better Overwatch error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Functions.DebugMessage("Failed to fetch tokens, message: " + wex.Message);
+                HttpListener listener = new HttpListener();
+                listener.Prefixes.Add("http://127.0.0.1:8005/");
+                listener.Start();
+                HttpListenerContext context = await listener.GetContextAsync();
+                HttpListenerRequest request = context.Request;
+                HttpListenerResponse response = context.Response;
+                Stream output = response.OutputStream;
+                string privateToken = request.QueryString["privateToken"];
+                string publicToken = request.QueryString["publicToken"];
+                byte[] buffer = { };
+
+                if (privateToken != null && publicToken != null)
+                {
+                    Vars.settings.privateToken = privateToken;
+                    Vars.settings.publicToken = publicToken;
+
+                    if (Program.authorizeForm != null)
+                    {
+                        Program.authorizeForm.Close();
+                    }
+                    Settings.Save();
+                    buffer = Encoding.UTF8.GetBytes($"<html>success<meta http-equiv=\"refresh\" content=\"0; url = http://betteroverwatch.com/{publicToken}?auth_success=1\" /></html>");
+                }
+                else
+                {
+                    buffer = Encoding.UTF8.GetBytes("<html>Failed to create your account, please try again</html>");
+
+                    if (Program.authorizeForm != null)
+                    {
+                        Program.authorizeForm.Show();
+                        Program.authorizeForm.authorizeButton.Enabled = true;
+                    }
+                }
+
+                response.ContentLength64 = buffer.Length;
+                output.Write(buffer, 0, buffer.Length);
+
+                output.Close();
+                listener.Stop();
             }
-            return false;
+            catch { }
         }
     }
     class ServerOutput
@@ -189,6 +241,8 @@ namespace BetterOverwatch
             public string privateToken { get; set; }
             [JsonProperty("publicToken")]
             public string publicToken { get; set; }
+            [JsonProperty("isLinked")]
+            public bool isLinked { get; set; }
         }
         public class OffsetOutput
         {

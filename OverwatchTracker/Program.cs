@@ -13,6 +13,7 @@ namespace BetterOverwatch
     class Program
     {
         public static TrayMenu trayMenu;
+        public static AuthorizeForm authorizeForm;
         private static AdminPromptForm adminPromptForm;
         private static DesktopDuplicator desktopDuplicator;
         private static Mutex mutex = new Mutex(true, "74bf6260-c133-4d69-ad9c-efc607887c97");
@@ -20,7 +21,7 @@ namespace BetterOverwatch
         static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.1.2",
+                version: "1.1.5",
                 host: "betteroverwatch.com",
                 gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest"
                 );
@@ -89,16 +90,10 @@ namespace BetterOverwatch
                 Directory.CreateDirectory(Vars.configPath);
                 Vars.settings = new Settings();
                 Settings.Load();
-                Settings.Save();
                 Vars.gameData = new Game();
-                adminPromptForm = new AdminPromptForm();
                 trayMenu = new TrayMenu();
-
-                if (!Settings.VerifyUser()) return;
-
-                new Thread(CaptureDesktop) { IsBackground = true }.Start();
                 Server.autoUpdaterTimer.Start();
-                Functions.DebugMessage("> success - Better Overwatch started without fail");
+                Functions.DebugMessage("> success - Better Overwatch started");
             }
             catch (Exception e)
             {
@@ -108,7 +103,12 @@ namespace BetterOverwatch
             }
             if (!Vars.isAdmin)
             {
+                adminPromptForm = new AdminPromptForm();
                 adminPromptForm.Show();
+            }
+            else
+            {
+                Server.VerifyToken();
             }
             Application.Run(trayMenu);
         }
@@ -179,6 +179,7 @@ namespace BetterOverwatch
 
                                     if (Functions.CompareStrings(quickPlayText, "PLHY") >= 70)
                                     {
+                                        Thread.Sleep(250);
                                         Protocols.CheckPlayMenu(frame.DesktopImage);
                                     }
                                 }
@@ -200,11 +201,12 @@ namespace BetterOverwatch
                                     {
                                         if (Vars.gameData.playerListImage == null)
                                         {
-                                            Thread.Sleep(2000);
+                                            Thread.Sleep(Vars.getInfoTimeout.ElapsedMilliseconds >= 4000 ? 0 : 2000);
                                             try
                                             {
                                                 frame = desktopDuplicator.GetLatestFrame();
                                                 Vars.gameData.playerListImage = new Bitmap(Functions.CaptureRegion(frame.DesktopImage, 0, 110, 1920, 700));
+                                                Vars.gameData.debugImage = new Bitmap(frame.DesktopImage);
                                             }
                                             catch { }
                                         }
@@ -242,7 +244,7 @@ namespace BetterOverwatch
                                     Protocols.CheckFinalScore(frame.DesktopImage);
                                 }
 
-                                if (Vars.gameData.state == State.Finished)
+                                if (Vars.gameData.state == State.Finished && Vars.getInfoTimeout.ElapsedMilliseconds >= 500)
                                 {
                                     Protocols.CheckGameScore(frame.DesktopImage);
                                 }

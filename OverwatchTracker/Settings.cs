@@ -1,19 +1,14 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using Newtonsoft.Json;
 
 namespace BetterOverwatch
 {
     class Settings
     {
-        /// <summary>
-        /// Used by the server to authenticate the user on the website, this is essentially a password.
-        /// </summary>
         [JsonProperty("privateToken")]
         public string privateToken = "";
-        /// <summary>
-        /// This will be the user's permanent link on the website, to share their profile with others, this can be changed.
-        /// </summary>
         [JsonProperty("publicToken")]
         public string publicToken = "";
         [JsonProperty("uploadScreenshot")]
@@ -37,24 +32,12 @@ namespace BetterOverwatch
                         Vars.settings = JsonConvert.DeserializeObject<Settings>(json);
                     }
                 }
-            }catch { }
+            } catch { }
         }
         public static void Save()
         {
             string json = JsonConvert.SerializeObject(Vars.settings, Formatting.Indented);
             File.WriteAllText(Path.Combine(Vars.configPath, "settings.json"), json);
-        }
-        public static bool VerifyUser()
-        {
-            if (Server.FetchTokens())
-            {
-                Save();
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
     }
 }

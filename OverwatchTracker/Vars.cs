@@ -20,8 +20,8 @@ namespace BetterOverwatch
         public static string[] heroNames = { "GGGMFIST", "GENJI", "MCCREE", "PHARAH", "REAPER", "SOLDIERZS", "SOMBRA", "TRACER", "BASTION", "HANZG", "JUHKRAT", "MEI", "TDRBJGRN", "WIDOWMAKER", "DVA", "ORISA", "REINHARDT", "RGADHOG", "WINSTON", "ZARYA", "AHA", "BRIGITTE", "LUCIO", "MERCY", "MOIRA", "SYMMETRA", "ZENYATTA", "WRECKIHGBAL", "ASHE" };
         public static string[] heroNamesReal = { "Doomfist", "Genji", "McCree", "Pharah", "Reaper", "Soldier: 76", "Sombra", "Tracer", "Bastion", "Hanzo", "Junkrat", "Mei", "Torbjörn", "Widowmaker", "D.va", "Orisa", "Reinhardt", "Roadhog", "Winston", "Zarya", "Ana", "Brigitte", "Lúcio", "Mercy", "Moira", "Symmetra", "Zenyatta", "Wrecking Ball", "Ashe" };
         public static int loopDelay = 250;
-        public static string[] srCheck = { "", "" }, team1Check = { "", "" }, team2Check = { "", "" }, statsCheck = { "", "", "", "", "" };
-        public static int srCheckIndex = 0, team1CheckIndex = 0, team2CheckIndex = 0, statsCheckIndex = 0, roundsCompleted = 0;
+        public static string[] team1Check = { "", "" }, team2Check = { "", "" }, statsCheck = { "", "", "", "", "" };
+        public static int team1CheckIndex = 0, team2CheckIndex = 0, statsCheckIndex = 0, roundsCompleted = 0;
         public static Stopwatch frameTimer = new Stopwatch(), gameTimer = new Stopwatch(), roundTimer = new Stopwatch(), heroTimer = new Stopwatch(), getInfoTimeout = new Stopwatch(), statsTimer = new Stopwatch();
     }
     enum State
