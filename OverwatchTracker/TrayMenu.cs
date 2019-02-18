@@ -86,7 +86,7 @@ namespace BetterOverwatch
             if (Vars.lastGameJSON.Length > 0)
             {
                 string path = Path.Combine(Path.GetTempPath(), "lastgame.json");
-                File.AppendAllText(path, Vars.lastGameJSON);
+                File.WriteAllText(path, Vars.lastGameJSON);
                 Process.Start("notepad.exe", path);
                 TrayPopup("Last game successfully fetched", 3000);
             }
@@ -192,11 +192,11 @@ namespace BetterOverwatch
         private readonly string team2Score;
         [JsonProperty("duration")]
         private readonly string duration;
+        [JsonProperty("battleTag")]
+        private readonly string battleTag;
         [JsonProperty("heroes")]
         private readonly List<HeroPlayed> heroes;
         [JsonProperty("statsRecorded")]
         private readonly List<Stats> statsRecorded;
-        [JsonProperty("battleTag")]
-        private readonly string battleTag;
     }
 }

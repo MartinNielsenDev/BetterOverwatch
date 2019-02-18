@@ -24,46 +24,31 @@ namespace BetterOverwatch
                 srText = srText.Substring(srText.Length - 4);
             }
 
-            if (!srText.Equals(String.Empty) && srText.Length <= 4) // CHECK SR
+            if (!srText.Equals(String.Empty) && srText.Length == 4)
             {
                 if (Convert.ToInt32(srText) > 1000 && Convert.ToInt32(srText) < 5000)
                 {
-                    if (!Vars.srCheck[0].Equals(srText) || !Vars.srCheck[1].Equals(srText))
+                    if (!Vars.gameData.currentRating.Equals(srText) || Vars.gameData.state >= State.Finished)
                     {
-                        if (Vars.srCheckIndex > Vars.srCheck.Length - 1)
-                        {
-                            Vars.srCheckIndex = 0;
-                        }
-                        Vars.srCheck[Vars.srCheckIndex] = srText;
-                        Vars.srCheckIndex++;
+                        Functions.PlaySound();
+                        Program.trayMenu.currentGame.MenuItems[1].Text = "Skill rating: " + srText;
+                        Functions.DebugMessage("Recognized sr: '" + srText + "'");
                     }
-                    if (Vars.srCheck[0].Equals(srText) && Vars.srCheck[1].Equals(srText))
-                    {
-                        if (!Vars.gameData.currentRating.Equals(srText) || Vars.gameData.state >= State.Finished)
-                        {
-                            Functions.PlaySound();
-                            Program.trayMenu.currentGame.MenuItems[1].Text = "Skill rating: " + srText;
-                            Functions.DebugMessage("Recognized sr: '" + srText + "'");
-                        }
-                        Vars.gameTimer.Stop();
-                        Vars.srCheck[0] = "";
-                        Vars.srCheck[1] = "";
-                        Vars.srCheckIndex = 0;
-                        Vars.gameData.currentRating = srText;
+                    Vars.gameTimer.Stop();
+                    Vars.gameData.currentRating = srText;
 
-                        if (Vars.gameData.state == State.Recording ||
-                            Vars.gameData.state == State.Finished ||
-                            Vars.gameData.state == State.WaitForUpload
-                            )
-                        {
-                            if (!IsValidGame()) return;
-                            string game = Vars.gameData.GetData();
-                            Vars.lastGameJSON = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<CleanedGame>(game), Formatting.Indented);
-                            Server.UploadGame(game);
-                            ResetGame();
-                        }
-                        Program.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Properties.Resources.IconActive);
+                    if (Vars.gameData.state == State.Recording ||
+                        Vars.gameData.state == State.Finished ||
+                        Vars.gameData.state == State.WaitForUpload
+                        )
+                    {
+                        if (!IsValidGame()) return;
+                        string game = Vars.gameData.GetData();
+                        Vars.lastGameJSON = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<CleanedGame>(game), Formatting.Indented);
+                        Server.UploadGame(game);
+                        ResetGame();
                     }
+                    Program.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Properties.Resources.IconActive);
                 }
             }
         }
@@ -103,11 +88,11 @@ namespace BetterOverwatch
                                     {
                                         Vars.gameData.stats.Add(
                                             new Stats(
-                                                elimsText, 
-                                                damageText, 
-                                                objKillsText, 
-                                                healingText, 
-                                                deathsText, 
+                                                elimsText,
+                                                damageText,
+                                                objKillsText,
+                                                healingText,
+                                                deathsText,
                                                 Vars.gameTimer.ElapsedMilliseconds - Functions.GetTimeDeduction()
                                                 ));
                                         Vars.statsTimer.Restart();
@@ -194,7 +179,7 @@ namespace BetterOverwatch
             {
                 string team1SR = Functions.BitmapToText(frame, 545, 220, 245, 70, contrastFirst: false, radius: 90, network: Network.TeamSkillRating);
                 team1SR = Regex.Match(team1SR, "[0-9]+").ToString();
-                
+
                 if (!team1SR.Equals(String.Empty) && team1SR.Length >= 4) // TEAM 1 SR
                 {
                     team1SR = team1SR.Substring(team1SR.Length - 4);
@@ -224,7 +209,7 @@ namespace BetterOverwatch
             {
                 string team2SR = Functions.BitmapToText(frame, 1135, 220, 245, 70, contrastFirst: false, radius: 90, network: Network.TeamSkillRating);
                 team2SR = Regex.Match(team2SR, "[0-9]+").ToString();
-                
+
                 if (!team2SR.Equals(String.Empty) && team2SR.Length >= 4) // TEAM 1 SR
                 {
                     team2SR = team2SR.Substring(team2SR.Length - 4);
@@ -370,12 +355,12 @@ namespace BetterOverwatch
                     Vars.gameData.state = State.Finished;
                     Vars.gameTimer.Stop();
                     Vars.heroTimer.Stop();
+                    Vars.getInfoTimeout.Restart();
 
                     for (int i = 0; i < Vars.gameData.heroPlayed.Count; i++)
                     {
                         Vars.gameData.heroTimePlayed[i].Stop();
                     }
-                    Thread.Sleep(500);
                 }
             }
         }
@@ -383,7 +368,6 @@ namespace BetterOverwatch
         {
             if (Vars.gameData.team1Score.Equals(String.Empty) && Vars.gameData.team1Score.Equals(String.Empty))
             {
-                Thread.Sleep(2000); //prevent big animation from being captured
                 string scoreTextLeft = Functions.BitmapToText(frame, 800, 560, 95, 135, contrastFirst: false, radius: 45, network: Network.TeamSkillRating);
                 string scoreTextRight = Functions.BitmapToText(frame, 1000, 560, 95, 135, contrastFirst: false, radius: 45, network: Network.TeamSkillRating);
                 scoreTextLeft = Regex.Match(scoreTextLeft, "[0-9]+").ToString();
@@ -402,6 +386,7 @@ namespace BetterOverwatch
                         Functions.DebugMessage("Recognized team score Team 1:" + scoreTextLeft + " Team 2:" + scoreTextRight);
                         Program.trayMenu.currentGame.MenuItems[5].Text = "Final score: " + scoreTextLeft + " | " + scoreTextRight;
                         Vars.gameData.state = State.WaitForUpload;
+                        Vars.getInfoTimeout.Stop();
                     }
                 }
             }

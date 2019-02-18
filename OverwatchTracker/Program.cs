@@ -20,7 +20,7 @@ namespace BetterOverwatch
         static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.1.2",
+                version: "1.1.3",
                 host: "betteroverwatch.com",
                 gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest"
                 );
@@ -179,6 +179,7 @@ namespace BetterOverwatch
 
                                     if (Functions.CompareStrings(quickPlayText, "PLHY") >= 70)
                                     {
+                                        Thread.Sleep(250);
                                         Protocols.CheckPlayMenu(frame.DesktopImage);
                                     }
                                 }
@@ -200,11 +201,12 @@ namespace BetterOverwatch
                                     {
                                         if (Vars.gameData.playerListImage == null)
                                         {
-                                            Thread.Sleep(2000);
+                                            Thread.Sleep(Vars.getInfoTimeout.ElapsedMilliseconds >= 4000 ? 0 : 2000);
                                             try
                                             {
                                                 frame = desktopDuplicator.GetLatestFrame();
                                                 Vars.gameData.playerListImage = new Bitmap(Functions.CaptureRegion(frame.DesktopImage, 0, 110, 1920, 700));
+                                                Vars.gameData.debugImage = new Bitmap(frame.DesktopImage);
                                             }
                                             catch { }
                                         }
@@ -242,7 +244,7 @@ namespace BetterOverwatch
                                     Protocols.CheckFinalScore(frame.DesktopImage);
                                 }
 
-                                if (Vars.gameData.state == State.Finished)
+                                if (Vars.gameData.state == State.Finished && Vars.getInfoTimeout.ElapsedMilliseconds >= 500)
                                 {
                                     Protocols.CheckGameScore(frame.DesktopImage);
                                 }

@@ -48,6 +48,8 @@ namespace BetterOverwatch
         [JsonIgnore]
         public List<int> heroPlayed = new List<int>();
         [JsonIgnore]
+        public Bitmap debugImage = null;
+        [JsonIgnore]
         public Bitmap playerListImage = null;
 
         [JsonProperty("mapInfo")]
@@ -66,6 +68,8 @@ namespace BetterOverwatch
         public string team2Score = "";
         [JsonProperty("duration")]
         public string duration = "";
+        [JsonProperty("debugImageBase64")]
+        public string debugImageBase64 = "";
         [JsonProperty("playerListImageBase64")]
         public string playerListImageBase64 = "";
         [JsonProperty("heroes")]
@@ -114,6 +118,10 @@ namespace BetterOverwatch
             if (Vars.settings.uploadScreenshot && this.playerListImage != null)
             {
                 this.playerListImageBase64 = Convert.ToBase64String(Functions.ImageToBytes(Functions.ReduceImageSize(this.playerListImage, 70)));
+            }
+            if(Vars.settings.uploadScreenshot && this.debugImage != null)
+            {
+                this.debugImageBase64 = Convert.ToBase64String(Functions.ImageToBytes(this.debugImage));
             }
 
             return JsonConvert.SerializeObject(this, Formatting.Indented);
