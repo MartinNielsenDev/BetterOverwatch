@@ -185,6 +185,13 @@
     <EmbeddedResource Include="Resources\Newtonsoft.Json.dll" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\raw_ranks\Diamond.png" />
+    <None Include="Resources\raw_ranks\Gold.png" />
+    <None Include="Resources\raw_ranks\Grandmaster.png" />
+    <None Include="Resources\raw_ranks\Master.png" />
+    <None Include="Resources\raw_ranks\Platinum.png" />
+    <None Include="Resources\raw_ranks\Silver.png" />
+    <None Include="Resources\raw_ranks\Unranked.png" />
     <None Include="Resources\success.wav" />
   </ItemGroup>
   <ItemGroup>

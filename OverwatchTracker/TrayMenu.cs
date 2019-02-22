@@ -180,7 +180,7 @@ namespace BetterOverwatch
     {
 #pragma warning disable 0169
         [JsonProperty("mapInfo")]
-        private readonly MapInfo mapInfo;
+        private readonly Game.MapInfo mapInfo;
         [JsonProperty("startRating")]
         private readonly string startRating;
         [JsonProperty("endRating")]
@@ -198,8 +198,10 @@ namespace BetterOverwatch
         [JsonProperty("battleTag")]
         private readonly string battleTag;
         [JsonProperty("heroes")]
-        private readonly List<HeroPlayed> heroes;
+        private readonly List<Game.HeroPlayed> heroes;
+        [JsonProperty("players")]
+        private readonly List<Game.Player> players;
         [JsonProperty("statsRecorded")]
-        private readonly List<Stats> statsRecorded;
+        private readonly List<Game.Stats> statsRecorded;
     }
 }

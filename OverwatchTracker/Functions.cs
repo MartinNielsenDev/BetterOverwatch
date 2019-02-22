@@ -55,7 +55,7 @@ namespace BetterOverwatch
 
             return b;
         }
-        public static void AdjustContrast(Bitmap image, float Value, bool invertColors = false)
+        public static void AdjustContrast(Bitmap image, float value, bool invertColors = false, bool limeToWhite = false)
         {
             BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, image.PixelFormat);
             int Width = image.Width;
@@ -77,9 +77,9 @@ namespace BetterOverwatch
                         float Red = R / 255.0f;
                         float Green = G / 255.0f;
                         float Blue = B / 255.0f;
-                        Red = (((Red - 0.5f) * Value) + 0.5f) * 255.0f;
-                        Green = (((Green - 0.5f) * Value) + 0.5f) * 255.0f;
-                        Blue = (((Blue - 0.5f) * Value) + 0.5f) * 255.0f;
+                        Red = (((Red - 0.5f) * value) + 0.5f) * 255.0f;
+                        Green = (((Green - 0.5f) * value) + 0.5f) * 255.0f;
+                        Blue = (((Blue - 0.5f) * value) + 0.5f) * 255.0f;
 
                         int iR = (int)Red;
                         iR = iR > 255 ? 255 : iR;
@@ -93,7 +93,7 @@ namespace BetterOverwatch
 
                         if (invertColors)
                         {
-                            if (iB == 255)
+                            if (iB == 255 && iG == 255 && iR == 255)
                             {
                                 iB = 0;
                                 iG = 0;
@@ -106,12 +106,91 @@ namespace BetterOverwatch
                                 iR = 255;
                             }
                         }
+                        if(limeToWhite && iG == 255 && iR == 255)
+                        {
+                            iB = 255;
+                        }
 
                         row[columnOffset] = (byte)iB;
                         row[columnOffset + 1] = (byte)iG;
                         row[columnOffset + 2] = (byte)iR;
 
                         columnOffset += 4;
+                    }
+                }
+            }
+
+            image.UnlockBits(data);
+        }
+        public static byte[] GetPixelAtPosition(Bitmap image, int pixelX, int pixelY)
+        {
+            BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, image.PixelFormat);
+            byte R = 0, G = 0, B = 0;
+            unsafe
+            {
+                byte* row = (byte*)data.Scan0 + (pixelY * data.Stride);
+                B = row[pixelX * 4];
+                G = row[(pixelX * 4) + 1];
+                R = row[(pixelX * 4) + 2];
+            }
+
+            image.UnlockBits(data);
+
+            return new byte[] { R, G, B };
+        }
+        public static double CompareTwoBitmaps(Bitmap image, Bitmap image2)
+        {
+            int correctPixels = 0;
+            if (image.Width + image.Height != image2.Width + image2.Height) return 0.00;
+
+            BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, image.PixelFormat);
+            BitmapData data2 = image2.LockBits(new Rectangle(0, 0, image2.Width, image2.Height), ImageLockMode.ReadOnly, image2.PixelFormat);
+
+            unsafe
+            {
+                for (int y = 0; y < image.Height; y++)
+                {
+                    byte* row = (byte*)data.Scan0 + (y * data.Stride);
+                    byte* row2 = (byte*)data2.Scan0 + (y * data2.Stride);
+
+                    for (int x = 0; x < image.Width; x++)
+                    {
+                        byte B = row[x * 4];
+                        byte G = row[(x * 4) + 1];
+                        byte R = row[(x * 4) + 2];
+                        byte B2 = row2[x * 4];
+                        byte G2 = row2[(x * 4) + 1];
+                        byte R2 = row2[(x * 4) + 2];
+
+                        if (B == B2 && G == G2 && R == R2) correctPixels++;
+                    }
+                }
+            }
+
+            image.UnlockBits(data);
+            image2.UnlockBits(data);
+
+            return ((double)correctPixels / (double)(image.Width * image.Height));
+
+        }
+        public static void InvertColors(Bitmap image)
+        {
+            BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, image.PixelFormat);
+            byte R = 0, G = 0, B = 0;
+            unsafe
+            {
+                for (int y = 0; y < image.Height; y++)
+                {
+                    byte* row = (byte*)data.Scan0 + (y * data.Stride);
+
+                    for (int x = 0; x < image.Width; x++)
+                    {
+                        B = row[x * 4];
+                        G = row[(x * 4) + 1];
+                        R = row[(x * 4) + 2];
+                        row[x * 4] = B == 255 ? (byte)0 : (byte)255;
+                        row[(x * 4) + 1] = G == 255 ? (byte)0 : (byte)255;
+                        row[(x * 4) + 2] = R == 255 ? (byte)0 : (byte)255;
                     }
                 }
             }
@@ -180,7 +259,7 @@ namespace BetterOverwatch
             }
             return false;
         }
-        public static string BitmapToText(Bitmap frame, int x, int y, int width, int height, bool contrastFirst = false, short radius = 110, Network network = 0, bool invertColors = false, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true)
+        public static string BitmapToText(Bitmap frame, int x, int y, int width, int height, bool contrastFirst = false, short radius = 110, Network network = 0, bool invertColors = false, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true, bool limeToWhite = false)
         {
             string output = String.Empty;
             try
@@ -189,13 +268,13 @@ namespace BetterOverwatch
 
                 if (contrastFirst)
                 {
-                    AdjustContrast(result, 255f);
+                    AdjustContrast(result, 255f, invertColors, limeToWhite);
                     result = AdjustColors(result, radius, red, green, blue, fillOutside);
                 }
                 else
                 {
                     result = AdjustColors(result, radius, red, green, blue, fillOutside);
-                    AdjustContrast(result, 255f, invertColors);
+                    AdjustContrast(result, 255f, invertColors, limeToWhite);
                 }
                 output = FetchTextFromImage(result, network);
                 result.Dispose();
@@ -533,14 +612,19 @@ namespace BetterOverwatch
                 network.InputNode(i).Value = input[i];
             }
             network.Run();
+            int bestNode = network.BestNodeIndex;
 
             if (networkId == Network.Maps || networkId == Network.HeroNames)
             {
-                return Convert.ToChar('A' + network.BestNodeIndex).ToString();
+                return Convert.ToChar('A' + bestNode).ToString();
             }
             else if (networkId == Network.TeamSkillRating || networkId == Network.Numbers)
             {
-                return network.BestNodeIndex.ToString();
+                return bestNode.ToString();
+            }
+            else if(networkId == Network.PlayerNames)
+            {
+                return bestNode < 9 ? (bestNode + 1).ToString() : Convert.ToChar('A' + (bestNode - 9)).ToString();
             }
             return String.Empty;
         }
@@ -568,6 +652,10 @@ namespace BetterOverwatch
                     else if (network == Network.HeroNames)
                     {
                         text += FetchLetterFromImage(BetterOverwatchNetworks.heroNamesNN, bitmaps[i], network);
+                    }
+                    else if(network == Network.PlayerNames)
+                    {
+                        text += FetchLetterFromImage(BetterOverwatchNetworks.playersNN, bitmaps[i], network);
                     }
                     bitmaps[i].Dispose();
                 }

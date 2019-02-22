@@ -21,7 +21,7 @@ namespace BetterOverwatch
         static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.1.5",
+                version: "1.2.0",
                 host: "betteroverwatch.com",
                 gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest"
                 );
@@ -127,7 +127,7 @@ namespace BetterOverwatch
             }
             while (true)
             {
-                if (!Functions.ActiveWindowTitle().Equals("Overwatch"))
+                if (!Functions.ActiveWindowTitle().Equals("Overwatch") && 1 == 2)
                 {
                     if (!Vars.overwatchRunning)
                     {
@@ -207,6 +207,7 @@ namespace BetterOverwatch
                                                 frame = desktopDuplicator.GetLatestFrame();
                                                 Vars.gameData.playerListImage = new Bitmap(Functions.CaptureRegion(frame.DesktopImage, 0, 110, 1920, 700));
                                                 Vars.gameData.debugImage = new Bitmap(frame.DesktopImage);
+                                                Protocols.CheckPlayerNamesAndRank(frame.DesktopImage);
                                             }
                                             catch { }
                                         }

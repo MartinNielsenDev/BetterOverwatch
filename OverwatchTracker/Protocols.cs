@@ -87,7 +87,7 @@ namespace BetterOverwatch
                                         Functions.CheckStats(elimsText, damageText, objKillsText, healingText, deathsText, Vars.gameTimer.ElapsedMilliseconds - Functions.GetTimeDeduction()))
                                     {
                                         Vars.gameData.stats.Add(
-                                            new Stats(
+                                            new Game.Stats(
                                                 elimsText,
                                                 damageText,
                                                 objKillsText,
@@ -389,6 +389,39 @@ namespace BetterOverwatch
                         Vars.getInfoTimeout.Stop();
                     }
                 }
+            }
+        }
+        public static void CheckPlayerNamesAndRank(Bitmap frame)
+        {
+            Bitmap img = new Bitmap(@"C:\Users\mani\source\repos\OverwatchTracker\OverwatchTracker\test_data\unprocessed\2185-2183.png");
+
+            int playerNameX = 355, playerRankX = 733;
+
+            for (int teams = 0; teams < 2; teams++)
+            {
+                for (int players = 0; players < 6; players++)
+                {
+                    string playerName = Functions.BitmapToText(img, playerNameX, 325 + (players * 75), 260, 43, contrastFirst: true, radius: 110, network: Network.PlayerNames, invertColors: false, red: 255, green: 255, blue: 255, fillOutside: true, limeToWhite: true);
+                    Bitmap rank = img.Clone(new Rectangle(playerRankX, 331 + (players * 75), 33, 33), img.PixelFormat);
+                    byte[] backgroundColor = Functions.GetPixelAtPosition(rank, 0, 32);
+                    Functions.AdjustColors(rank, 100, backgroundColor[0], backgroundColor[1], backgroundColor[2]); // fill rank with white
+                    Functions.AdjustColors(rank, 100, backgroundColor[0], backgroundColor[1], backgroundColor[2], false); // fill backgroundColor with black
+                    double[] resultRank = new double[2] { -1, -1 };
+
+                    for (int r = 0; r < Vars.ranks.Length; r++)
+                    {
+                        double high = Functions.CompareTwoBitmaps(rank, Vars.ranks[r]);
+
+                        if (high > resultRank[1])
+                        {
+                            resultRank[0] = r;
+                            resultRank[1] = high;
+                        }
+                    }
+                    Vars.gameData.players.Add(new Game.Player(playerName, resultRank[0].ToString()));
+                }
+                playerNameX += 945;
+                playerRankX += 422;
             }
         }
         private static bool IsValidGame()

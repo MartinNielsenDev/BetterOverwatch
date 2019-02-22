@@ -6,31 +6,6 @@ using Newtonsoft.Json;
 
 namespace BetterOverwatch
 {
-    class Stats
-    {
-        [JsonProperty("playerElims")]
-        public string playerElims { get; set; }
-        [JsonProperty("playerDamage")]
-        public string playerDamage { get; set; }
-        [JsonProperty("playerObjKills")]
-        public string playerObjKills { get; set; }
-        [JsonProperty("playerHealing")]
-        public string playerHealing { get; set; }
-        [JsonProperty("playerDeaths")]
-        public string playerDeaths { get; set; }
-        [JsonProperty("time")]
-        public int time { get; set; }
-
-        public Stats(string elims, string damage, string objective, string healing, string deaths, double t)
-        {
-            playerElims = elims;
-            playerDamage = damage;
-            playerObjKills = objective;
-            playerHealing = healing;
-            playerDeaths = deaths;
-            time = Convert.ToInt32(Math.Floor(t / 1000));
-        }
-    }
     class Game
     {
         public Game(string currentRating = "")
@@ -72,10 +47,12 @@ namespace BetterOverwatch
         public string debugImageBase64 = "";
         [JsonProperty("playerListImageBase64")]
         public string playerListImageBase64 = "";
-        [JsonProperty("heroes")]
-        private List<HeroPlayed> heroes = new List<HeroPlayed>();
+        [JsonProperty("players")]
+        public List<Player> players = new List<Player>();
         [JsonProperty("statsRecorded")]
         public List<Stats> stats = new List<Stats>();
+        [JsonProperty("heroes")]
+        private List<HeroPlayed> heroes = new List<HeroPlayed>();
         [JsonProperty("battleTag")]
         public readonly string battleTag = Functions.FetchBattleTag();
         [JsonProperty("privateToken")]
@@ -126,25 +103,63 @@ namespace BetterOverwatch
 
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-    }
-    class HeroPlayed
-    {
-        [JsonProperty("heroIndex")]
-        private string heroIndex { get; }
-        [JsonProperty("heroPercentPlayed")]
-        private string heroPercentPlayed { get;}
-
-        public HeroPlayed(string heroIndex, string heroPercentPlayed)
+        public class Stats
         {
-            this.heroIndex = heroIndex;
-            this.heroPercentPlayed = heroPercentPlayed;
+            [JsonProperty("playerElims")]
+            public string playerElims { get; set; }
+            [JsonProperty("playerDamage")]
+            public string playerDamage { get; set; }
+            [JsonProperty("playerObjKills")]
+            public string playerObjKills { get; set; }
+            [JsonProperty("playerHealing")]
+            public string playerHealing { get; set; }
+            [JsonProperty("playerDeaths")]
+            public string playerDeaths { get; set; }
+            [JsonProperty("time")]
+            public int time { get; set; }
+
+            public Stats(string elims, string damage, string objective, string healing, string deaths, double t)
+            {
+                playerElims = elims;
+                playerDamage = damage;
+                playerObjKills = objective;
+                playerHealing = healing;
+                playerDeaths = deaths;
+                time = Convert.ToInt32(Math.Floor(t / 1000));
+            }
         }
-    }
-    class MapInfo
-    {
-        [JsonProperty("mapName")]
-        public string mapName = "";
-        [JsonProperty("isKoth")]
-        public bool isKoth = false;
+        public class Player
+        {
+            [JsonProperty("playerName")]
+            public string playerName { get; set; }
+            [JsonProperty("playerRank")]
+            public string playerRank { get; set; }
+
+            public Player(string playerName, string playerRank)
+            {
+                this.playerName = playerName;
+                this.playerRank = playerRank;
+            }
+        }
+        public class HeroPlayed
+        {
+            [JsonProperty("heroIndex")]
+            private string heroIndex { get; }
+            [JsonProperty("heroPercentPlayed")]
+            private string heroPercentPlayed { get; }
+
+            public HeroPlayed(string heroIndex, string heroPercentPlayed)
+            {
+                this.heroIndex = heroIndex;
+                this.heroPercentPlayed = heroPercentPlayed;
+            }
+        }
+        public class MapInfo
+        {
+            [JsonProperty("mapName")]
+            public string mapName = "";
+            [JsonProperty("isKoth")]
+            public bool isKoth = false;
+        }
     }
 }
