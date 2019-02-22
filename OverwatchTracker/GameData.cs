@@ -100,7 +100,21 @@ namespace BetterOverwatch
             {
                 this.debugImageBase64 = Convert.ToBase64String(Functions.ImageToBytes(this.debugImage));
             }
-
+            if(this.players.Count >= 12)
+            {
+                if(!this.battleTag.Equals("PLAYER-0000"))
+                {
+                    string[] btagSplit = this.battleTag.Split('-');
+                    if (btagSplit.Length > 1)
+                    {
+                        this.players[0].playerName = btagSplit[0];
+                    }
+                }
+            }
+            else
+            {
+                this.players.Clear();
+            }
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
         public class Stats

@@ -127,7 +127,7 @@ namespace BetterOverwatch
             }
             while (true)
             {
-                if (!Functions.ActiveWindowTitle().Equals("Overwatch") && 1 == 2)
+                if (!Functions.ActiveWindowTitle().Equals("Overwatch"))
                 {
                     if (!Vars.overwatchRunning)
                     {
@@ -206,7 +206,7 @@ namespace BetterOverwatch
                                             {
                                                 frame = desktopDuplicator.GetLatestFrame();
                                                 Vars.gameData.playerListImage = new Bitmap(Functions.CaptureRegion(frame.DesktopImage, 0, 110, 1920, 700));
-                                                Vars.gameData.debugImage = new Bitmap(frame.DesktopImage);
+                                                //Vars.gameData.debugImage = new Bitmap(frame.DesktopImage);
                                                 Protocols.CheckPlayerNamesAndRank(frame.DesktopImage);
                                             }
                                             catch { }
@@ -229,10 +229,9 @@ namespace BetterOverwatch
 
                                 if (Vars.gameData.state == State.Recording)
                                 {
-                                    if (Functions.GetAsyncKeyState(0x09) < 0)
+                                    if (!Vars.isAdmin || Functions.GetAsyncKeyState(0x09) < 0) // GetAsyncKeyState only works with admin
                                     {
-                                        Protocols.CheckHeroPlayed(frame.DesktopImage);
-                                        if (Vars.roundTimer.ElapsedMilliseconds >= Functions.GetTimeDeduction(getNextDeduction: true))
+                                        if (Protocols.CheckHeroPlayed(frame.DesktopImage) && Vars.roundTimer.ElapsedMilliseconds >= Functions.GetTimeDeduction(getNextDeduction: true))
                                         {
                                             Protocols.CheckStats(frame.DesktopImage);
                                         }

@@ -393,16 +393,20 @@ namespace BetterOverwatch
         }
         public static void CheckPlayerNamesAndRank(Bitmap frame)
         {
-            Bitmap img = new Bitmap(@"C:\Users\mani\source\repos\OverwatchTracker\OverwatchTracker\test_data\unprocessed\2185-2183.png");
-
             int playerNameX = 355, playerRankX = 733;
 
             for (int teams = 0; teams < 2; teams++)
             {
                 for (int players = 0; players < 6; players++)
                 {
-                    string playerName = Functions.BitmapToText(img, playerNameX, 325 + (players * 75), 260, 43, contrastFirst: true, radius: 110, network: Network.PlayerNames, invertColors: false, red: 255, green: 255, blue: 255, fillOutside: true, limeToWhite: true);
-                    Bitmap rank = img.Clone(new Rectangle(playerRankX, 331 + (players * 75), 33, 33), img.PixelFormat);
+                    string playerName = Functions.BitmapToText(frame, playerNameX, 325 + (players * 75), 260, 43, contrastFirst: true, radius: 110, network: Network.PlayerNames, invertColors: false, red: 255, green: 255, blue: 255, fillOutside: true, limeToWhite: true);
+
+                    if(playerName.Equals(String.Empty))
+                    {
+                        Vars.gameData.players.Clear();
+                        return;
+                    }
+                    Bitmap rank = frame.Clone(new Rectangle(playerRankX, 331 + (players * 75), 33, 33), frame.PixelFormat);
                     byte[] backgroundColor = Functions.GetPixelAtPosition(rank, 0, 32);
                     Functions.AdjustColors(rank, 100, backgroundColor[0], backgroundColor[1], backgroundColor[2]); // fill rank with white
                     Functions.AdjustColors(rank, 100, backgroundColor[0], backgroundColor[1], backgroundColor[2], false); // fill backgroundColor with black
