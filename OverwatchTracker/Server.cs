@@ -207,7 +207,7 @@ namespace BetterOverwatch
                         Program.authorizeForm.Close();
                     }
                     Settings.Save();
-                    buffer = Encoding.UTF8.GetBytes($"<html>success<meta http-equiv=\"refresh\" content=\"0; url = http://betteroverwatch.com/{publicToken}?auth_success=1\" /></html>");
+                    buffer = Encoding.UTF8.GetBytes($"<html>success<meta http-equiv=\"refresh\" content=\"0; url = http://betteroverwatch.com/user/{publicToken}?auth_success=1\" /></html>");
                 }
                 else
                 {

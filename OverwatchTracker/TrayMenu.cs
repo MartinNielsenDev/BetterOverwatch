@@ -152,7 +152,7 @@ namespace BetterOverwatch
         {
             if (!Vars.settings.publicToken.Equals(String.Empty))
             {
-                Process.Start("http://" + Vars.initalize.Host + "/" + Vars.settings.publicToken);
+                Process.Start("http://" + Vars.initalize.Host + "/user/" + Vars.settings.publicToken);
             }
         }
         private async void Login(object sender, EventArgs e)
