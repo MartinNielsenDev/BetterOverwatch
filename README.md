@@ -34,4 +34,4 @@ All processing is done locally through this application, the server only display
 ![games](http://betteroverwatch.com/images/games.png)
 ![detailed-game](http://betteroverwatch.com/images/detailed-game.png)
 
-Live demo on my profile: http://betteroverwatch.com/Avoid
+Live demo on my profile: http://betteroverwatch.com/user/Avoid
