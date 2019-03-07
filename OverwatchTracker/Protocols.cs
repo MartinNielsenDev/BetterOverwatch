@@ -1,9 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Text.RegularExpressions;
-using System.Threading;
+using Newtonsoft.Json;
 
 namespace BetterOverwatch
 {

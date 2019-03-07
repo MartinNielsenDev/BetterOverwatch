@@ -5,38 +5,24 @@ using System.Collections.Specialized;
 using System.Net;
 using System.Threading;
 using System.Text;
-using System.Xml;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using System.IO;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BetterOverwatch
 {
     class Initalize
     {
-        private readonly string version = "";
-        private readonly string host = "";
-        private readonly string gitHubHost = "";
-
         public Initalize(string version, string host, string gitHubHost)
         {
-            this.version = version;
-            this.host = host;
-            this.gitHubHost = gitHubHost;
+            this.Version = version;
+            this.Host = host;
+            this.GitHubHost = gitHubHost;
         }
-        public string Version
-        {
-            get { return version; }
-        }
-        public string Host
-        {
-            get { return host; }
-        }
-        public string GitHubHost
-        {
-            get { return gitHubHost; }
-        }
+        public string Version { get; } = "";
+        public string Host { get; } = "";
+        public string GitHubHost { get; } = "";
     }
     class Server
     {
@@ -167,11 +153,11 @@ namespace BetterOverwatch
                         if(!result.isLinked)
                         {
                             Program.authorizeForm = new AuthorizeForm();
-                            Program.authorizeForm.shouldLink = true;
+                            Program.authorizeForm.isLinking = true;
                             Program.authorizeForm.textLabel.Text = "You can now link your Battle.net account to your Better Overwatch\r\n\r\nYou will then be able to login to your Better Overwatch from any computer";
                             Program.authorizeForm.Show();
                         }
-                        new Thread(Program.CaptureDesktop) { IsBackground = true }.Start();
+                        Program.captureDesktop = true;
                     }
                     else
                     {
@@ -207,11 +193,12 @@ namespace BetterOverwatch
                         Program.authorizeForm.Close();
                     }
                     Settings.Save();
-                    buffer = Encoding.UTF8.GetBytes($"<html>success<meta http-equiv=\"refresh\" content=\"0; url = http://betteroverwatch.com/user/{publicToken}?auth_success=1\" /></html>");
+                    Program.captureDesktop = true;
+                    buffer = Encoding.UTF8.GetBytes($"<html><meta http-equiv=\"refresh\" content=\"0; url = http://betteroverwatch.com/user/{publicToken}?auth_success=1\" /></html>");
                 }
                 else
                 {
-                    buffer = Encoding.UTF8.GetBytes("<html>Failed to create your account, please try again</html>");
+                    buffer = Encoding.UTF8.GetBytes("<html>Failed to authorize, please try again</html>");
 
                     if (Program.authorizeForm != null)
                     {

@@ -106,7 +106,7 @@ namespace BetterOverwatch
                                 iR = 255;
                             }
                         }
-                        if(limeToWhite && iG == 255 && iR == 255)
+                        if (limeToWhite && iG == 255 && iR == 255)
                         {
                             iB = 255;
                         }
@@ -197,51 +197,43 @@ namespace BetterOverwatch
 
             image.UnlockBits(data);
         }
-        public static double CompareStrings(string s, string t)
+        public static double CompareStrings(string string1, string string2)
         {
-            s = s.ToLower();
-            t = t.ToLower();
-            int n = s.Length;
-            int m = t.Length;
-            int[,] d = new int[n + 1, m + 1];
+            string1 = string1.ToLower();
+            string2 = string2.ToLower();
+            int[,] d = new int[string1.Length + 1, string2.Length + 1];
 
-            if (n == 0) return m;
-            if (m == 0) return n;
-            for (int i = 0; i <= n; d[i, 0] = i++) { }
-            for (int j = 0; j <= m; d[0, j] = j++) { }
+            if (string1.Length == 0) return string2.Length;
+            if (string2.Length == 0) return string1.Length;
+            for (int i = 0; i <= string1.Length; d[i, 0] = i++) { }
+            for (int j = 0; j <= string2.Length; d[0, j] = j++) { }
 
-            for (int i = 1; i <= n; i++)
+            for (int i = 1; i <= string1.Length; i++)
             {
-                for (int j = 1; j <= m; j++)
+                for (int j = 1; j <= string2.Length; j++)
                 {
-                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
+                    int cost = (string2[j - 1] == string1[i - 1]) ? 0 : 1;
 
                     d[i, j] = Math.Min(Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1), d[i - 1, j - 1] + cost);
                 }
             }
-            int big = Math.Max(s.Length, t.Length);
+            int big = Math.Max(string1.Length, string2.Length);
 
-            return Math.Floor(Convert.ToDouble(big - d[n, m]) / Convert.ToDouble(big) * 100);
+            return Math.Floor(Convert.ToDouble(big - d[string1.Length, string2.Length]) / Convert.ToDouble(big) * 100);
         }
         public static string CheckMaps(string input)
         {
             for (int i = 0; i < Vars.maps.Length; i++)
             {
-                string map = Vars.maps[i].Replace(" ", String.Empty).ToLower();
+                string mapName = Vars.maps[i].Replace(" ", String.Empty).ToLower();
 
-                if (input.ToLower().Contains(map))
-                {
-                    return Vars.maps[i];
-                }
-                else
-                {
-                    double percent = CompareStrings(input, map);
+                if (input.ToLower().Contains(mapName)) return Vars.maps[i];
+            }
+            for (int i = 0; i < Vars.maps.Length; i++)
+            {
+                string mapName = Vars.maps[i].Replace(" ", String.Empty).ToLower();
 
-                    if (percent >= 60)
-                    {
-                        return Vars.maps[i];
-                    }
-                }
+                if (CompareStrings(input, mapName) >= 60) return Vars.maps[i];
             }
             return String.Empty;
         }
@@ -573,7 +565,7 @@ namespace BetterOverwatch
                 Process[] processes = Process.GetProcessesByName("Battle.net");
                 foreach (Process process in processes)
                 {
-                    if(Vars.blizzardAppOffset == 0)
+                    if (Vars.blizzardAppOffset == 0)
                     {
                         if (!Server.FetchBlizzardAppOffset(process.MainModule.FileVersionInfo.FileVersion)) break;
                     }
@@ -622,7 +614,7 @@ namespace BetterOverwatch
             {
                 return bestNode.ToString();
             }
-            else if(networkId == Network.PlayerNames)
+            else if (networkId == Network.PlayerNames)
             {
                 return bestNode < 9 ? (bestNode + 1).ToString() : Convert.ToChar('A' + (bestNode - 9)).ToString();
             }
@@ -653,7 +645,7 @@ namespace BetterOverwatch
                     {
                         text += FetchLetterFromImage(BetterOverwatchNetworks.heroNamesNN, bitmaps[i], network);
                     }
-                    else if(network == Network.PlayerNames)
+                    else if (network == Network.PlayerNames)
                     {
                         text += FetchLetterFromImage(BetterOverwatchNetworks.playersNN, bitmaps[i], network);
                     }

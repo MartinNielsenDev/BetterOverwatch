@@ -42,6 +42,7 @@ namespace BetterOverwatch
                 trayMenu.MenuItems.Add("Start with Windows", ToggleWindows);
                 trayMenu.MenuItems.Add("-");
                 trayMenu.MenuItems.Add(debugTools);
+                trayMenu.MenuItems.Add("Logout", Logout);
                 trayMenu.MenuItems.Add("Exit", OnExit);
                 trayMenu.MenuItems[0].Enabled = false;
 
@@ -159,6 +160,15 @@ namespace BetterOverwatch
         {
             Process.Start("https://eu.battle.net/oauth/authorize?response_type=code&client_id=20d78829a4e641e694d8ec7f1198dc8b&redirect_uri=http://betteroverwatch.com/api/authorize/");
             await Server.StartLocalAuthServer();
+        }
+        private void Logout(object sender, EventArgs e)
+        {
+            File.Delete(Path.Combine(Vars.configPath, "settings.json"));
+            Vars.settings = new Settings();
+            Program.captureDesktop = false;
+            Program.authorizeForm = new AuthorizeForm();
+            Program.authorizeForm.textLabel.Text = "Logout successful and settings cleared\r\n\r\nYou must authorize to continue using Better Overwatch";
+            Program.authorizeForm.Show();
         }
         public void ChangeTray(string text, Icon icon)
         {

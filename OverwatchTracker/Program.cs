@@ -12,16 +12,17 @@ namespace BetterOverwatch
 {
     class Program
     {
+        public static bool captureDesktop = false;
         public static TrayMenu trayMenu;
         public static AuthorizeForm authorizeForm;
-        private static AdminPromptForm adminPromptForm;
+        public static AdminPromptForm adminPromptForm;
         private static DesktopDuplicator desktopDuplicator;
         private static Mutex mutex = new Mutex(true, "74bf6260-c133-4d69-ad9c-efc607887c97");
         [STAThread]
         static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.2.1",
+                version: "1.2.2",
                 host: "betteroverwatch.com",
                 gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest"
                 );
@@ -110,6 +111,7 @@ namespace BetterOverwatch
             {
                 Server.VerifyToken();
             }
+            new Thread(CaptureDesktop) { IsBackground = true }.Start();
             Application.Run(trayMenu);
         }
         public static void CaptureDesktop()
@@ -127,137 +129,146 @@ namespace BetterOverwatch
             }
             while (true)
             {
-                if (!Functions.ActiveWindowTitle().Equals("Overwatch"))
+                if (captureDesktop)
                 {
-                    if (!Vars.overwatchRunning)
+                    Console.WriteLine("CaptureDesktop() RUN");
+                    if (!Functions.ActiveWindowTitle().Equals("Overwatch"))
                     {
-                        if (Functions.IsProcessOpen("Overwatch"))
+                        if (!Vars.overwatchRunning)
                         {
-                            trayMenu.ChangeTray("Visit play menu to update your skill rating", Properties.Resources.IconVisitMenu);
-                            Vars.overwatchRunning = true;
+                            if (Functions.IsProcessOpen("Overwatch"))
+                            {
+                                trayMenu.ChangeTray("Visit play menu to update your skill rating", Properties.Resources.IconVisitMenu);
+                                Vars.overwatchRunning = true;
+                            }
+                            else
+                            {
+                                Server.AutoUpdater();
+                            }
                         }
                         else
                         {
-                            Server.AutoUpdater();
+                            if (!Functions.IsProcessOpen("Overwatch"))
+                            {
+                                trayMenu.ChangeTray("Waiting for Overwatch, idle...", Properties.Resources.Idle);
+                                Vars.overwatchRunning = false;
+                            }
                         }
+                        Thread.Sleep(500);
                     }
                     else
                     {
-                        if (!Functions.IsProcessOpen("Overwatch"))
+                        Thread.Sleep(50);
+                        trayMenu.currentGame.MenuItems[0].Text = "Game elapsed: " + Functions.SecondsToMinutes((int)Math.Floor(Convert.ToDouble(Vars.gameTimer.ElapsedMilliseconds / 1000)));
+
+                        if (Vars.frameTimer.ElapsedMilliseconds >= Vars.loopDelay)
                         {
-                            trayMenu.ChangeTray("Waiting for Overwatch, idle...", Properties.Resources.Idle);
-                            Vars.overwatchRunning = false;
+                            DesktopFrame frame = null;
+
+                            try
+                            {
+                                frame = desktopDuplicator.GetLatestFrame();
+                            }
+                            catch
+                            {
+                                desktopDuplicator.Reinitialize();
+                                continue;
+                            }
+                            if (frame != null)
+                            {
+                                try
+                                {
+                                    if (Vars.gameData.state != State.Ingame)
+                                    {
+                                        string quickPlayText = Functions.BitmapToText(frame.DesktopImage, 476, 644, 80, 40, contrastFirst: false, radius: 140, network: Network.Maps, invertColors: true);
+
+                                        if (Functions.CompareStrings(quickPlayText, "PLHY") >= 70)
+                                        {
+                                            Thread.Sleep(500);
+                                            Protocols.CheckPlayMenu(frame.DesktopImage);
+                                        }
+                                    }
+
+                                    if (Vars.gameData.state == State.Idle || Vars.gameData.state == State.Finished || Vars.gameData.state == State.WaitForUpload)
+                                    {
+                                        Protocols.CheckCompetitiveGameEntered(frame.DesktopImage);
+                                    }
+
+                                    if (Vars.gameData.state == State.Ingame)
+                                    {
+                                        Protocols.CheckMap(frame.DesktopImage);
+                                        Protocols.CheckTeamsSkillRating(frame.DesktopImage);
+
+                                        if (!Vars.gameData.team1Rating.Equals(String.Empty) &&
+                                            !Vars.gameData.team2Rating.Equals(String.Empty) &&
+                                            !Vars.gameData.mapInfo.Equals(String.Empty) ||
+                                            !Vars.gameData.mapInfo.Equals(String.Empty) && Vars.getInfoTimeout.ElapsedMilliseconds >= 4000)
+                                        {
+                                            if (Vars.gameData.playerListImage == null)
+                                            {
+                                                Thread.Sleep(Vars.getInfoTimeout.ElapsedMilliseconds >= 4000 ? 0 : 2000);
+                                                try
+                                                {
+                                                    frame = desktopDuplicator.GetLatestFrame();
+                                                    Vars.gameData.playerListImage = new Bitmap(Functions.CaptureRegion(frame.DesktopImage, 0, 110, 1920, 700));
+                                                    //Vars.gameData.debugImage = new Bitmap(frame.DesktopImage);
+                                                    Protocols.CheckPlayerNamesAndRank(frame.DesktopImage);
+                                                }
+                                                catch { }
+                                            }
+                                            Vars.loopDelay = 500;
+                                            Vars.gameData.state = State.Recording;
+                                            trayMenu.ChangeTray("Recording... visit the main menu after the game", Properties.Resources.IconRecord);
+                                            Vars.statsTimer.Restart();
+                                            Vars.getInfoTimeout.Stop();
+                                        }
+                                        else if (Vars.getInfoTimeout.ElapsedMilliseconds >= 4500)
+                                        {
+                                            Vars.roundTimer.Stop();
+                                            Vars.gameTimer.Stop();
+                                            Vars.getInfoTimeout.Stop();
+                                            Vars.gameData.state = State.Idle;
+                                            Functions.DebugMessage("Failed to find game");
+                                        }
+                                    }
+
+                                    if (Vars.gameData.state == State.Recording)
+                                    {
+                                        if (!Vars.isAdmin || Functions.GetAsyncKeyState(0x09) < 0) // GetAsyncKeyState only works with admin
+                                        {
+                                            if (Protocols.CheckHeroPlayed(frame.DesktopImage) && Vars.roundTimer.ElapsedMilliseconds >= Functions.GetTimeDeduction(getNextDeduction: true))
+                                            {
+                                                Protocols.CheckStats(frame.DesktopImage);
+                                            }
+                                        }
+                                        else if (Vars.roundTimer.ElapsedMilliseconds >= Functions.GetTimeDeduction(getNextDeduction: true))
+                                        {
+                                            Protocols.CheckRoundCompleted(frame.DesktopImage);
+                                        }
+                                        Protocols.CheckMainMenu(frame.DesktopImage);
+                                        Protocols.CheckFinalScore(frame.DesktopImage);
+                                    }
+
+                                    if (Vars.gameData.state == State.Finished && Vars.getInfoTimeout.ElapsedMilliseconds >= 500)
+                                    {
+                                        Protocols.CheckGameScore(frame.DesktopImage);
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Functions.DebugMessage("Main Exception: " + e.ToString());
+                                    Thread.Sleep(500);
+                                }
+                            }
+
+                            Vars.frameTimer.Restart();
                         }
                     }
-                    Thread.Sleep(500);
                 }
                 else
                 {
-                    Thread.Sleep(50);
-                    trayMenu.currentGame.MenuItems[0].Text = "Game elapsed: " + Functions.SecondsToMinutes((int)Math.Floor(Convert.ToDouble(Vars.gameTimer.ElapsedMilliseconds / 1000)));
-
-                    if (Vars.frameTimer.ElapsedMilliseconds >= Vars.loopDelay)
-                    {
-                        DesktopFrame frame = null;
-
-                        try
-                        {
-                            frame = desktopDuplicator.GetLatestFrame();
-                        }
-                        catch
-                        {
-                            desktopDuplicator.Reinitialize();
-                            continue;
-                        }
-                        if (frame != null)
-                        {
-                            try
-                            {
-                                if (Vars.gameData.state != State.Ingame)
-                                {
-                                    string quickPlayText = Functions.BitmapToText(frame.DesktopImage, 476, 644, 80, 40, contrastFirst: false, radius: 140, network: Network.Maps, invertColors: true);
-
-                                    if (Functions.CompareStrings(quickPlayText, "PLHY") >= 70)
-                                    {
-                                        Thread.Sleep(250);
-                                        Protocols.CheckPlayMenu(frame.DesktopImage);
-                                    }
-                                }
-
-                                if (Vars.gameData.state == State.Idle || Vars.gameData.state == State.Finished || Vars.gameData.state == State.WaitForUpload)
-                                {
-                                    Protocols.CheckCompetitiveGameEntered(frame.DesktopImage);
-                                }
-
-                                if (Vars.gameData.state == State.Ingame)
-                                {
-                                    Protocols.CheckMap(frame.DesktopImage);
-                                    Protocols.CheckTeamsSkillRating(frame.DesktopImage);
-
-                                    if (!Vars.gameData.team1Rating.Equals(String.Empty) &&
-                                        !Vars.gameData.team2Rating.Equals(String.Empty) &&
-                                        !Vars.gameData.mapInfo.Equals(String.Empty) ||
-                                        !Vars.gameData.mapInfo.Equals(String.Empty) && Vars.getInfoTimeout.ElapsedMilliseconds >= 4000)
-                                    {
-                                        if (Vars.gameData.playerListImage == null)
-                                        {
-                                            Thread.Sleep(Vars.getInfoTimeout.ElapsedMilliseconds >= 4000 ? 0 : 2000);
-                                            try
-                                            {
-                                                frame = desktopDuplicator.GetLatestFrame();
-                                                Vars.gameData.playerListImage = new Bitmap(Functions.CaptureRegion(frame.DesktopImage, 0, 110, 1920, 700));
-                                                //Vars.gameData.debugImage = new Bitmap(frame.DesktopImage);
-                                                Protocols.CheckPlayerNamesAndRank(frame.DesktopImage);
-                                            }
-                                            catch { }
-                                        }
-                                        Vars.loopDelay = 500;
-                                        Vars.gameData.state = State.Recording;
-                                        trayMenu.ChangeTray("Recording... visit the main menu after the game", Properties.Resources.IconRecord);
-                                        Vars.statsTimer.Restart();
-                                        Vars.getInfoTimeout.Stop();
-                                    }
-                                    else if (Vars.getInfoTimeout.ElapsedMilliseconds >= 4500)
-                                    {
-                                        Vars.roundTimer.Stop();
-                                        Vars.gameTimer.Stop();
-                                        Vars.getInfoTimeout.Stop();
-                                        Vars.gameData.state = State.Idle;
-                                        Functions.DebugMessage("Failed to find game");
-                                    }
-                                }
-
-                                if (Vars.gameData.state == State.Recording)
-                                {
-                                    if (!Vars.isAdmin || Functions.GetAsyncKeyState(0x09) < 0) // GetAsyncKeyState only works with admin
-                                    {
-                                        if (Protocols.CheckHeroPlayed(frame.DesktopImage) && Vars.roundTimer.ElapsedMilliseconds >= Functions.GetTimeDeduction(getNextDeduction: true))
-                                        {
-                                            Protocols.CheckStats(frame.DesktopImage);
-                                        }
-                                    }
-                                    else if (Vars.roundTimer.ElapsedMilliseconds >= Functions.GetTimeDeduction(getNextDeduction: true))
-                                    {
-                                        Protocols.CheckRoundCompleted(frame.DesktopImage);
-                                    }
-                                    Protocols.CheckMainMenu(frame.DesktopImage);
-                                    Protocols.CheckFinalScore(frame.DesktopImage);
-                                }
-
-                                if (Vars.gameData.state == State.Finished && Vars.getInfoTimeout.ElapsedMilliseconds >= 500)
-                                {
-                                    Protocols.CheckGameScore(frame.DesktopImage);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Functions.DebugMessage("Main Exception: " + e.ToString());
-                                Thread.Sleep(500);
-                            }
-                        }
-
-                        Vars.frameTimer.Restart();
-                    }
+                    Console.WriteLine("CaptureDesktop() DO NOT RUN");
+                    Thread.Sleep(1000);
                 }
             }
         }

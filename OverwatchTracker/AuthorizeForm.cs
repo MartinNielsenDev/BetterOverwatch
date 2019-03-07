@@ -8,7 +8,7 @@ namespace BetterOverwatch
 {
     public partial class AuthorizeForm : Form
     {
-        public bool shouldLink = false;
+        public bool isLinking = false;
         public const int WM_NCLBUTTONDOWN = 0xA1;
         public const int HT_CAPTION = 0x2;
 
@@ -26,14 +26,7 @@ namespace BetterOverwatch
         }
         private void closeButton_Click(object sender, EventArgs e)
         {
-            if (shouldLink)
-            {
-                Close();
-            }
-            else
-            {
-                Application.Exit();
-            }
+            Application.Exit();
         }
         public void MoveForm_MouseDown(object sender, MouseEventArgs e)
         {
@@ -47,13 +40,12 @@ namespace BetterOverwatch
         {
             ControlPaint.DrawBorder(e.Graphics, this.borderPanel.ClientRectangle, Color.FromArgb(255, 57, 96, 130), ButtonBorderStyle.Solid);
         }
-
         private async void authorizeButton_Click(object sender, EventArgs e)
         {
             Hide();
             Program.authorizeForm.authorizeButton.Enabled = false;
-            Process.Start("https://eu.battle.net/oauth/authorize?response_type=code&client_id=20d78829a4e641e694d8ec7f1198dc8b&redirect_uri=http://betteroverwatch.com/api/authorize/" + (shouldLink ? "&state=" + Vars.settings.privateToken : ""));
-            this.Focus();
+            Process.Start("https://eu.battle.net/oauth/authorize?response_type=code&client_id=20d78829a4e641e694d8ec7f1198dc8b&redirect_uri=http://betteroverwatch.com/api/authorize/" + (isLinking ? "&state=" + Vars.settings.privateToken : ""));
+            Focus();
             await Server.StartLocalAuthServer();
         }
     }

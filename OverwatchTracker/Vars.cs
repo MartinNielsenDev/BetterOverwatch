@@ -24,7 +24,8 @@ namespace BetterOverwatch
         public static string[] team1Check = { "", "" }, team2Check = { "", "" }, statsCheck = { "", "", "", "", "" };
         public static int team1CheckIndex = 0, team2CheckIndex = 0, statsCheckIndex = 0, roundsCompleted = 0;
         public static Stopwatch frameTimer = new Stopwatch(), gameTimer = new Stopwatch(), roundTimer = new Stopwatch(), heroTimer = new Stopwatch(), getInfoTimeout = new Stopwatch(), statsTimer = new Stopwatch();
-        public static Bitmap[] ranks = { new Bitmap(Properties.Resources.Unranked),
+        public static Bitmap[] ranks = {
+            new Bitmap(Properties.Resources.Unranked),
             new Bitmap(Properties.Resources.Silver),
             new Bitmap(Properties.Resources.Gold),
             new Bitmap(Properties.Resources.Platinum),
