@@ -22,7 +22,7 @@ namespace BetterOverwatch
         static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.2.2",
+                version: "1.2.3",
                 host: "betteroverwatch.com",
                 gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest"
                 );
@@ -131,7 +131,6 @@ namespace BetterOverwatch
             {
                 if (captureDesktop)
                 {
-                    Console.WriteLine("CaptureDesktop() RUN");
                     if (!Functions.ActiveWindowTitle().Equals("Overwatch"))
                     {
                         if (!Vars.overwatchRunning)
@@ -152,6 +151,13 @@ namespace BetterOverwatch
                             {
                                 trayMenu.ChangeTray("Waiting for Overwatch, idle...", Properties.Resources.Idle);
                                 Vars.overwatchRunning = false;
+                                if (Vars.gameData.state == State.Recording || 
+                                    Vars.gameData.state == State.Finished || 
+                                    Vars.gameData.state == State.WaitForUpload
+                                    )
+                                {
+                                    Protocols.CheckGameUpload();
+                                }
                             }
                         }
                         Thread.Sleep(500);

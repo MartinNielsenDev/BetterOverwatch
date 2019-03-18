@@ -195,6 +195,7 @@ namespace BetterOverwatch
                     Settings.Save();
                     Program.captureDesktop = true;
                     buffer = Encoding.UTF8.GetBytes($"<html><meta http-equiv=\"refresh\" content=\"0; url = http://betteroverwatch.com/user/{publicToken}?auth_success=1\" /></html>");
+                    Program.trayMenu.trayMenu.MenuItems[1].Text = "Logout";
                 }
                 else
                 {

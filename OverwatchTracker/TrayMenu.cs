@@ -36,13 +36,12 @@ namespace BetterOverwatch
                 debugTools.MenuItems.Add(currentGame);
 
                 trayMenu.MenuItems.Add("Better Overwatch v" + Vars.initalize.Version);
-                trayMenu.MenuItems.Add("Login", Login);
+                trayMenu.MenuItems.Add("Logout", LoginLogout);
                 trayMenu.MenuItems.Add("-");
                 trayMenu.MenuItems.Add("Upload screenshot of player list", ToggleUpload);
                 trayMenu.MenuItems.Add("Start with Windows", ToggleWindows);
                 trayMenu.MenuItems.Add("-");
                 trayMenu.MenuItems.Add(debugTools);
-                trayMenu.MenuItems.Add("Logout", Logout);
                 trayMenu.MenuItems.Add("Exit", OnExit);
                 trayMenu.MenuItems[0].Enabled = false;
 
@@ -156,19 +155,24 @@ namespace BetterOverwatch
                 Process.Start("http://" + Vars.initalize.Host + "/user/" + Vars.settings.publicToken);
             }
         }
-        private async void Login(object sender, EventArgs e)
+        private async void LoginLogout(object sender, EventArgs e)
         {
-            Process.Start("https://eu.battle.net/oauth/authorize?response_type=code&client_id=20d78829a4e641e694d8ec7f1198dc8b&redirect_uri=http://betteroverwatch.com/api/authorize/");
-            await Server.StartLocalAuthServer();
-        }
-        private void Logout(object sender, EventArgs e)
-        {
-            File.Delete(Path.Combine(Vars.configPath, "settings.json"));
-            Vars.settings = new Settings();
-            Program.captureDesktop = false;
-            Program.authorizeForm = new AuthorizeForm();
-            Program.authorizeForm.textLabel.Text = "Logout successful and settings cleared\r\n\r\nYou must authorize to continue using Better Overwatch";
-            Program.authorizeForm.Show();
+            if (trayMenu.MenuItems[1].Text.Equals("Login"))
+            {
+                Process.Start("https://eu.battle.net/oauth/authorize?response_type=code&client_id=20d78829a4e641e694d8ec7f1198dc8b&redirect_uri=http://betteroverwatch.com/api/authorize/");
+                await Server.StartLocalAuthServer();
+            }
+            else
+            {
+                trayMenu.MenuItems[1].Text = "Login";
+                Process.Start("http://betteroverwatch.com/logout.php");
+                File.Delete(Path.Combine(Vars.configPath, "settings.json"));
+                Vars.settings = new Settings();
+                Program.captureDesktop = false;
+                Program.authorizeForm = new AuthorizeForm();
+                Program.authorizeForm.textLabel.Text = "Logout successful and settings cleared\r\n\r\nYou must authorize to continue using Better Overwatch";
+                Program.authorizeForm.Show();
+            }
         }
         public void ChangeTray(string text, Icon icon)
         {
