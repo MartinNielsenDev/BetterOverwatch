@@ -42,6 +42,7 @@
             // 
             // changeLogTextBox
             // 
+            this.changeLogTextBox.BackColor = System.Drawing.Color.White;
             this.changeLogTextBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.changeLogTextBox.Location = new System.Drawing.Point(12, 138);
             this.changeLogTextBox.Multiline = true;

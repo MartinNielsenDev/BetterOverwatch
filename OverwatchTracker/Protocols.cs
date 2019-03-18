@@ -42,10 +42,7 @@ namespace BetterOverwatch
                         )
                     {
                         if (!IsValidGame()) return;
-                        string game = Vars.gameData.GetData();
-                        Vars.lastGameJSON = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<CleanedGame>(game), Formatting.Indented);
-                        Server.UploadGame(game);
-                        ResetGame();
+                        CheckGameUpload();
                     }
                     Program.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Properties.Resources.IconActive);
                 }
@@ -128,11 +125,7 @@ namespace BetterOverwatch
                 {
                     if (Vars.gameData.state == State.Finished || Vars.gameData.state == State.WaitForUpload) // a game finished
                     {
-                        string game = Vars.gameData.GetData();
-                        Vars.lastGameJSON = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<CleanedGame>(game), Formatting.Indented);
-                        Server.UploadGame(game);
-                        Vars.gameData = new Game(Vars.gameData.currentRating);
-                        ResetGame();
+                        CheckGameUpload();
                     }
                     Vars.getInfoTimeout.Restart();
                     Vars.gameData.state = State.Ingame;
@@ -426,6 +419,15 @@ namespace BetterOverwatch
                 playerNameX += 945;
                 playerRankX += 422;
             }
+        }
+        public static void CheckGameUpload()
+        {
+            string game = Vars.gameData.GetData();
+            Vars.lastGameJSON = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<CleanedGame>(game), Formatting.Indented);
+            string battleTag = Functions.FetchBattleTag();
+            if (!battleTag.Equals(Vars.gameData.battleTag)) Vars.gameData.battleTag = battleTag;
+            Server.UploadGame(game);
+            ResetGame();
         }
         private static bool IsValidGame()
         {

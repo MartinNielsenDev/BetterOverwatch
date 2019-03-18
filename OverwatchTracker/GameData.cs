@@ -54,7 +54,7 @@ namespace BetterOverwatch
         [JsonProperty("heroes")]
         private List<HeroPlayed> heroes = new List<HeroPlayed>();
         [JsonProperty("battleTag")]
-        public readonly string battleTag = Functions.FetchBattleTag();
+        public string battleTag = Functions.FetchBattleTag();
         [JsonProperty("privateToken")]
         private readonly string privateToken = Vars.settings.privateToken;
 
