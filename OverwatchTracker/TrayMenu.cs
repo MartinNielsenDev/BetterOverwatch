@@ -1,9 +1,11 @@
 ﻿using System;
-using System.IO;
-using System.Windows.Forms;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
+using BetterOverwatch.Forms;
+using BetterOverwatch.Properties;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 
@@ -14,7 +16,6 @@ namespace BetterOverwatch
         public MenuItem currentGame = new MenuItem("Last Game");
         public NotifyIcon trayIcon = new NotifyIcon();
         public ContextMenu trayMenu = new ContextMenu();
-        private readonly RegistryKey registry = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
 
         public TrayMenu()
         {
@@ -32,7 +33,7 @@ namespace BetterOverwatch
                 }
                 MenuItem debugTools = new MenuItem("Tools");
                 debugTools.MenuItems.Add("Open logs", OpenLogs);
-                debugTools.MenuItems.Add("Export Last Game", FetchJSON);
+                debugTools.MenuItems.Add("Export Last Game", FetchJson);
                 debugTools.MenuItems.Add(currentGame);
 
                 trayMenu.MenuItems.Add("Better Overwatch v" + Vars.initalize.Version);
@@ -54,18 +55,18 @@ namespace BetterOverwatch
                     trayMenu.MenuItems[4].Checked = true;
                     using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
                     {
-                        if (key != null)
-                        {
-                            key.SetValue("BetterOverwatch", "\"" + Application.ExecutablePath.ToString() + "\"");
-                        }
+                        key?.SetValue("BetterOverwatch", "\"" + Application.ExecutablePath + "\"");
                     }
                 }
-                ChangeTray("Waiting for Overwatch, idle...", Properties.Resources.Idle);
+                ChangeTray("Waiting for Overwatch, idle...", Resources.Idle);
                 trayIcon.ContextMenu = trayMenu;
                 trayIcon.Visible = true;
-                trayIcon.DoubleClick += new EventHandler(OpenMatchHistory);
+                trayIcon.DoubleClick += OpenMatchHistory;
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
         protected override void OnLoad(EventArgs e)
         {
@@ -82,12 +83,12 @@ namespace BetterOverwatch
         {
             if (InvokeRequired)
             {
-                this.Invoke(new Action<string, int>(TrayPopup), new object[] { text, timeout });
+                Invoke(new Action<string, int>(TrayPopup), text, timeout);
                 return;
             }
             trayIcon.ShowBalloonTip(timeout, "Better Overwatch", text, ToolTipIcon.None);
         }
-        private void FetchJSON(object sender, EventArgs e)
+        private void FetchJson(object sender, EventArgs e)
         {
             if (Vars.lastGameJSON.Length > 0)
             {
@@ -140,7 +141,7 @@ namespace BetterOverwatch
                 {
                     if (key != null)
                     {
-                        key.SetValue("BetterOverwatch", "\"" + Application.ExecutablePath.ToString() + "\"");
+                        key.SetValue("BetterOverwatch", "\"" + Application.ExecutablePath + "\"");
                     }
                 }
                 trayMenu.MenuItems[4].Checked = true;
@@ -150,7 +151,7 @@ namespace BetterOverwatch
         }
         private void OpenMatchHistory(object sender, EventArgs e)
         {
-            if (!Vars.settings.publicToken.Equals(String.Empty))
+            if (!Vars.settings.publicToken.Equals(string.Empty))
             {
                 Process.Start("http://" + Vars.initalize.Host + "/user/" + Vars.settings.publicToken);
             }
@@ -169,8 +170,13 @@ namespace BetterOverwatch
                 File.Delete(Path.Combine(Vars.configPath, "settings.json"));
                 Vars.settings = new Settings();
                 Program.captureDesktop = false;
-                Program.authorizeForm = new AuthorizeForm();
-                Program.authorizeForm.textLabel.Text = "Logout successful and settings cleared\r\n\r\nYou must authorize to continue using Better Overwatch";
+                Program.authorizeForm = new AuthorizeForm
+                {
+                    textLabel =
+                    {
+                        Text = "Logout successful and settings cleared\r\n\r\nYou must authorize to continue using Better Overwatch"
+                    }
+                };
                 Program.authorizeForm.Show();
             }
         }
@@ -190,7 +196,8 @@ namespace BetterOverwatch
             base.Dispose(isDisposing);
         }
     }
-    class CleanedGame
+
+    internal class CleanedGame
     {
 #pragma warning disable 0169
         [JsonProperty("mapInfo")]

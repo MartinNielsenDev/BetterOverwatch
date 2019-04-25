@@ -1,30 +1,32 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Windows.Forms;
-using System.Collections.Specialized;
-using System.Net;
-using System.Threading;
-using System.Text;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using BetterOverwatch.Forms;
 using Newtonsoft.Json;
 
 namespace BetterOverwatch
 {
-    class Initalize
+    internal class Initalize
     {
         public Initalize(string version, string host, string gitHubHost)
         {
-            this.Version = version;
-            this.Host = host;
-            this.GitHubHost = gitHubHost;
+            Version = version;
+            Host = host;
+            GitHubHost = gitHubHost;
         }
         public string Version { get; } = "";
         public string Host { get; } = "";
         public string GitHubHost { get; } = "";
     }
-    class Server
+
+    internal class Server
     {
         public static Stopwatch autoUpdaterTimer = new Stopwatch();
         public static void AutoUpdater()
@@ -41,7 +43,7 @@ namespace BetterOverwatch
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/fetch-offset/", new NameValueCollection()
+                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/fetch-offset/", new NameValueCollection
                     {
                         { "version", version }
                     });
@@ -54,7 +56,10 @@ namespace BetterOverwatch
                     }
                 }
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
             return false;
         }
         public static bool CheckNewestVersion()
@@ -89,7 +94,10 @@ namespace BetterOverwatch
                     }
                 }
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
             return true;
         }
         public static void UploadGame(string gameData)
@@ -110,7 +118,7 @@ namespace BetterOverwatch
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/upload-game/", new NameValueCollection()
+                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/upload-game/", new NameValueCollection
                     {
                         { "gameData", gameData }
                     });
@@ -121,13 +129,13 @@ namespace BetterOverwatch
                         Functions.DebugMessage("Successfully uploaded game");
                         return true;
                     }
-                    else
-                    {
-                        Functions.DebugMessage("Failed to upload game, message: " + result.message);
-                    }
+                    Functions.DebugMessage("Failed to upload game, message: " + result.message);
                 }
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
             return false;
         }
         public static void VerifyToken()
@@ -136,7 +144,7 @@ namespace BetterOverwatch
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/verify-account/", new NameValueCollection()
+                    byte[] response = client.UploadValues("http://api." + Vars.initalize.Host + "/verify-account/", new NameValueCollection
                     {
                         { "privateToken", Vars.settings.privateToken }
                     });
@@ -166,7 +174,10 @@ namespace BetterOverwatch
                     }
                 }
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
         public static async Task StartLocalAuthServer()
         {
@@ -214,10 +225,14 @@ namespace BetterOverwatch
                 output.Close();
                 listener.Stop();
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
     }
-    class ServerOutput
+
+    internal class ServerOutput
     {
         public class TokensOutput
         {
@@ -242,7 +257,8 @@ namespace BetterOverwatch
             public string offset { get; set; }
         }
     }
-    class GitHub
+
+    internal class GitHub
     {
         public class Json
         {
@@ -261,11 +277,12 @@ namespace BetterOverwatch
             public int size { get; set; }
         }
     }
-    class Versioning
+
+    internal class Versioning
     {
-        public int major = 0;
-        public int minor = 0;
-        public int patch = 0;
+        public int major;
+        public int minor;
+        public int patch;
 
         public Versioning(string rawVersion)
         {
@@ -273,24 +290,24 @@ namespace BetterOverwatch
 
             if (versions.Length == 3)
             {
-                int.TryParse(versions[0], out this.major);
-                int.TryParse(versions[1], out this.minor);
-                int.TryParse(versions[2], out this.patch);
+                int.TryParse(versions[0], out major);
+                int.TryParse(versions[1], out minor);
+                int.TryParse(versions[2], out patch);
             }
         }
         public bool IsNewerThan(Versioning version)
         {
-            if (this.major > version.major)
+            if (major > version.major)
             {
                 return true;
             }
-            else if (this.major == version.major)
+            if (major == version.major)
             {
-                if (this.minor > version.minor)
+                if (minor > version.minor)
                 {
                     return true;
                 }
-                else if (this.minor == version.minor && this.patch > version.patch)
+                if (minor == version.minor && patch > version.patch)
                 {
                     return true;
                 }

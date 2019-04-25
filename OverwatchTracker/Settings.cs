@@ -1,10 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Newtonsoft.Json;
 
 namespace BetterOverwatch
 {
-    class Settings
+    internal class Settings
     {
         [JsonProperty("privateToken")]
         public string privateToken = "";
@@ -22,16 +21,19 @@ namespace BetterOverwatch
 
             try
             {
-                string json;
                 if (File.Exists(Path.Combine(Vars.configPath, "settings.json")))
                 {
-                    json = File.ReadAllText(Path.Combine(Vars.configPath, "settings.json"));
-                    if ((json.Replace("\r", String.Empty).Replace("\n", String.Empty) != String.Empty) && json.Length > 0)
+                    string json = File.ReadAllText(Path.Combine(Vars.configPath, "settings.json"));
+                    if ((json.Replace("\r", string.Empty).Replace("\n", string.Empty) != string.Empty) && json.Length > 0)
                     {
                         Vars.settings = JsonConvert.DeserializeObject<Settings>(json);
                     }
                 }
-            } catch { }
+            }
+            catch
+            {
+                // ignored
+            }
         }
         public static void Save()
         {

@@ -97,17 +97,17 @@
     <StartupObject>BetterOverwatch.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AdminPromptForm.cs">
+    <Compile Include="Forms\AdminPromptForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AdminPromptForm.Designer.cs">
+    <Compile Include="Forms\AdminPromptForm.Designer.cs">
       <DependentUpon>AdminPromptForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Protocols.cs" />
-    <Compile Include="AuthorizeForm.cs">
+    <Compile Include="Forms\AuthorizeForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AuthorizeForm.Designer.cs">
+    <Compile Include="Forms\AuthorizeForm.Designer.cs">
       <DependentUpon>AuthorizeForm.cs</DependentUpon>
     </Compile>
     <Compile Include="TrayMenu.cs">
@@ -125,14 +125,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="UpdateNotificationForm.cs">
+    <Compile Include="Forms\UpdateNotificationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UpdateNotificationForm.Designer.cs">
+    <Compile Include="Forms\UpdateNotificationForm.Designer.cs">
       <DependentUpon>UpdateNotificationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Vars.cs" />
-    <EmbeddedResource Include="AdminPromptForm.resx">
+    <EmbeddedResource Include="Forms\AdminPromptForm.resx">
       <DependentUpon>AdminPromptForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -145,10 +145,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="AuthorizeForm.resx">
+    <EmbeddedResource Include="Forms\AuthorizeForm.resx">
       <DependentUpon>AuthorizeForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UpdateNotificationForm.resx">
+    <EmbeddedResource Include="Forms\UpdateNotificationForm.resx">
       <DependentUpon>UpdateNotificationForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.manifest">

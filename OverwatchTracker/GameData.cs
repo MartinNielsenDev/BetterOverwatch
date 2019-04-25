@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using Newtonsoft.Json;
 
 namespace BetterOverwatch
 {
-    class Game
+    internal class Game
     {
         public Game(string currentRating = "")
         {
@@ -17,7 +17,7 @@ namespace BetterOverwatch
         [JsonIgnore]
         public int currentHero = -1;
         [JsonIgnore]
-        public string currentRating = String.Empty;
+        public string currentRating = string.Empty;
         [JsonIgnore]
         public List<Stopwatch> heroTimePlayed = new List<Stopwatch>();
         [JsonIgnore]
@@ -60,60 +60,60 @@ namespace BetterOverwatch
 
         public string GetData()
         {
-            if (this.heroPlayed.Count > 0)
+            if (heroPlayed.Count > 0)
             {
-                for (int i = 0; i < (this.heroPlayed.Count > 3 ? 3 : this.heroPlayed.Count); i++)
+                for (int i = 0; i < (heroPlayed.Count > 3 ? 3 : heroPlayed.Count); i++)
                 {
                     long mostPlayed = 0;
                     int mostPlayedIndex = 0;
 
-                    for (int h = 0; h < this.heroPlayed.Count; h++)
+                    for (int h = 0; h < heroPlayed.Count; h++)
                     {
-                        if (this.heroPlayed[h] > -1)
+                        if (heroPlayed[h] > -1)
                         {
-                            if (this.heroTimePlayed[h].ElapsedMilliseconds / 1000 > mostPlayed)
+                            if (heroTimePlayed[h].ElapsedMilliseconds / 1000 > mostPlayed)
                             {
-                                mostPlayed = this.heroTimePlayed[h].ElapsedMilliseconds / 1000;
+                                mostPlayed = heroTimePlayed[h].ElapsedMilliseconds / 1000;
                                 mostPlayedIndex = h;
                             }
                         }
                     }
-                    if (this.heroTimePlayed[mostPlayedIndex].ElapsedMilliseconds > 60000)
+                    if (heroTimePlayed[mostPlayedIndex].ElapsedMilliseconds > 60000)
                     {
-                        this.heroes.Add(
+                        heroes.Add(
                             new HeroPlayed(
-                                this.heroPlayed[mostPlayedIndex].ToString(),
-                                Math.Round(Convert.ToDouble(this.heroTimePlayed[mostPlayedIndex].ElapsedMilliseconds / 1000) / Convert.ToDouble(Vars.heroTimer.ElapsedMilliseconds / 1000) * 100, 0).ToString()
+                                heroPlayed[mostPlayedIndex].ToString(),
+                                Math.Round(Convert.ToDouble(heroTimePlayed[mostPlayedIndex].ElapsedMilliseconds / 1000) / Convert.ToDouble(Vars.heroTimer.ElapsedMilliseconds / 1000) * 100, 0).ToString()
                                 ));
                     }
-                    this.heroPlayed[mostPlayedIndex] = -1;
+                    heroPlayed[mostPlayedIndex] = -1;
                 }
             }
-            this.duration = Math.Floor(Convert.ToDouble(Vars.gameTimer.ElapsedMilliseconds / 1000)).ToString();
-            this.endRating = currentRating;
+            duration = Math.Floor(Convert.ToDouble(Vars.gameTimer.ElapsedMilliseconds / 1000)).ToString();
+            endRating = currentRating;
 
-            if (Vars.settings.uploadScreenshot && this.playerListImage != null)
+            if (Vars.settings.uploadScreenshot && playerListImage != null)
             {
-                this.playerListImageBase64 = Convert.ToBase64String(Functions.ImageToBytes(Functions.ReduceImageSize(this.playerListImage, 70)));
+                playerListImageBase64 = Convert.ToBase64String(Functions.ImageToBytes(Functions.ReduceImageSize(playerListImage, 70)));
             }
-            if(Vars.settings.uploadScreenshot && this.debugImage != null)
+            if(Vars.settings.uploadScreenshot && debugImage != null)
             {
-                this.debugImageBase64 = Convert.ToBase64String(Functions.ImageToBytes(this.debugImage));
+                debugImageBase64 = Convert.ToBase64String(Functions.ImageToBytes(debugImage));
             }
-            if(this.players.Count >= 12)
+            if(players.Count >= 12)
             {
-                if(!this.battleTag.Equals("PLAYER-0000"))
+                if(!battleTag.Equals("PLAYER-0000"))
                 {
-                    string[] btagSplit = this.battleTag.Split('-');
+                    string[] btagSplit = battleTag.Split('-');
                     if (btagSplit.Length > 1)
                     {
-                        this.players[0].playerName = btagSplit[0];
+                        players[0].playerName = btagSplit[0];
                     }
                 }
             }
             else
             {
-                this.players.Clear();
+                players.Clear();
             }
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
@@ -173,7 +173,7 @@ namespace BetterOverwatch
             [JsonProperty("mapName")]
             public string mapName = "";
             [JsonProperty("isKoth")]
-            public bool isKoth = false;
+            public bool isKoth;
         }
     }
 }

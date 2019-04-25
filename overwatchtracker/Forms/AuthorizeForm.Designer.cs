@@ -1,11 +1,14 @@
-﻿namespace BetterOverwatch
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace BetterOverwatch.Forms
 {
     partial class AuthorizeForm
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -164,12 +167,12 @@
 
         #endregion
 
-        private System.Windows.Forms.Panel headerPanel;
-        private System.Windows.Forms.Panel borderPanel;
-        private System.Windows.Forms.Panel authorizePanel;
-        private System.Windows.Forms.Button closeButton;
-        private System.Windows.Forms.PictureBox logoPictureBox;
-        public System.Windows.Forms.Label textLabel;
-        public System.Windows.Forms.Button authorizeButton;
+        private Panel headerPanel;
+        private Panel borderPanel;
+        private Panel authorizePanel;
+        private Button closeButton;
+        private PictureBox logoPictureBox;
+        public Label textLabel;
+        public Button authorizeButton;
     }
 }

@@ -7,13 +7,13 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace BetterOverwatch
+namespace BetterOverwatch.Forms
 {
     public partial class UpdateNotificationForm : Form
     {
-        public string downloadUrl = String.Empty;
+        public string downloadUrl = string.Empty;
         public int downloadSize = 0;
-        private int downloadProgress = 0;
+        private int downloadProgress;
 
         public UpdateNotificationForm()
         {
@@ -21,8 +21,8 @@ namespace BetterOverwatch
         }
         private void UpdateNotificationForm_Shown(object sender, EventArgs e)
         {
-            this.Deactivate += (s, a) => WindowFlasher.FlashWindowEx(this.Handle, WindowFlasher.FLASHW_TRAY);
-            this.Activated += (s, a) => WindowFlasher.FlashWindowEx(this.Handle, WindowFlasher.FLASHW_STOP);
+            Deactivate += (s, a) => WindowFlasher.FlashWindowEx(Handle, WindowFlasher.FLASHW_TRAY);
+            Activated += (s, a) => WindowFlasher.FlashWindowEx(Handle, WindowFlasher.FLASHW_STOP);
             SystemSounds.Asterisk.Play();
             updateButton.Focus();
         }
@@ -30,7 +30,7 @@ namespace BetterOverwatch
         {
             updateButton.Enabled = false;
 
-            if (!downloadUrl.Equals(String.Empty))
+            if (!downloadUrl.Equals(string.Empty))
             {
                 changeLogTextBox.Text = "";
                 AppendChangeLog("Starting download... size " + FileSuffix(downloadSize));
@@ -69,12 +69,15 @@ namespace BetterOverwatch
             {
                 try
                 {
-                    webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(webClient_DownloadProgressChanged);
-                    webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(webClient_DownloadFileCompleted);
+                    webClient.DownloadProgressChanged += webClient_DownloadProgressChanged;
+                    webClient.DownloadFileCompleted += webClient_DownloadFileCompleted;
 
                     webClient.DownloadFileAsync(new Uri(downloadUrl), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"overwatchtracker\overwatchtracker.exe"));
                 }
-                catch { }
+                catch
+                {
+                    // ignored
+                }
             }
         }
         public void OpenUpdate()
@@ -83,25 +86,27 @@ namespace BetterOverwatch
             string tempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"overwatchtracker\overwatchtracker.exe");
             string currentPath = Application.ExecutablePath;
 
-            ProcessStartInfo Info = new ProcessStartInfo();
-            Info.Arguments = String.Format(argument, currentPath, tempPath, currentPath, Path.GetDirectoryName(currentPath), Path.GetFileName(currentPath), "");
-            Info.WindowStyle = ProcessWindowStyle.Hidden;
-            Info.CreateNoWindow = true;
-            Info.FileName = "cmd.exe";
-            Process.Start(Info);
+            ProcessStartInfo info = new ProcessStartInfo
+            {
+                Arguments = string.Format(argument, currentPath, tempPath, currentPath, Path.GetDirectoryName(currentPath), Path.GetFileName(currentPath), ""),
+                WindowStyle = ProcessWindowStyle.Hidden,
+                CreateNoWindow = true,
+                FileName = "cmd.exe"
+            };
+            Process.Start(info);
             Environment.Exit(0);
         }
         private void AppendChangeLog(string message)
         {
             changeLogTextBox.AppendText(message + Environment.NewLine);
         }
-        private string FileSuffix(int fileSize)
+        private static string FileSuffix(int fileSize)
         {
             if((double)fileSize / 1024 / 1024 > 0)
             {
                 return Math.Round((double)fileSize / 1024 / 1024, 2) + " MB";
             }
-            else if((double)fileSize / 1024 > 0)
+            if((double)fileSize / 1024 > 0)
             {
                 return Math.Round((double)fileSize / 1024, 2) + " KB";
             }
@@ -121,7 +126,7 @@ namespace BetterOverwatch
         }
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
+        private static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
 
         public const int FLASHW_STOP = 0;
         public const int FLASHW_CAPTION = 1;
@@ -138,7 +143,7 @@ namespace BetterOverwatch
             fInfo.cbSize = Convert.ToInt32(Marshal.SizeOf(fInfo));
             fInfo.hwnd = hWnd;
             fInfo.dwFlags = flags;
-            fInfo.uCount = Int32.MaxValue;
+            fInfo.uCount = int.MaxValue;
             fInfo.dwTimeout = 0;
 
             return FlashWindowEx(ref fInfo);

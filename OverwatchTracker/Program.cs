@@ -1,30 +1,32 @@
 ﻿using System;
-using System.Reflection;
 using System.Drawing;
-using System.Windows.Forms;
-using System.Threading;
 using System.IO;
-using System.Security.Principal;
 using System.Net;
-using DesktopDuplication;
+using System.Reflection;
+using System.Security.Principal;
+using System.Threading;
+using System.Windows.Forms;
+using BetterOverwatch.DesktopDuplication;
+using BetterOverwatch.Forms;
+using BetterOverwatch.Properties;
 
 namespace BetterOverwatch
 {
-    class Program
+    internal class Program
     {
         public static bool captureDesktop = false;
         public static TrayMenu trayMenu;
         public static AuthorizeForm authorizeForm;
         public static AdminPromptForm adminPromptForm;
         private static DesktopDuplicator desktopDuplicator;
-        private static Mutex mutex = new Mutex(true, "74bf6260-c133-4d69-ad9c-efc607887c97");
+        private static readonly Mutex mutex = new Mutex(true, "74bf6260-c133-4d69-ad9c-efc607887c97");
         [STAThread]
-        static void Main()
+        private static void Main()
         {
             Vars.initalize = new Initalize(
-                version: "1.2.3",
-                host: "betteroverwatch.com",
-                gitHubHost: "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest"
+                "1.2.4",
+                "betteroverwatch.com",
+                "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest"
                 );
             Functions.DebugMessage("Starting Better Overwatch version " + Vars.initalize.Version);
 
@@ -33,7 +35,7 @@ namespace BetterOverwatch
                 MessageBox.Show("Better Overwatch is already running\r\n\r\nYou must close other instances of Better Overwatch if you want to open this one", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler((s, assembly) =>
+            AppDomain.CurrentDomain.AssemblyResolve += (s, assembly) =>
             {
                 if (assembly.Name.Contains("Newtonsoft.Json,"))
                 {
@@ -76,7 +78,7 @@ namespace BetterOverwatch
                     return LoadAssembly("BetterOverwatch.Resources.System.Xml.dll");
                 }
                 return null;
-            });
+            };
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             try
             {
@@ -98,7 +100,7 @@ namespace BetterOverwatch
             }
             catch (Exception e)
             {
-                MessageBox.Show("Startup error: " + e.ToString() + "\r\n\r\nReport this on the discord server");
+                MessageBox.Show("Startup error: " + e + "\r\n\r\nReport this on the discord server");
                 Environment.Exit(0);
                 return;
             }
@@ -124,7 +126,7 @@ namespace BetterOverwatch
             }
             catch (Exception e)
             {
-                Functions.DebugMessage("Could not initialize desktopDuplication API - shutting down:" + e.ToString());
+                Functions.DebugMessage("Could not initialize desktopDuplication API - shutting down:" + e);
                 Environment.Exit(0);
             }
             while (true)
@@ -137,7 +139,7 @@ namespace BetterOverwatch
                         {
                             if (Functions.IsProcessOpen("Overwatch"))
                             {
-                                trayMenu.ChangeTray("Visit play menu to update your skill rating", Properties.Resources.IconVisitMenu);
+                                trayMenu.ChangeTray("Visit play menu to update your skill rating", Resources.IconVisitMenu);
                                 Vars.overwatchRunning = true;
                             }
                             else
@@ -149,7 +151,7 @@ namespace BetterOverwatch
                         {
                             if (!Functions.IsProcessOpen("Overwatch"))
                             {
-                                trayMenu.ChangeTray("Waiting for Overwatch, idle...", Properties.Resources.Idle);
+                                trayMenu.ChangeTray("Waiting for Overwatch, idle...", Resources.Idle);
                                 Vars.overwatchRunning = false;
                                 if (Vars.gameData.state == State.Recording || 
                                     Vars.gameData.state == State.Finished || 
@@ -169,7 +171,7 @@ namespace BetterOverwatch
 
                         if (Vars.frameTimer.ElapsedMilliseconds >= Vars.loopDelay)
                         {
-                            DesktopFrame frame = null;
+                            DesktopFrame frame;
 
                             try
                             {
@@ -186,7 +188,7 @@ namespace BetterOverwatch
                                 {
                                     if (Vars.gameData.state != State.Ingame)
                                     {
-                                        string quickPlayText = Functions.BitmapToText(frame.DesktopImage, 476, 644, 80, 40, contrastFirst: false, radius: 140, network: Network.Maps, invertColors: true);
+                                        string quickPlayText = Functions.BitmapToText(frame.DesktopImage, 476, 644, 80, 40, false, 140, Network.Maps, true);
 
                                         if (Functions.CompareStrings(quickPlayText, "PLHY") >= 70)
                                         {
@@ -205,10 +207,10 @@ namespace BetterOverwatch
                                         Protocols.CheckMap(frame.DesktopImage);
                                         Protocols.CheckTeamsSkillRating(frame.DesktopImage);
 
-                                        if (!Vars.gameData.team1Rating.Equals(String.Empty) &&
-                                            !Vars.gameData.team2Rating.Equals(String.Empty) &&
-                                            !Vars.gameData.mapInfo.Equals(String.Empty) ||
-                                            !Vars.gameData.mapInfo.Equals(String.Empty) && Vars.getInfoTimeout.ElapsedMilliseconds >= 4000)
+                                        if (!Vars.gameData.team1Rating.Equals(string.Empty) &&
+                                            !Vars.gameData.team2Rating.Equals(string.Empty) &&
+                                            !Vars.gameData.mapInfo.mapName.Equals(string.Empty) ||
+                                            !Vars.gameData.mapInfo.mapName.Equals(string.Empty) && Vars.getInfoTimeout.ElapsedMilliseconds >= 4000)
                                         {
                                             if (Vars.gameData.playerListImage == null)
                                             {
@@ -220,11 +222,14 @@ namespace BetterOverwatch
                                                     //Vars.gameData.debugImage = new Bitmap(frame.DesktopImage);
                                                     Protocols.CheckPlayerNamesAndRank(frame.DesktopImage);
                                                 }
-                                                catch { }
+                                                catch
+                                                {
+                                                    // ignored
+                                                }
                                             }
                                             Vars.loopDelay = 500;
                                             Vars.gameData.state = State.Recording;
-                                            trayMenu.ChangeTray("Recording... visit the main menu after the game", Properties.Resources.IconRecord);
+                                            trayMenu.ChangeTray("Recording... visit the main menu after the game", Resources.IconRecord);
                                             Vars.statsTimer.Restart();
                                             Vars.getInfoTimeout.Stop();
                                         }
@@ -242,12 +247,12 @@ namespace BetterOverwatch
                                     {
                                         if (!Vars.isAdmin || Functions.GetAsyncKeyState(0x09) < 0) // GetAsyncKeyState only works with admin
                                         {
-                                            if (Protocols.CheckHeroPlayed(frame.DesktopImage) && Vars.roundTimer.ElapsedMilliseconds >= Functions.GetTimeDeduction(getNextDeduction: true))
+                                            if (Protocols.CheckHeroPlayed(frame.DesktopImage) && Vars.roundTimer.ElapsedMilliseconds >= Functions.GetTimeDeduction(true))
                                             {
                                                 Protocols.CheckStats(frame.DesktopImage);
                                             }
                                         }
-                                        else if (Vars.roundTimer.ElapsedMilliseconds >= Functions.GetTimeDeduction(getNextDeduction: true))
+                                        else if (Vars.roundTimer.ElapsedMilliseconds >= Functions.GetTimeDeduction(true))
                                         {
                                             Protocols.CheckRoundCompleted(frame.DesktopImage);
                                         }
@@ -262,7 +267,7 @@ namespace BetterOverwatch
                                 }
                                 catch (Exception e)
                                 {
-                                    Functions.DebugMessage("Main Exception: " + e.ToString());
+                                    Functions.DebugMessage("Main Exception: " + e);
                                     Thread.Sleep(500);
                                 }
                             }
@@ -273,20 +278,23 @@ namespace BetterOverwatch
                 }
                 else
                 {
-                    Console.WriteLine("CaptureDesktop() DO NOT RUN");
                     Thread.Sleep(1000);
                 }
             }
         }
         private static Assembly LoadAssembly(string resource)
         {
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource))
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource))
             {
-                byte[] assemblyData = new byte[stream.Length];
+                if (stream != null)
+                {
+                    byte[] assemblyData = new byte[stream.Length];
 
-                stream.Read(assemblyData, 0, assemblyData.Length);
-                return Assembly.Load(assemblyData);
+                    stream.Read(assemblyData, 0, assemblyData.Length);
+                    return Assembly.Load(assemblyData);
+                }
             }
+            return null;
         }
     }
 }

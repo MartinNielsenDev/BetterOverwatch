@@ -1,11 +1,14 @@
-﻿namespace BetterOverwatch
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace BetterOverwatch.Forms
 {
     partial class UpdateNotificationForm
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -164,14 +167,14 @@
 
         #endregion
 
-        public System.Windows.Forms.TextBox changeLogTextBox;
-        private System.Windows.Forms.Label titleLabel;
-        public System.Windows.Forms.Label installedVersionLabel;
-        public System.Windows.Forms.Label updateVersionLabel;
-        private System.Windows.Forms.Label changeLogLabel;
-        private System.Windows.Forms.Button updateButton;
-        private System.Windows.Forms.Button cancelButton;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        public System.Windows.Forms.Label titleSubLabel;
+        public TextBox changeLogTextBox;
+        private Label titleLabel;
+        public Label installedVersionLabel;
+        public Label updateVersionLabel;
+        private Label changeLogLabel;
+        private Button updateButton;
+        private Button cancelButton;
+        private PictureBox pictureBox1;
+        public Label titleSubLabel;
     }
 }

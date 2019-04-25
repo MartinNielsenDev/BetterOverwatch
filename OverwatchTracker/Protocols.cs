@@ -2,20 +2,21 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Text.RegularExpressions;
+using BetterOverwatch.Properties;
 using Newtonsoft.Json;
 
 namespace BetterOverwatch
 {
-    class Protocols
+    internal class Protocols
     {
         public static void CheckPlayMenu(Bitmap frame)
         {
-            string srText = Functions.BitmapToText(frame, 1100, 444, 100, 40, contrastFirst: true, radius: 110, network: Network.Numbers); // GROUP CHECK
+            string srText = Functions.BitmapToText(frame, 1100, 444, 100, 40, true, 110, Network.Numbers); // GROUP CHECK
             srText = Regex.Match(srText, "[0-9]+").ToString();
 
             if (srText.Length < 4)
             {
-                srText = srText = Functions.BitmapToText(frame, 1100, 504, 100, 32, contrastFirst: true, radius: 110, network: Network.Numbers); // SOLO CHECK
+                srText = Functions.BitmapToText(frame, 1100, 504, 100, 32, true, 110, Network.Numbers); // SOLO CHECK
                 srText = Regex.Match(srText, "[0-9]+").ToString();
             }
             if (srText.Length > 4)
@@ -23,7 +24,7 @@ namespace BetterOverwatch
                 srText = srText.Substring(srText.Length - 4);
             }
 
-            if (!srText.Equals(String.Empty) && srText.Length == 4)
+            if (!srText.Equals(string.Empty) && srText.Length == 4)
             {
                 if (Convert.ToInt32(srText) > 1000 && Convert.ToInt32(srText) < 5000)
                 {
@@ -44,32 +45,32 @@ namespace BetterOverwatch
                         if (!IsValidGame()) return;
                         CheckGameUpload();
                     }
-                    Program.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Properties.Resources.IconActive);
+                    Program.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.IconActive);
                 }
             }
         }
         public static void CheckStats(Bitmap frame)
         {
-            short threshold = 110;
-            string elimsText = Functions.BitmapToText(frame, 130, 895, 40, 22, contrastFirst: false, radius: threshold, network: Network.Numbers);
+            const short threshold = 110;
+            string elimsText = Functions.BitmapToText(frame, 130, 895, 40, 22, false, threshold, Network.Numbers);
 
-            if (!elimsText.Equals(String.Empty))
+            if (!elimsText.Equals(string.Empty))
             {
-                string damageText = Functions.BitmapToText(frame, 130, 957, 80, 22, contrastFirst: false, radius: threshold, network: Network.Numbers);
+                string damageText = Functions.BitmapToText(frame, 130, 957, 80, 22, false, threshold, Network.Numbers);
 
-                if (!damageText.Equals(String.Empty))
+                if (!damageText.Equals(string.Empty))
                 {
-                    string objKillsText = Functions.BitmapToText(frame, 375, 895, 40, 22, contrastFirst: false, radius: threshold, network: Network.Numbers);
+                    string objKillsText = Functions.BitmapToText(frame, 375, 895, 40, 22, false, threshold, Network.Numbers);
 
-                    if (!objKillsText.Equals(String.Empty))
+                    if (!objKillsText.Equals(string.Empty))
                     {
-                        string healingText = Functions.BitmapToText(frame, 375, 957, 80, 22, contrastFirst: false, radius: threshold, network: Network.Numbers);
+                        string healingText = Functions.BitmapToText(frame, 375, 957, 80, 22, false, threshold, Network.Numbers);
 
-                        if (!healingText.Equals(String.Empty))
+                        if (!healingText.Equals(string.Empty))
                         {
-                            string deathsText = Functions.BitmapToText(frame, 625, 957, 40, 22, contrastFirst: false, radius: threshold, network: Network.Numbers);
+                            string deathsText = Functions.BitmapToText(frame, 625, 957, 40, 22, false, threshold, Network.Numbers);
 
-                            if (!deathsText.Equals(String.Empty))
+                            if (!deathsText.Equals(string.Empty))
                             {
                                 if (Vars.statsCheck[0].Equals(elimsText) &&
                                     Vars.statsCheck[1].Equals(damageText) &&
@@ -115,9 +116,9 @@ namespace BetterOverwatch
         }
         public static void CheckCompetitiveGameEntered(Bitmap frame)
         {
-            string compText = Functions.BitmapToText(frame, 1354, 892, 323, 48, contrastFirst: false, radius: 120, network: 0, invertColors: false, red: 255, green: 255, blue: 0);
+            string compText = Functions.BitmapToText(frame, 1354, 892, 323, 48, false, 120, 0, false, 255, 255, 0);
 
-            if (!compText.Equals(String.Empty))
+            if (!compText.Equals(string.Empty))
             {
                 double percent = Functions.CompareStrings(compText, "COMPETITIVEPLAY");
 
@@ -137,15 +138,15 @@ namespace BetterOverwatch
         }
         public static void CheckMap(Bitmap frame)
         {
-            if (Vars.gameData.mapInfo.mapName.Equals(String.Empty))
+            if (Vars.gameData.mapInfo.mapName.Equals(string.Empty))
             {
                 string mapText = Functions.BitmapToText(frame, 915, 945, 780, 85);
 
-                if (!mapText.Equals(String.Empty))
+                if (!mapText.Equals(string.Empty))
                 {
                     mapText = Functions.CheckMaps(mapText);
 
-                    if (!mapText.Equals(String.Empty))
+                    if (!mapText.Equals(string.Empty))
                     {
                         Vars.gameData.mapInfo.mapName = mapText;
                         Program.trayMenu.currentGame.MenuItems[2].Text = "Map: " + mapText;
@@ -167,12 +168,12 @@ namespace BetterOverwatch
         }
         public static void CheckTeamsSkillRating(Bitmap frame)
         {
-            if (Vars.gameData.team1Rating.Equals(String.Empty))
+            if (Vars.gameData.team1Rating.Equals(string.Empty))
             {
-                string team1SR = Functions.BitmapToText(frame, 545, 220, 245, 70, contrastFirst: false, radius: 90, network: Network.TeamSkillRating);
+                string team1SR = Functions.BitmapToText(frame, 545, 220, 245, 70, false, 90, Network.TeamSkillRating);
                 team1SR = Regex.Match(team1SR, "[0-9]+").ToString();
 
-                if (!team1SR.Equals(String.Empty) && team1SR.Length >= 4) // TEAM 1 SR
+                if (!team1SR.Equals(string.Empty) && team1SR.Length >= 4) // TEAM 1 SR
                 {
                     team1SR = team1SR.Substring(team1SR.Length - 4);
 
@@ -197,12 +198,12 @@ namespace BetterOverwatch
                     }
                 }
             }
-            if (Vars.gameData.team2Rating.Equals(String.Empty))
+            if (Vars.gameData.team2Rating.Equals(string.Empty))
             {
-                string team2SR = Functions.BitmapToText(frame, 1135, 220, 245, 70, contrastFirst: false, radius: 90, network: Network.TeamSkillRating);
+                string team2SR = Functions.BitmapToText(frame, 1135, 220, 245, 70, false, 90, Network.TeamSkillRating);
                 team2SR = Regex.Match(team2SR, "[0-9]+").ToString();
 
-                if (!team2SR.Equals(String.Empty) && team2SR.Length >= 4) // TEAM 1 SR
+                if (!team2SR.Equals(string.Empty) && team2SR.Length >= 4) // TEAM 1 SR
                 {
                     team2SR = team2SR.Substring(team2SR.Length - 4);
 
@@ -228,31 +229,31 @@ namespace BetterOverwatch
                     }
                 }
             }
-            if (!Vars.gameData.team1Rating.Equals(String.Empty) && !Vars.gameData.team1Rating.Equals(String.Empty))
+            if (!Vars.gameData.team1Rating.Equals(string.Empty) && !Vars.gameData.team1Rating.Equals(string.Empty))
             {
                 Program.trayMenu.currentGame.MenuItems[3].Text = "Team ratings: " + Vars.gameData.team1Rating + " | " + Vars.gameData.team2Rating;
             }
-            else if (!Vars.gameData.team1Rating.Equals(String.Empty))
+            else if (!Vars.gameData.team1Rating.Equals(string.Empty))
             {
                 Program.trayMenu.currentGame.MenuItems[3].Text = "Team ratings: " + Vars.gameData.team1Rating + " | -";
             }
-            else if (!Vars.gameData.team2Rating.Equals(String.Empty))
+            else if (!Vars.gameData.team2Rating.Equals(string.Empty))
             {
                 Program.trayMenu.currentGame.MenuItems[3].Text = "Team ratings: - | " + Vars.gameData.team2Rating;
             }
         }
         public static void CheckMainMenu(Bitmap frame)
         {
-            string menuText = Functions.BitmapToText(frame, 50, 234, 118, 58, contrastFirst: false, radius: 140);
+            string menuText = Functions.BitmapToText(frame, 50, 234, 118, 58, false, 140);
 
-            if (!menuText.Equals(String.Empty))
+            if (!menuText.Equals(string.Empty))
             {
                 if (menuText.Equals("PLAY"))
                 {
                     Functions.DebugMessage("Recognized main menu");
                     if (!IsValidGame()) return;
                     Vars.loopDelay = 250;
-                    Program.trayMenu.ChangeTray("Visit play menu to upload last game", Properties.Resources.IconVisitMenu);
+                    Program.trayMenu.ChangeTray("Visit play menu to upload last game", Resources.IconVisitMenu);
                     Vars.gameData.state = State.Finished;
                     Vars.gameTimer.Stop();
                     Vars.heroTimer.Stop();
@@ -267,9 +268,9 @@ namespace BetterOverwatch
         public static bool CheckHeroPlayed(Bitmap frame)
         {
             bool heroDetected = false;
-            string heroText = Functions.BitmapToText(frame, 955, 834, 170, 35, contrastFirst: false, radius: 200, network: Network.HeroNames);
+            string heroText = Functions.BitmapToText(frame, 955, 834, 170, 35, false, 200, Network.HeroNames);
 
-            if (!heroText.Equals(String.Empty))
+            if (!heroText.Equals(string.Empty))
             {
                 for (int h = 0; h < Vars.heroNames.Length; h++)
                 {
@@ -320,7 +321,7 @@ namespace BetterOverwatch
         {
             string roundCompletedText = Functions.BitmapToText(frame, 940, 160, 290, 76);
 
-            if (!roundCompletedText.Equals(String.Empty))
+            if (!roundCompletedText.Equals(string.Empty))
             {
                 if (Functions.CompareStrings(roundCompletedText, "COMPLETED") >= 70)
                 {
@@ -334,7 +335,7 @@ namespace BetterOverwatch
         {
             string finalScoreText = Functions.BitmapToText(frame, 870, 433, 180, 40);
 
-            if (!finalScoreText.Equals(String.Empty))
+            if (!finalScoreText.Equals(string.Empty))
             {
                 if (Functions.CompareStrings(finalScoreText, "FIHNLSCORE") >= 40)
                 {
@@ -343,7 +344,7 @@ namespace BetterOverwatch
                     {
                         return;
                     }
-                    Program.trayMenu.ChangeTray("Visit play menu to upload last game", Properties.Resources.IconVisitMenu);
+                    Program.trayMenu.ChangeTray("Visit play menu to upload last game", Resources.IconVisitMenu);
                     Vars.gameData.state = State.Finished;
                     Vars.gameTimer.Stop();
                     Vars.heroTimer.Stop();
@@ -358,14 +359,14 @@ namespace BetterOverwatch
         }
         public static void CheckGameScore(Bitmap frame)
         {
-            if (Vars.gameData.team1Score.Equals(String.Empty) && Vars.gameData.team1Score.Equals(String.Empty))
+            if (Vars.gameData.team1Score.Equals(string.Empty) && Vars.gameData.team1Score.Equals(string.Empty))
             {
-                string scoreTextLeft = Functions.BitmapToText(frame, 800, 560, 95, 135, contrastFirst: false, radius: 45, network: Network.TeamSkillRating);
-                string scoreTextRight = Functions.BitmapToText(frame, 1000, 560, 95, 135, contrastFirst: false, radius: 45, network: Network.TeamSkillRating);
+                string scoreTextLeft = Functions.BitmapToText(frame, 800, 560, 95, 135, false, 45, Network.TeamSkillRating);
+                string scoreTextRight = Functions.BitmapToText(frame, 1000, 560, 95, 135, false, 45, Network.TeamSkillRating);
                 scoreTextLeft = Regex.Match(scoreTextLeft, "[0-9]+").ToString();
                 scoreTextRight = Regex.Match(scoreTextRight, "[0-9]+").ToString();
 
-                if (!scoreTextLeft.Equals(String.Empty) && !scoreTextRight.Equals(String.Empty))
+                if (!scoreTextLeft.Equals(string.Empty) && !scoreTextRight.Equals(string.Empty))
                 {
                     int team1 = Convert.ToInt16(scoreTextLeft);
                     int team2 = Convert.ToInt16(scoreTextRight);
@@ -391,9 +392,9 @@ namespace BetterOverwatch
             {
                 for (int players = 0; players < 6; players++)
                 {
-                    string playerName = Functions.BitmapToText(frame, playerNameX, 325 + (players * 75), 260, 43, contrastFirst: true, radius: 110, network: Network.PlayerNames, invertColors: false, red: 255, green: 255, blue: 255, fillOutside: true, limeToWhite: true);
+                    string playerName = Functions.BitmapToText(frame, playerNameX, 325 + (players * 75), 260, 43, true, 110, Network.PlayerNames, false, 255, 255, 255, true, true);
 
-                    if(playerName.Equals(String.Empty))
+                    if(playerName.Equals(string.Empty))
                     {
                         Vars.gameData.players.Clear();
                         return;
@@ -446,7 +447,7 @@ namespace BetterOverwatch
         private static void ResetGame()
         {
             Vars.gameData = new Game(Vars.gameData.currentRating);
-            Program.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Properties.Resources.IconActive);
+            Program.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.IconActive);
         }
     }
 }

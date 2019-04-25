@@ -3,11 +3,11 @@ using System.Runtime.InteropServices;
 
 namespace BetterOverwatch
 {
-    class Memory
+    internal class Memory
     {
         [DllImport("kernel32.dll", EntryPoint = "ReadProcessMemory")]
-        public static extern Int32 ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress,
-        [In, Out] byte[] buffer, Int32 sizeout, out IntPtr lpNumberOfBytesRead);
+        public static extern int ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress,
+        [In, Out] byte[] buffer, int sizeout, out IntPtr lpNumberOfBytesRead);
 
         public static byte[] ReadBytes(IntPtr handle, IntPtr address, int[] offsets, int bytesToRead = 256)
         {

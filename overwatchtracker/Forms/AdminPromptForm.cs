@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Media;
 using System.Threading;
 using System.Windows.Forms;
+using ThreadState = System.Threading.ThreadState;
 
-namespace BetterOverwatch
+namespace BetterOverwatch.Forms
 {
     public partial class AdminPromptForm : Form
     {
@@ -17,7 +19,7 @@ namespace BetterOverwatch
         private void AdminPromptForm_Load(object sender, EventArgs e)
         {
             Functions.SendMessage(button1.Handle, BCM_SETSHIELD, 0, 0xFFFFFFFF);
-            System.Media.SystemSounds.Asterisk.Play();
+            SystemSounds.Asterisk.Play();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -28,7 +30,7 @@ namespace BetterOverwatch
             };
             restartAsAdminThread.Start();
 
-            while (restartAsAdminThread.ThreadState == System.Threading.ThreadState.Background)
+            while (restartAsAdminThread.ThreadState == ThreadState.Background)
             {
                 Thread.Sleep(1);
             }
@@ -57,7 +59,10 @@ namespace BetterOverwatch
                 };
                 process.Start();
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
     }
 }
