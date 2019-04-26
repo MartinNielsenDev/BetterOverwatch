@@ -4,7 +4,7 @@
 
 Official website at http://betteroverwatch.com/
 
-![better overwatch website](https://i.imgur.com/zjBEn7i.png)
+![better overwatch website](https://betteroverwatch.com/images/website.png)
 ## What does it do?
 My match tracker will seamlessly run as you play competitive Overwatch games and record your stats, such as..
 * Current skill rating
