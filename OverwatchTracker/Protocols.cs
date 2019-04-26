@@ -33,6 +33,7 @@ namespace BetterOverwatch
                         Functions.PlaySound();
                         Program.trayMenu.currentGame.MenuItems[1].Text = "Skill rating: " + srText;
                         Functions.DebugMessage("Recognized sr: '" + srText + "'");
+                        Program.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.IconActive);
                     }
                     Vars.gameTimer.Stop();
                     Vars.gameData.currentRating = srText;
@@ -45,7 +46,6 @@ namespace BetterOverwatch
                         if (!IsValidGame()) return;
                         CheckGameUpload();
                     }
-                    Program.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.IconActive);
                 }
             }
         }

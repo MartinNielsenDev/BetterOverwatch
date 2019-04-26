@@ -85,7 +85,6 @@ namespace BetterOverwatch
                         UpdateNotificationForm updateForm = new UpdateNotificationForm();
                         updateForm.installedVersionLabel.Text += Vars.initalize.Version;
                         updateForm.updateVersionLabel.Text += json.tag_name;
-                        updateForm.titleSubLabel.Text += json.tag_name;
                         updateForm.changeLogTextBox.Text = json.body;
                         updateForm.downloadUrl = json.assets[0].browser_download_url;
                         updateForm.downloadSize = json.assets[0].size;

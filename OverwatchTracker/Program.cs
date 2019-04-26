@@ -23,8 +23,10 @@ namespace BetterOverwatch
         [STAThread]
         private static void Main()
         {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
             Vars.initalize = new Initalize(
-                "1.2.4",
+                "1.2.5",
                 "betteroverwatch.com",
                 "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest"
                 );
@@ -88,15 +90,13 @@ namespace BetterOverwatch
                 }
                 if (!Server.CheckNewestVersion()) return;
 
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
                 Directory.CreateDirectory(Vars.configPath);
                 Vars.settings = new Settings();
                 Settings.Load();
                 Vars.gameData = new Game();
                 trayMenu = new TrayMenu();
                 Server.autoUpdaterTimer.Start();
-                Functions.DebugMessage("> success - Better Overwatch started");
+                Functions.DebugMessage("Better Overwatch started");
             }
             catch (Exception e)
             {
