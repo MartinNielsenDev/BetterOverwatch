@@ -4,7 +4,7 @@
 
 Official website at http://betteroverwatch.com/
 
-![better overwatch website](https://betteroverwatch.com/images/website.png)
+![better overwatch website](https://betteroverwatch.com/assets/images/website.png)
 ## What does it do?
 My match tracker will seamlessly run as you play competitive Overwatch games and record your stats, such as..
 * Current skill rating
@@ -31,7 +31,7 @@ The Tracker works by looking at the game screen and applying computer vision the
 All processing is done locally through this application, the server only displays the data that the tracker sends nicely for you.
 
 ## Examples
-![games](http://betteroverwatch.com/images/games.png)
-![detailed-game](http://betteroverwatch.com/images/detailed-game.png)
+![games](http://betteroverwatch.com/assets/images/games.png)
+![detailed-game](http://betteroverwatch.com/assets/images/detailed-game.png)
 
 Live demo on my profile: http://betteroverwatch.com/user/Avoid

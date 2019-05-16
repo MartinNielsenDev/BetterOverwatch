@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A71353EE-4FA0-4326-9935-EDCF1468C739}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>BetterOverwatch</RootNamespace>
+    <AssemblyName>BetterOverwatch</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <targetplatformversion>10.0</targetplatformversion>
+    <PublishUrl>publish</PublishUrl>
+    <Install>false</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.0</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>82DDD61F2A3BD4A24845BAAD1C54EEAB8F563D5B</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>key.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>false</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>BetterOverwatch.Program</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Constants.cs" />
+    <Compile Include="DataObjects\CompetitiveGame.cs" />
+    <Compile Include="DataObjects\Initialize.cs" />
+    <Compile Include="DataObjects\ServerOutput.cs" />
+    <Compile Include="Forms\AdminPromptForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AdminPromptForm.Designer.cs">
+      <DependentUpon>AdminPromptForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataObjects\GitHub.cs" />
+    <Compile Include="DataObjects\SemanticVersion.cs" />
+    <Compile Include="Game\Objects\HeroPlayed.cs" />
+    <Compile Include="Game\Objects\Map.cs" />
+    <Compile Include="Game\Objects\Player.cs" />
+    <Compile Include="Game\Objects\Stat.cs" />
+    <Compile Include="GameMethods.cs" />
+    <Compile Include="Forms\AuthorizeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AuthorizeForm.Designer.cs">
+      <DependentUpon>AuthorizeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="KeyboardHook.cs" />
+    <Compile Include="TrayMenu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DesktopDuplication\DesktopDuplicationException.cs" />
+    <Compile Include="DesktopDuplication\DesktopDuplicator.cs" />
+    <Compile Include="DesktopDuplication\DesktopFrame.cs" />
+    <Compile Include="DesktopDuplication\MovedRegion.cs" />
+    <Compile Include="DesktopDuplication\PointerInfo.cs" />
+    <Compile Include="Functions.cs" />
+    <Compile Include="Game\GameData.cs" />
+    <Compile Include="Game\BattleTag.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Networking\Server.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Forms\UpdateNotificationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\UpdateNotificationForm.Designer.cs">
+      <DependentUpon>UpdateNotificationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Vars.cs" />
+    <EmbeddedResource Include="Forms\AdminPromptForm.resx">
+      <DependentUpon>AdminPromptForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="Forms\AuthorizeForm.resx">
+      <DependentUpon>AuthorizeForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\UpdateNotificationForm.resx">
+      <DependentUpon>UpdateNotificationForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="app.manifest">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="DesktopDuplication\packages.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\AForge.Imaging.dll" />
+    <EmbeddedResource Include="Resources\SharpDX.Direct3D11.dll" />
+    <EmbeddedResource Include="Resources\SharpDX.dll" />
+    <EmbeddedResource Include="Resources\SharpDX.DXGI.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Idle.ico" />
+    <EmbeddedResource Include="Resources\Newtonsoft.Json.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\raw_ranks\Diamond.png" />
+    <None Include="Resources\raw_ranks\Gold.png" />
+    <None Include="Resources\raw_ranks\Grandmaster.png" />
+    <None Include="Resources\raw_ranks\Master.png" />
+    <None Include="Resources\raw_ranks\Platinum.png" />
+    <None Include="Resources\raw_ranks\Silver.png" />
+    <None Include="Resources\raw_ranks\Unranked.png" />
+    <None Include="Resources\success.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\IconDownload.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\System.dll" />
+    <EmbeddedResource Include="Resources\System.Drawing.dll" />
+    <EmbeddedResource Include="Resources\System.Windows.Forms.dll" />
+    <EmbeddedResource Include="Resources\System.Xml.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="AForge.Imaging">
+      <HintPath>Resources\AForge.Imaging.dll</HintPath>
+    </Reference>
+    <Reference Include="NeuralNetwork">
+      <HintPath>Resources\NeuralNetwork.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Resources\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX">
+      <HintPath>Resources\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>Resources\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI">
+      <HintPath>Resources\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\NeuralNetwork.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Icon_Small.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Icon.ico" />
+    <Content Include="Resources\Icon_Active.ico" />
+    <Content Include="Resources\Icon_Record.ico" />
+    <Content Include="Resources\Icon_Wait.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
