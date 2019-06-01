@@ -28,7 +28,7 @@ namespace BetterOverwatch
         private static void Main()
         {
             Vars.initalize = new Initalize(
-                "1.3.0",
+                "1.3.1",
                 "betteroverwatch.com",
                 "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
             Application.EnableVisualStyles();
@@ -149,7 +149,14 @@ namespace BetterOverwatch
                     {
                         if (Functions.IsProcessOpen("Overwatch"))
                         {
-                            trayMenu.ChangeTray("Visit play menu to update your skill rating", Resources.Icon_Wait);
+                            if (Vars.gameData.currentRating > 0)
+                            {
+                                trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);
+                            }
+                            else
+                            {
+                                trayMenu.ChangeTray("Visit play menu to update your skill rating", Resources.Icon_Wait);
+                            }
                             Vars.overwatchRunning = true;
                         }
                         else
@@ -247,20 +254,12 @@ namespace BetterOverwatch
                                 }
                                 if (Vars.gameData.state == State.Recording)
                                 {
-                                    if (Vars.gameData.tabPressed && Vars.gameData.tabTimer.ElapsedMilliseconds > 250/*Functions.GetAsyncKeyState(0x09) < 0*/)
+                                    if (Vars.gameData.tabPressed && Vars.gameData.tabTimer.ElapsedMilliseconds > 250)
                                     {
-                                        //if (Vars.getInfoTimeout.ElapsedMilliseconds >= 250)
-                                        //{
-                                            if (GameMethods.ReadHeroPlayed(frame.DesktopImage))
-                                            {
-                                                GameMethods.ReadStats(frame.DesktopImage);
-                                            }
-                                            //Vars.getInfoTimeout.Restart();
-                                        //}
-                                        //else
-                                        //{
-                                        //    Vars.getInfoTimeout.Restart();
-                                        //}
+                                        if (GameMethods.ReadHeroPlayed(frame.DesktopImage))
+                                        {
+                                            GameMethods.ReadStats(frame.DesktopImage);
+                                        }
                                     }
                                     GameMethods.ReadRoundCompleted(frame.DesktopImage);
                                     GameMethods.ReadMainMenu(frame.DesktopImage);
@@ -268,7 +267,7 @@ namespace BetterOverwatch
                                 }
                                 if (Vars.gameData.state == State.RoundComplete)
                                 {
-                                    if (Vars.gameData.tabPressed && Vars.gameData.tabTimer.ElapsedMilliseconds > 250/*Functions.GetAsyncKeyState(0x09) < 0*/)
+                                    if (Vars.gameData.tabPressed && Vars.gameData.tabTimer.ElapsedMilliseconds > 250)
                                     {
                                         GameMethods.ReadHeroPlayed(frame.DesktopImage);
                                     }

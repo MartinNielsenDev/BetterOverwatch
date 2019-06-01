@@ -40,7 +40,6 @@ namespace BetterOverwatch
                     Vars.gameData.state == State.Finished ||
                     Vars.gameData.state == State.WaitForUpload)
                 {
-                    if (!IsValidGame()) return;
                     Server.CheckGameUpload();
                     Vars.gameData = new GameData(Vars.gameData.currentRating);
                 }
@@ -69,20 +68,20 @@ namespace BetterOverwatch
         {
             if (Vars.statsTimer.Elapsed.TotalSeconds < 20) return;
 
-            string eliminationsText = Functions.BitmapToText(frame, 129, 894, 40, 21, false, 110, Network.Numbers);
+            string eliminationsText = Functions.BitmapToText(frame, 129, 895, 40, 23, false, 110, Network.Numbers);
             if (eliminationsText.Equals(string.Empty)) return;
-            string damageText = Functions.BitmapToText(frame, 129, 958, 80, 21, false, 110, Network.Numbers);
+            string damageText = Functions.BitmapToText(frame, 129, 959, 80, 23, false, 110, Network.Numbers);
             if (damageText.Equals(string.Empty)) return;
-            string objKillsText = Functions.BitmapToText(frame, 379, 898, 40, 21, false, 110, Network.Numbers);
-            if (objKillsText.Equals(string.Empty)) return;
-            string healingText = Functions.BitmapToText(frame, 379, 958, 80, 21, false, 110, Network.Numbers);
+            string objectiveKillsText = Functions.BitmapToText(frame, 379, 895, 40, 23, false, 110, Network.Numbers);
+            if (objectiveKillsText.Equals(string.Empty)) return;
+            string healingText = Functions.BitmapToText(frame, 379, 959, 80, 23, false, 110, Network.Numbers);
             if (healingText.Equals(string.Empty)) return;
-            string deathsText = Functions.BitmapToText(frame, 629, 958, 40, 21, false, 110, Network.Numbers);
+            string deathsText = Functions.BitmapToText(frame, 629, 959, 40, 23, false, 110, Network.Numbers);
             if (deathsText.Equals(string.Empty)) return;
 
             if (int.TryParse(eliminationsText, out int eliminations) &&
                 int.TryParse(damageText, out int damage) &&
-                int.TryParse(objKillsText, out int objectiveKills) &&
+                int.TryParse(objectiveKillsText, out int objectiveKills) &&
                 int.TryParse(healingText, out int healing) &&
                 int.TryParse(deathsText, out int deaths))
             {
@@ -98,6 +97,7 @@ namespace BetterOverwatch
                         break;
                     }
                 }
+                //frame.Save(@"C:\testData\" + eliminations + "_" + Guid.NewGuid() + ".png"); // test
                 Vars.gameData.stats.Add(new Stat((int)Vars.gameData.gameTimer.Elapsed.TotalSeconds, eliminations, damage, objectiveKills, healing, deaths, heroStats));
                 Vars.statsTimer.Restart();
             }
@@ -186,7 +186,6 @@ namespace BetterOverwatch
             {
                 if (menuText.Equals("PLAY"))
                 {
-                    if (!IsValidGame()) return;
                     Functions.DebugMessage("Recognized main menu");
                     Vars.loopDelay = 250;
                     Vars.gameData.state = State.Finished;
@@ -269,7 +268,6 @@ namespace BetterOverwatch
             {
                 if (Functions.CompareStrings(finalScoreText, "FIHNLSCORE") >= 40)
                 {
-                    if (!IsValidGame()) return;
                     Functions.DebugMessage("Recognized final score");
                     Vars.gameData.state = State.Finished;
                     Vars.gameData.timer.Stop();
@@ -339,7 +337,7 @@ namespace BetterOverwatch
                 playerRankX += 422;
             }
         }
-        private static bool IsValidGame()
+        public static bool IsValidGame()
         {
             if (Vars.gameData.timer.Elapsed.TotalSeconds < 300)
             {

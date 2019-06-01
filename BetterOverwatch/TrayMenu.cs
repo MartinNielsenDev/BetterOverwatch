@@ -20,7 +20,7 @@ namespace BetterOverwatch
             try
             {
                 MenuItem debugTools = new MenuItem("Tools");
-                debugTools.MenuItems.Add("Start test", StartTest);
+                //debugTools.MenuItems.Add("Start test", StartTest);
                 debugTools.MenuItems.Add("Open logs", OpenLogs);
                 debugTools.MenuItems.Add("Export Last Game", FetchJson);
 
