@@ -36,7 +36,6 @@ namespace BetterOverwatch
         Finished = 5,
         WaitForUpload = 6
     }
-
     internal enum Network
     {
         Maps = 0,

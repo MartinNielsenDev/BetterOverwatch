@@ -4,13 +4,11 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using AForge.Imaging;
 using AForge.Imaging.Filters;
-using BetterOverwatch.Networking;
 using Image = System.Drawing.Image;
 
 namespace BetterOverwatch
@@ -582,7 +580,6 @@ namespace BetterOverwatch
                     {
                         text += FetchLetterFromImage(BetterOverwatchNetworks.playersNN, bitmaps[i], network);
                     }
-                    //bitmaps[i].Save(@"C:\testData\" + Guid.NewGuid() + ".png");
                     bitmaps[i].Dispose();
                 }
             }

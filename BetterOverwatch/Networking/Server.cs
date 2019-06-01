@@ -62,7 +62,10 @@ namespace BetterOverwatch.Networking
                     }
                 }
             }
-            catch { }
+            catch {
+                Program.authorizeForm = new AuthorizeForm();
+                Program.authorizeForm.Show();
+            }
         }
         public static bool FetchBlizzardAppOffset(string version)
         {
@@ -124,6 +127,7 @@ namespace BetterOverwatch.Networking
         {
             string game = Vars.gameData.ToString();
             Vars.lastGameJSON = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<CompetitiveGame>(game), Formatting.Indented);
+            if (!GameMethods.IsValidGame()) return;
             UploadGame(game);
         }
         public static void UploadGame(string gameData)
