@@ -200,7 +200,7 @@ namespace BetterOverwatch.Networking
 
                 response.ContentLength64 = buffer.Length;
                 output.Write(buffer, 0, buffer.Length);
-
+                Thread.Sleep(1500);
                 output.Close();
                 listener.Stop();
             }

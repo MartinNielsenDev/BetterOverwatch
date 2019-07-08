@@ -15,10 +15,10 @@ namespace BetterOverwatch.Game
         {
             if (Vars.isAdmin)
             {
-
                 Process[] processes = Process.GetProcessesByName("Battle.net");
                 foreach (Process process in processes)
                 {
+                    Console.WriteLine(Vars.blizzardAppOffset);
                     if (Vars.blizzardAppOffset == 0)
                     {
                         if (!Server.FetchBlizzardAppOffset(process.MainModule.FileVersionInfo.FileVersion)) break;
@@ -29,7 +29,18 @@ namespace BetterOverwatch.Game
                         if (processModule.ModuleName == "battle.net.dll")
                         {
                             IntPtr processBaseAddress = processModule.BaseAddress;
-                            byte[] battleTagBytes = ReadBytes(process.Handle, processBaseAddress + Vars.blizzardAppOffset, new[] { 0x28, 0x10, 0x8, 0x84, 0x0 });
+                            byte[] battleTagBytes = ReadBytes(process.Handle, processBaseAddress + Vars.blizzardAppOffset, new[] { 0x28, 0x10, 0x8, 0x84, 0x0, 0x0 });
+                            
+                            if (battleTagBytes.Length > 0)
+                            {
+                                string[] battleTagSplit = Encoding.UTF8.GetString(battleTagBytes).Split('#');
+
+                                if (battleTagSplit.Length == 2)
+                                {
+                                    return $"{battleTagSplit[0]}-{battleTagSplit[1].Substring(0, battleTagSplit[1].Length > 4 ? 5 : 4)}";
+                                }
+                            }
+                            battleTagBytes = ReadBytes(process.Handle, processBaseAddress + Vars.blizzardAppOffset, new[] { 0x28, 0x10, 0x8, 0x84, 0x0 });
 
                             if (battleTagBytes.Length > 0)
                             {

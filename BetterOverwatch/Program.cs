@@ -28,7 +28,7 @@ namespace BetterOverwatch
         private static void Main()
         {
             Vars.initalize = new Initalize(
-                "1.3.1",
+                "1.3.3",
                 "betteroverwatch.com",
                 "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
             Application.EnableVisualStyles();
@@ -143,171 +143,180 @@ namespace BetterOverwatch
                     Thread.Sleep(1000);
                     continue;
                 }
-                if (!Functions.ActiveWindowTitle().Equals("Overwatch"))
+                if (!Vars.overwatchRunning)
                 {
-                    if (!Vars.overwatchRunning)
+                    if (Functions.IsProcessOpen("Overwatch"))
                     {
-                        if (Functions.IsProcessOpen("Overwatch"))
+                        if (Vars.gameData.currentRating > 0)
                         {
-                            if (Vars.gameData.currentRating > 0)
-                            {
-                                trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);
-                            }
-                            else
-                            {
-                                trayMenu.ChangeTray("Visit play menu to update your skill rating", Resources.Icon_Wait);
-                            }
-                            Vars.overwatchRunning = true;
+                            trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);
                         }
                         else
                         {
-                            Server.AutoUpdater();
+                            trayMenu.ChangeTray("Visit play menu to update your skill rating", Resources.Icon_Wait);
                         }
+                        Vars.overwatchRunning = true;
                     }
                     else
                     {
-                        if (!Functions.IsProcessOpen("Overwatch"))
+                        Server.AutoUpdater();
+                    }
+                }
+                else
+                {
+                    if (!Functions.IsProcessOpen("Overwatch"))
+                    {
+                        trayMenu.ChangeTray("Waiting for Overwatch, idle...", Resources.Icon);
+                        Vars.overwatchRunning = false;
+                        if (Vars.gameData.state == State.Recording ||
+                            Vars.gameData.state == State.Finished ||
+                            Vars.gameData.state == State.WaitForUpload
+                            )
                         {
-                            trayMenu.ChangeTray("Waiting for Overwatch, idle...", Resources.Icon);
-                            Vars.overwatchRunning = false;
-                            if (Vars.gameData.state == State.Recording ||
-                                Vars.gameData.state == State.Finished ||
-                                Vars.gameData.state == State.WaitForUpload
-                                )
-                            {
-                                Server.CheckGameUpload();
-                                Vars.gameData = new GameData(Vars.gameData.currentRating);
-                            }
+                            Server.CheckGameUpload();
+                            Vars.gameData = new GameData(Vars.gameData.currentRating);
                         }
                     }
+                }
+                if(!Vars.overwatchRunning)
+                {
                     Thread.Sleep(500);
+                    continue;
+                }
+                if(Vars.gameData.state == State.Recording && !Functions.ActiveWindowTitle().Equals("Overwatch"))
+                {
+                    Thread.Sleep(500);
+                    continue;
                 }
                 else
                 {
                     Thread.Sleep(50);
+                }
+                if (Vars.frameTimer.ElapsedMilliseconds >= Vars.loopDelay)
+                {
+                    DesktopFrame frame;
 
-                    if (Vars.frameTimer.ElapsedMilliseconds >= Vars.loopDelay)
+                    try
                     {
-                        DesktopFrame frame;
-
+                        frame = desktopDuplicator.GetLatestFrame();
+                    }
+                    catch
+                    {
+                        desktopDuplicator.Reinitialize();
+                        continue;
+                    }
+                    if (frame != null)
+                    {
                         try
                         {
-                            frame = desktopDuplicator.GetLatestFrame();
-                        }
-                        catch
-                        {
-                            desktopDuplicator.Reinitialize();
-                            continue;
-                        }
-                        if (frame != null)
-                        {
-                            try
+                            if (Vars.gameData.state != State.Ingame)
                             {
-                                if (Vars.gameData.state != State.Ingame)
-                                {
-                                    string quickPlayText = Functions.BitmapToText(frame.DesktopImage, 476, 644, 80, 40, false, 140, Network.Maps, true);
+                                string quickPlayText = Functions.BitmapToText(frame.DesktopImage, 476, 644, 80, 40, false, 140, Network.Maps, true);
 
-                                    if (Functions.CompareStrings(quickPlayText, "PLHY") >= 100)
-                                    {
-                                        Thread.Sleep(150);
-                                        GameMethods.ReadPlayMenu(frame.DesktopImage);
-                                    }
-                                }
-                                if (Vars.gameData.state == State.Idle || Vars.gameData.state == State.Finished || Vars.gameData.state == State.WaitForUpload)
+                                if (Functions.CompareStrings(quickPlayText, "PLHY") >= 100)
                                 {
-                                    GameMethods.ReadCompetitiveGameEntered(frame.DesktopImage);
+                                    Thread.Sleep(150);
+                                    GameMethods.ReadPlayMenu(frame.DesktopImage);
                                 }
-                                if (Vars.gameData.state == State.Ingame)
+                            }
+                            if (Vars.gameData.state == State.Idle || Vars.gameData.state == State.Finished || Vars.gameData.state == State.WaitForUpload)
+                            {
+                                GameMethods.ReadCompetitiveGameEntered(frame.DesktopImage);
+                            }
+                            if (Vars.gameData.state == State.Ingame)
+                            {
+                                if (Vars.getInfoTimeout.Elapsed.TotalSeconds > 2 || Vars.getInfoTimeout.Elapsed.TotalSeconds > 1 && !Vars.gameData.map.Equals(string.Empty))
                                 {
-                                    if (Vars.getInfoTimeout.Elapsed.TotalSeconds > 2)
+                                    if(Vars.gameData.map.Equals(string.Empty))
                                     {
                                         GameMethods.ReadMap(frame.DesktopImage);
+                                    }
+                                    else
+                                    {
                                         GameMethods.ReadTeamsSkillRating(frame.DesktopImage);
 
-                                        if (!Vars.gameData.map.Equals(string.Empty))
+                                        if (Vars.gameData.playerListImage == null)
                                         {
-                                            if (Vars.gameData.playerListImage == null)
+                                            try
                                             {
-                                                try
-                                                {
-                                                    frame = desktopDuplicator.GetLatestFrame();
-                                                    Vars.gameData.playerListImage = new Bitmap(Functions.CaptureRegion(frame.DesktopImage, 0, 110, 1920, 700));
-                                                    GameMethods.ReadPlayerNamesAndRank(frame.DesktopImage);
-                                                }
-                                                catch { }
+                                                frame = desktopDuplicator.GetLatestFrame();
+                                                Vars.gameData.playerListImage = new Bitmap(Functions.CaptureRegion(frame.DesktopImage, 0, 110, 1920, 700));
+                                                GameMethods.ReadPlayerNamesAndRank(frame.DesktopImage);
                                             }
-                                            Vars.loopDelay = 500;
-                                            Vars.gameData.state = State.RoundComplete;
-                                            Vars.gameData.timer.Start();
-                                            Vars.statsTimer.Restart();
-                                            Vars.getInfoTimeout.Start();
-                                            trayMenu.ChangeTray("Recording... visit the main menu after the game", Resources.Icon_Record);
+                                            catch { }
                                         }
-                                    }
-                                    else if (Vars.getInfoTimeout.Elapsed.TotalSeconds > 5)
-                                    {
-                                        Vars.gameData.timer.Reset();
-                                        Vars.getInfoTimeout.Reset();
-                                        Vars.gameData.state = State.Idle;
-                                        Functions.DebugMessage("Failed to find game");
-                                    }
-                                }
-                                if (Vars.gameData.state == State.Recording)
-                                {
-                                    if (Vars.gameData.tabPressed && Vars.gameData.tabTimer.ElapsedMilliseconds > 250)
-                                    {
-                                        if (GameMethods.ReadHeroPlayed(frame.DesktopImage))
-                                        {
-                                            GameMethods.ReadStats(frame.DesktopImage);
-                                        }
-                                    }
-                                    GameMethods.ReadRoundCompleted(frame.DesktopImage);
-                                    GameMethods.ReadMainMenu(frame.DesktopImage);
-                                    GameMethods.ReadFinalScore(frame.DesktopImage);
-                                }
-                                if (Vars.gameData.state == State.RoundComplete)
-                                {
-                                    if (Vars.gameData.tabPressed && Vars.gameData.tabTimer.ElapsedMilliseconds > 250)
-                                    {
-                                        GameMethods.ReadHeroPlayed(frame.DesktopImage);
-                                    }
-                                    else if (GameMethods.ReadRoundStarted(frame.DesktopImage) || Vars.getInfoTimeout.Elapsed.TotalSeconds > 80)
-                                    {
-                                        Vars.getInfoTimeout.Restart();
-                                        Vars.gameData.state = State.RoundBeginning;
+                                        Vars.loopDelay = 500;
+                                        Vars.gameData.state = State.RoundComplete;
+                                        Vars.gameData.timer.Start();
+                                        Vars.statsTimer.Restart();
+                                        Vars.getInfoTimeout.Start();
+                                        trayMenu.ChangeTray("Recording... visit the main menu after the game", Resources.Icon_Record);
                                     }
                                 }
-                                if (Vars.gameData.state == State.RoundBeginning)
+                                else if (Vars.getInfoTimeout.Elapsed.TotalSeconds > 5)
                                 {
-                                    if (Vars.getInfoTimeout.Elapsed.TotalSeconds >= 40 || Vars.getInfoTimeout.Elapsed.TotalSeconds >= 30 && Vars.gameData.IsKoth())
-                                    {
-                                        Vars.gameData.gameTimer.Start();
-                                        Vars.gameData.heroTimer.Start();
-
-                                        if (Vars.gameData.heroesPlayed.Count > 0 && Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].time == 0)
-                                        {
-                                            Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].startTime = (int)Vars.gameData.gameTimer.Elapsed.TotalSeconds;
-                                        }
-                                        Vars.gameData.state = State.Recording;
-                                    }
-                                    else if (Vars.gameData.tabPressed && Vars.gameData.tabTimer.ElapsedMilliseconds > 250/*Functions.GetAsyncKeyState(0x09) < 0*/)
-                                    {
-                                        GameMethods.ReadHeroPlayed(frame.DesktopImage);
-                                    }
-                                }
-                                if (Vars.gameData.state == State.Finished && Vars.getInfoTimeout.ElapsedMilliseconds >= 500)
-                                {
-                                    GameMethods.ReadGameScore(frame.DesktopImage);
+                                    Vars.gameData.timer.Reset();
+                                    Vars.getInfoTimeout.Reset();
+                                    Vars.gameData.state = State.Idle;
+                                    Functions.DebugMessage("Failed to find game");
                                 }
                             }
-                            catch (Exception e)
+                            if (Vars.gameData.state == State.Recording)
                             {
-                                Functions.DebugMessage("Main Exception: " + e);
-                                Thread.Sleep(500);
+                                if (Vars.gameData.tabPressed && Vars.gameData.tabTimer.ElapsedMilliseconds > 250)
+                                {
+                                    if (GameMethods.ReadHeroPlayed(frame.DesktopImage))
+                                    {
+                                        GameMethods.ReadStats(frame.DesktopImage);
+                                    }
+                                }
+                                GameMethods.ReadRoundCompleted(frame.DesktopImage);
+                                GameMethods.ReadMainMenu(frame.DesktopImage);
+                                GameMethods.ReadFinalScore(frame.DesktopImage);
+                            }
+                            if (Vars.gameData.state == State.RoundComplete)
+                            {
+                                if (Vars.gameData.tabPressed && Vars.gameData.tabTimer.ElapsedMilliseconds > 250)
+                                {
+                                    GameMethods.ReadHeroPlayed(frame.DesktopImage);
+                                }
+                                else if (GameMethods.ReadRoundStarted(frame.DesktopImage) || Vars.getInfoTimeout.Elapsed.TotalSeconds > 80)
+                                {
+                                    Vars.getInfoTimeout.Restart();
+                                    Vars.gameData.state = State.RoundBeginning;
+                                }
+                                GameMethods.ReadMainMenu(frame.DesktopImage);
+                            }
+                            if (Vars.gameData.state == State.RoundBeginning)
+                            {
+                                if (Vars.getInfoTimeout.Elapsed.TotalSeconds >= 40 || Vars.getInfoTimeout.Elapsed.TotalSeconds >= 30 && Vars.gameData.IsKoth())
+                                {
+                                    Vars.gameData.gameTimer.Start();
+                                    Vars.gameData.heroTimer.Start();
+
+                                    if (Vars.gameData.heroesPlayed.Count > 0 && Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].time == 0)
+                                    {
+                                        Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].startTime = (int)Vars.gameData.gameTimer.Elapsed.TotalSeconds;
+                                    }
+                                    Vars.gameData.state = State.Recording;
+                                }
+                                else if (Vars.gameData.tabPressed && Vars.gameData.tabTimer.ElapsedMilliseconds > 250/*Functions.GetAsyncKeyState(0x09) < 0*/)
+                                {
+                                    GameMethods.ReadHeroPlayed(frame.DesktopImage);
+                                }
+                            }
+                            if (Vars.gameData.state == State.Finished && Vars.getInfoTimeout.ElapsedMilliseconds >= 500)
+                            {
+                                GameMethods.ReadGameScore(frame.DesktopImage);
                             }
                         }
-                        Vars.frameTimer.Restart();
+                        catch (Exception e)
+                        {
+                            Functions.DebugMessage("Main Exception: " + e);
+                            Thread.Sleep(500);
+                        }
                     }
+                    Vars.frameTimer.Restart();
                 }
             }
         }

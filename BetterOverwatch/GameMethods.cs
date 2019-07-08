@@ -38,7 +38,8 @@ namespace BetterOverwatch
 
                 if (Vars.gameData.state == State.Recording ||
                     Vars.gameData.state == State.Finished ||
-                    Vars.gameData.state == State.WaitForUpload)
+                    Vars.gameData.state == State.WaitForUpload ||
+                    Vars.gameData.state == State.RoundComplete)
                 {
                     Server.CheckGameUpload();
                     Vars.gameData = new GameData(Vars.gameData.currentRating);
@@ -138,6 +139,7 @@ namespace BetterOverwatch
                     if (!mapText.Equals(string.Empty))
                     {
                         Vars.gameData.map = mapText;
+                        Vars.getInfoTimeout.Restart();
                         Functions.DebugMessage("Recognized map: '" + mapText + "'");
                     }
                 }
@@ -210,6 +212,7 @@ namespace BetterOverwatch
                         if (Vars.gameData.heroesPlayed.Count > 0 &&
                             Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].name == Constants.heroList[h].name)
                         {
+                            Console.WriteLine("Hero detected " + Constants.heroList[h].name);
                             return true; // if playing the same hero, don't continue
                         }
                         if (Vars.gameData.heroesPlayed.Count > 0)
@@ -226,6 +229,7 @@ namespace BetterOverwatch
                         }
                         Vars.gameData.heroTimer.Restart();
                         Vars.gameData.heroesPlayed.Add(new HeroPlayed(Constants.heroList[h].name, (int)Vars.gameData.gameTimer.Elapsed.TotalSeconds));
+                        Console.WriteLine("New hero detected " + Constants.heroList[h].name);
                         return true;
                     }
                 }
