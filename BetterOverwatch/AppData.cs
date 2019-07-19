@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Media;
 using BetterOverwatch.Game;
@@ -9,10 +8,10 @@ using BetterOverwatch.Properties;
 
 namespace BetterOverwatch
 {
-    internal class Vars
+    internal class AppData
     {
         public static string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "overwatchtracker");
-        public static SoundPlayer successSound = new SoundPlayer(Resources.success);
+        public static SoundPlayer successSound = new SoundPlayer(Resources.success_new);
         public static GameData gameData;
         public static Settings settings;
         public static Initalize initalize;

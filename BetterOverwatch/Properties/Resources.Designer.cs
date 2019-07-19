@@ -111,6 +111,16 @@ namespace BetterOverwatch.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Icon_Download {
+            get {
+                object obj = ResourceManager.GetObject("Icon_Download", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon Icon_Record {
@@ -137,16 +147,6 @@ namespace BetterOverwatch.Properties {
             get {
                 object obj = ResourceManager.GetObject("Icon_Wait", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap IconDownload {
-            get {
-                object obj = ResourceManager.GetObject("IconDownload", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -186,6 +186,15 @@ namespace BetterOverwatch.Properties {
         internal static System.IO.UnmanagedMemoryStream success {
             get {
                 return ResourceManager.GetStream("success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream success_new {
+            get {
+                return ResourceManager.GetStream("success_new", resourceCulture);
             }
         }
         

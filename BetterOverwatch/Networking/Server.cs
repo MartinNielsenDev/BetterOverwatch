@@ -30,40 +30,34 @@ namespace BetterOverwatch.Networking
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues($"http://api.{Vars.initalize.Host}/verify-account/", new NameValueCollection
+                    byte[] response = client.UploadValues($"http://api.{AppData.initalize.Host}/verify-account/", new NameValueCollection
                     {
-                        { "privateToken", Vars.settings.privateToken }
+                        { "privateToken", AppData.settings.privateToken }
                     });
                     ServerOutput.TokensOutput result = JsonConvert.DeserializeObject<ServerOutput.TokensOutput>(Encoding.UTF8.GetString(response));
 
                     if (result.success)
                     {
-                        Vars.settings.privateToken = result.privateToken;
+                        AppData.settings.privateToken = result.privateToken;
 
                         if (result.publicToken.Length > 0)
                         {
-                            Vars.settings.publicToken = result.publicToken;
+                            AppData.settings.publicToken = result.publicToken;
                         }
-                        if (!result.isLinked)
-                        {
-                            Program.authorizeForm = new AuthorizeForm
-                            {
-                                isLinking = true
-                            };
-                            Program.authorizeForm.Show();
-                        }
-                        Program.captureDesktop = true;
+                        ScreenCaptureHandler.captureScreen = true;
+                        ScreenCaptureHandler.trayMenu.contextMenu.MenuItems[1].Text = "Logout";
                     }
                     else
                     {
-                        Program.authorizeForm = new AuthorizeForm();
-                        Program.authorizeForm.Show();
+                        Program.autenticationForm = new AuthenticationForm();
+                        Program.autenticationForm.Show();
                     }
                 }
             }
-            catch {
-                Program.authorizeForm = new AuthorizeForm();
-                Program.authorizeForm.Show();
+            catch
+            {
+                Program.autenticationForm = new AuthenticationForm();
+                Program.autenticationForm.Show();
             }
         }
         public static bool FetchBlizzardAppOffset(string version)
@@ -72,7 +66,7 @@ namespace BetterOverwatch.Networking
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues($"http://api.{Vars.initalize.Host}/fetch-offset/", new NameValueCollection
+                    byte[] response = client.UploadValues($"http://api.{AppData.initalize.Host}/fetch-offset/", new NameValueCollection
                     {
                         { "version", version }
                     });
@@ -80,7 +74,7 @@ namespace BetterOverwatch.Networking
 
                     if (result.success)
                     {
-                        Vars.blizzardAppOffset = Convert.ToInt32(result.offset, 16);
+                        AppData.blizzardAppOffset = Convert.ToInt32(result.offset, 16);
                         return true;
                     }
                 }
@@ -96,20 +90,20 @@ namespace BetterOverwatch.Networking
                 using (WebClient client = new WebClient())
                 {
                     client.Headers.Add("User-Agent", "Mozilla/5.0");
-                    serverResponse = client.DownloadString(Vars.initalize.GitHubHost);
+                    serverResponse = client.DownloadString(AppData.initalize.GitHubHost);
                 }
                 GitHub.Json json = JsonConvert.DeserializeObject<GitHub.Json>(serverResponse);
 
                 if (json.tag_name.Split('.').Length == 3 && json.assets.Count > 0)
                 {
-                    SemanticVersion thisVersion = new SemanticVersion(Vars.initalize.Version);
+                    SemanticVersion thisVersion = new SemanticVersion(AppData.initalize.Version);
                     SemanticVersion serverVersion = new SemanticVersion(json.tag_name);
 
                     if (serverVersion.IsNewerThan(thisVersion))
                     {
                         Functions.DebugMessage("New update required: v" + json.tag_name);
                         UpdateNotificationForm updateForm = new UpdateNotificationForm();
-                        updateForm.installedVersionLabel.Text += Vars.initalize.Version;
+                        updateForm.installedVersionLabel.Text += AppData.initalize.Version;
                         updateForm.updateVersionLabel.Text += json.tag_name;
                         updateForm.changeLogTextBox.Text = json.body;
                         updateForm.downloadUrl = json.assets[0].browser_download_url;
@@ -124,8 +118,8 @@ namespace BetterOverwatch.Networking
         }
         public static void CheckGameUpload()
         {
-            string game = Vars.gameData.ToString();
-            Vars.lastGameJSON = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<CompetitiveGame>(game), Formatting.Indented);
+            string game = AppData.gameData.ToString();
+            AppData.lastGameJSON = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<CompetitiveGame>(game), Formatting.Indented);
             if (!GameMethods.IsValidGame()) return;
             UploadGame(game);
         }
@@ -140,7 +134,7 @@ namespace BetterOverwatch.Networking
                     {
                         using (WebClient client = new WebClient())
                         {
-                            byte[] response = client.UploadValues($"http://api.{Vars.initalize.Host}/game/upload/", new NameValueCollection {
+                            byte[] response = client.UploadValues($"http://api.{AppData.initalize.Host}/game/upload/", new NameValueCollection {
                                 { "gameData", gameData }
                             });
                             ServerOutput.TokensOutput result = JsonConvert.DeserializeObject<ServerOutput.TokensOutput>(Encoding.UTF8.GetString(response));
@@ -160,12 +154,13 @@ namespace BetterOverwatch.Networking
         }
         public static async Task StartLocalAuthServer()
         {
+            // this local server is for capturing the privateToken and publicToken from the server through the user's browser
             try
             {
-                HttpListener listener = new HttpListener();
-                listener.Prefixes.Add("http://127.0.0.1:8005/");
-                listener.Start();
-                HttpListenerContext context = await listener.GetContextAsync();
+                HttpListener httpListener = new HttpListener();
+                httpListener.Prefixes.Add("http://127.0.0.1:8005/");
+                httpListener.Start();
+                HttpListenerContext context = await httpListener.GetContextAsync();
                 HttpListenerRequest request = context.Request;
                 HttpListenerResponse response = context.Response;
                 Stream output = response.OutputStream;
@@ -175,34 +170,32 @@ namespace BetterOverwatch.Networking
 
                 if (privateToken != null && publicToken != null)
                 {
-                    Vars.settings.privateToken = privateToken;
-                    Vars.settings.publicToken = publicToken;
+                    AppData.settings.privateToken = privateToken;
+                    AppData.settings.publicToken = publicToken;
 
-                    if (Program.authorizeForm != null)
-                    {
-                        Program.authorizeForm.Close();
-                    }
+                    if (Program.autenticationForm != null) Program.autenticationForm.Close();
                     Settings.Save();
-                    Program.captureDesktop = true;
+                    ScreenCaptureHandler.captureScreen = true;
                     buffer = Encoding.UTF8.GetBytes($"<html><meta http-equiv=\"refresh\" content=\"0; url = http://betteroverwatch.com/user/{publicToken}?auth_success=1\" /></html>");
-                    Program.trayMenu.trayMenu.MenuItems[1].Text = "Logout";
+                    ScreenCaptureHandler.trayMenu.contextMenu.MenuItems[1].Text = "Logout";
+                    Functions.DebugMessage($"Successfully authenticated user '{publicToken}'");
+                    Program.autenticationForm.Hide();
                 }
                 else
                 {
-                    buffer = Encoding.UTF8.GetBytes("<html>Failed to authorize, please try again</html>");
+                    buffer = Encoding.UTF8.GetBytes("<html>Failed to authenticate, please try again</html>");
+                    Functions.DebugMessage("Failed to authenticate");
 
-                    if (Program.authorizeForm != null)
+                    if (Program.autenticationForm != null)
                     {
-                        Program.authorizeForm.Show();
-                        Program.authorizeForm.authorizeButton.Enabled = true;
+                        Program.autenticationForm.Show();
                     }
                 }
-
                 response.ContentLength64 = buffer.Length;
                 output.Write(buffer, 0, buffer.Length);
                 Thread.Sleep(1500);
                 output.Close();
-                listener.Stop();
+                httpListener.Stop();
             }
             catch { }
         }

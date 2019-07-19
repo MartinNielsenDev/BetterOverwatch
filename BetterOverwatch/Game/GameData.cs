@@ -11,7 +11,7 @@ namespace BetterOverwatch.Game
         public GameData(int rating = 0)
         {
             currentRating = rating;
-            privateToken = Vars.settings.privateToken;
+            privateToken = AppData.settings.privateToken;
         }
         [JsonIgnore]
         public int currentRating;
@@ -38,7 +38,7 @@ namespace BetterOverwatch.Game
             duration = (int)timer.Elapsed.TotalSeconds;
             endRating = currentRating;
 
-            if (Vars.settings.uploadScreenshot && playerListImage != null)
+            if (AppData.settings.uploadScreenshot && playerListImage != null)
             {
                 playerListImageBase64 = Convert.ToBase64String(Functions.ImageToBytes(Functions.ReduceImageSize(playerListImage, 70)));
             }

@@ -27,22 +27,22 @@ namespace BetterOverwatch
 
             if (int.TryParse(ratingText, out int rating) && rating > 999 && rating < 5000)
             {
-                if (Vars.gameData.currentRating != rating || Vars.gameData.state >= State.Finished)
+                if (AppData.gameData.currentRating != rating || AppData.gameData.state >= State.Finished)
                 {
-                    Vars.successSound.Play();
+                    AppData.successSound.Play();
                     Functions.DebugMessage("Recognized rating: '" + ratingText + "'");
-                    Program.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);
+                    ScreenCaptureHandler.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);
                 }
-                Vars.gameData.timer.Stop();
-                Vars.gameData.currentRating = rating;
+                AppData.gameData.timer.Stop();
+                AppData.gameData.currentRating = rating;
 
-                if (Vars.gameData.state == State.Recording ||
-                    Vars.gameData.state == State.Finished ||
-                    Vars.gameData.state == State.WaitForUpload ||
-                    Vars.gameData.state == State.RoundComplete)
+                if (AppData.gameData.state == State.Recording ||
+                    AppData.gameData.state == State.Finished ||
+                    AppData.gameData.state == State.WaitForUpload ||
+                    AppData.gameData.state == State.RoundComplete)
                 {
                     Server.CheckGameUpload();
-                    Vars.gameData = new GameData(Vars.gameData.currentRating);
+                    AppData.gameData = new GameData(AppData.gameData.currentRating);
                 }
             }
         }
@@ -67,7 +67,7 @@ namespace BetterOverwatch
         }
         public static void ReadStats(Bitmap frame)
         {
-            if (Vars.statsTimer.Elapsed.TotalSeconds < 20) return;
+            if (AppData.statsTimer.Elapsed.TotalSeconds < 20) return;
 
             string eliminationsText = Functions.BitmapToText(frame, 129, 895, 40, 23, false, 110, Network.Numbers);
             if (eliminationsText.Equals(string.Empty)) return;
@@ -92,15 +92,15 @@ namespace BetterOverwatch
 
                 for (int i = 0; i < Constants.heroList.Length; i++)
                 {
-                    if (Constants.heroList[i].name.Equals(Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].name))
+                    if (Constants.heroList[i].name.Equals(AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].name))
                     {
                         heroStats = ReadHeroStats(frame, Constants.heroList[i].statSettings);
                         break;
                     }
                 }
                 //frame.Save(@"C:\testData\" + eliminations + "_" + Guid.NewGuid() + ".png"); // test
-                Vars.gameData.stats.Add(new Stat((int)Vars.gameData.gameTimer.Elapsed.TotalSeconds, eliminations, damage, objectiveKills, healing, deaths, heroStats));
-                Vars.statsTimer.Restart();
+                AppData.gameData.stats.Add(new Stat((int)AppData.gameData.gameTimer.Elapsed.TotalSeconds, eliminations, damage, objectiveKills, healing, deaths, heroStats));
+                AppData.statsTimer.Restart();
             }
         }
         public static void ReadCompetitiveGameEntered(Bitmap frame)
@@ -113,14 +113,14 @@ namespace BetterOverwatch
 
                 if (percent >= 70)
                 {
-                    if (Vars.gameData.state == State.Finished || Vars.gameData.state == State.WaitForUpload) // a game finished
+                    if (AppData.gameData.state == State.Finished || AppData.gameData.state == State.WaitForUpload) // a game finished
                     {
                         Server.CheckGameUpload();
                     }
-                    Vars.gameData = new GameData(Vars.gameData.currentRating);
-                    Vars.getInfoTimeout.Restart();
-                    Vars.gameData.state = State.Ingame;
-                    Vars.gameData.startRating = Vars.gameData.currentRating;
+                    AppData.gameData = new GameData(AppData.gameData.currentRating);
+                    AppData.getInfoTimeout.Restart();
+                    AppData.gameData.state = State.Ingame;
+                    AppData.gameData.startRating = AppData.gameData.currentRating;
 
                     Functions.DebugMessage("Recognized competitive game");
                 }
@@ -128,7 +128,7 @@ namespace BetterOverwatch
         }
         public static void ReadMap(Bitmap frame)
         {
-            if (Vars.gameData.map.Equals(string.Empty))
+            if (AppData.gameData.map.Equals(string.Empty))
             {
                 string mapText = Functions.BitmapToText(frame, 915, 945, 780, 85);
 
@@ -138,8 +138,8 @@ namespace BetterOverwatch
 
                     if (!mapText.Equals(string.Empty))
                     {
-                        Vars.gameData.map = mapText;
-                        Vars.getInfoTimeout.Restart();
+                        AppData.gameData.map = mapText;
+                        AppData.getInfoTimeout.Restart();
                         Functions.DebugMessage("Recognized map: '" + mapText + "'");
                     }
                 }
@@ -147,7 +147,7 @@ namespace BetterOverwatch
         }
         public static void ReadTeamsSkillRating(Bitmap frame)
         {
-            if (Vars.gameData.team1Rating == 0)
+            if (AppData.gameData.team1Rating == 0)
             {
                 string team1Rating = Functions.BitmapToText(frame, 545, 220, 245, 70, false, 90, Network.TeamSkillRating);
                 team1Rating = Regex.Match(team1Rating, "[0-9]+").ToString();
@@ -158,12 +158,12 @@ namespace BetterOverwatch
 
                     if (int.TryParse(team1Rating, out int rating) && rating > 999 && rating < 5000)
                     {
-                        Vars.gameData.team1Rating = rating;
+                        AppData.gameData.team1Rating = rating;
                         Functions.DebugMessage("Recognized team 1 SR: '" + team1Rating + "'");
                     }
                 }
             }
-            if (Vars.gameData.team2Rating == 0)
+            if (AppData.gameData.team2Rating == 0)
             {
                 string team2Rating = Functions.BitmapToText(frame, 1135, 220, 245, 70, false, 90, Network.TeamSkillRating);
                 team2Rating = Regex.Match(team2Rating, "[0-9]+").ToString();
@@ -174,7 +174,7 @@ namespace BetterOverwatch
 
                     if (int.TryParse(team2Rating, out int rating) && rating > 999 && rating < 5000)
                     {
-                        Vars.gameData.team2Rating = rating;
+                        AppData.gameData.team2Rating = rating;
                         Functions.DebugMessage("Recognized team 2 SR: '" + team2Rating + "'");
                     }
                 }
@@ -189,11 +189,11 @@ namespace BetterOverwatch
                 if (menuText.Equals("PLAY"))
                 {
                     Functions.DebugMessage("Recognized main menu");
-                    Vars.loopDelay = 250;
-                    Vars.gameData.state = State.Finished;
-                    Vars.gameData.timer.Stop();
-                    Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].time = (int)Vars.gameData.gameTimer.Elapsed.TotalSeconds;
-                    Program.trayMenu.ChangeTray("Visit play menu to upload last game", Resources.Icon_Wait);
+                    AppData.loopDelay = 250;
+                    AppData.gameData.state = State.Finished;
+                    AppData.gameData.timer.Stop();
+                    AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].time = (int)AppData.gameData.gameTimer.Elapsed.TotalSeconds;
+                    ScreenCaptureHandler.trayMenu.ChangeTray("Visit play menu to upload last game", Resources.Icon_Wait);
                 }
             }
         }
@@ -209,27 +209,25 @@ namespace BetterOverwatch
 
                     if (accuracy >= 70)
                     {
-                        if (Vars.gameData.heroesPlayed.Count > 0 &&
-                            Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].name == Constants.heroList[h].name)
+                        if (AppData.gameData.heroesPlayed.Count > 0 &&
+                            AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].name == Constants.heroList[h].name)
                         {
-                            Console.WriteLine("Hero detected " + Constants.heroList[h].name);
                             return true; // if playing the same hero, don't continue
                         }
-                        if (Vars.gameData.heroesPlayed.Count > 0)
+                        if (AppData.gameData.heroesPlayed.Count > 0)
                         {
-                            if ((Vars.gameData.state == State.RoundComplete || Vars.gameData.state == State.RoundBeginning) &&
-                                Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].time == 0)
+                            if ((AppData.gameData.state == State.RoundComplete || AppData.gameData.state == State.RoundBeginning) &&
+                                AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].time == 0)
                             {
-                                Vars.gameData.heroesPlayed.RemoveAt(Vars.gameData.heroesPlayed.Count - 1);
+                                AppData.gameData.heroesPlayed.RemoveAt(AppData.gameData.heroesPlayed.Count - 1);
                             }
                             else
                             {
-                                Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].time = (int)Vars.gameData.heroTimer.Elapsed.TotalSeconds;
+                                AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].time = (int)AppData.gameData.heroTimer.Elapsed.TotalSeconds;
                             }
                         }
-                        Vars.gameData.heroTimer.Restart();
-                        Vars.gameData.heroesPlayed.Add(new HeroPlayed(Constants.heroList[h].name, (int)Vars.gameData.gameTimer.Elapsed.TotalSeconds));
-                        Console.WriteLine("New hero detected " + Constants.heroList[h].name);
+                        AppData.gameData.heroTimer.Restart();
+                        AppData.gameData.heroesPlayed.Add(new HeroPlayed(Constants.heroList[h].name, (int)AppData.gameData.gameTimer.Elapsed.TotalSeconds));
                         return true;
                     }
                 }
@@ -244,12 +242,12 @@ namespace BetterOverwatch
             {
                 if (Functions.CompareStrings(roundCompletedText, "COMPLETED") >= 70)
                 {
-                    Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].time = (int)Vars.gameData.heroTimer.Elapsed.TotalSeconds;
+                    AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].time = (int)AppData.gameData.heroTimer.Elapsed.TotalSeconds;
                     //Vars.gameData.heroesPlayed.Add(new HeroPlayed(Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].name, (int)Vars.gameData.gameTimer.Elapsed.TotalSeconds));
-                    Vars.gameData.state = State.RoundComplete;
-                    Vars.gameData.heroTimer.Stop();
-                    Vars.gameData.gameTimer.Stop();
-                    Vars.getInfoTimeout.Restart();
+                    AppData.gameData.state = State.RoundComplete;
+                    AppData.gameData.heroTimer.Stop();
+                    AppData.gameData.gameTimer.Stop();
+                    AppData.getInfoTimeout.Restart();
                     Functions.DebugMessage($"Recognized round completed");
                 }
             }
@@ -259,10 +257,10 @@ namespace BetterOverwatch
             // hackfix: not actually reading the text, just checking the length
             string roundStartedText = Functions.BitmapToText(frame, 915, 70, 175, 13, true, 110, Network.Maps);
 
-            if (roundStartedText.Length >= 10) Vars.gameData.objectiveTicks++;
-            else if (roundStartedText.Length < 4) Vars.gameData.objectiveTicks = 0;
+            if (roundStartedText.Length >= 10) AppData.gameData.objectiveTicks++;
+            else if (roundStartedText.Length < 4) AppData.gameData.objectiveTicks = 0;
 
-            return Vars.gameData.objectiveTicks >= 4;
+            return AppData.gameData.objectiveTicks >= 4;
         }
         public static void ReadFinalScore(Bitmap frame)
         {
@@ -273,18 +271,18 @@ namespace BetterOverwatch
                 if (Functions.CompareStrings(finalScoreText, "FIHNLSCORE") >= 40)
                 {
                     Functions.DebugMessage("Recognized final score");
-                    Vars.gameData.state = State.Finished;
-                    Vars.gameData.timer.Stop();
-                    Vars.gameData.gameTimer.Stop();
-                    Vars.getInfoTimeout.Restart();
-                    Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].time = (int)Vars.gameData.heroTimer.Elapsed.TotalSeconds;
-                    Program.trayMenu.ChangeTray("Visit play menu to upload last game", Resources.Icon_Wait);
+                    AppData.gameData.state = State.Finished;
+                    AppData.gameData.timer.Stop();
+                    AppData.gameData.gameTimer.Stop();
+                    AppData.getInfoTimeout.Restart();
+                    AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].time = (int)AppData.gameData.heroTimer.Elapsed.TotalSeconds;
+                    ScreenCaptureHandler.trayMenu.ChangeTray("Visit play menu to upload last game", Resources.Icon_Wait);
                 }
             }
         }
         public static void ReadGameScore(Bitmap frame)
         {
-            if (Vars.gameData.team1Score == 0 && Vars.gameData.team1Score == 0)
+            if (AppData.gameData.team1Score == 0 && AppData.gameData.team1Score == 0)
             {
                 string scoreTextLeft = Functions.BitmapToText(frame, 800, 560, 95, 135, false, 45, Network.TeamSkillRating);
                 string scoreTextRight = Functions.BitmapToText(frame, 1000, 560, 95, 135, false, 45, Network.TeamSkillRating);
@@ -295,12 +293,12 @@ namespace BetterOverwatch
                     int.TryParse(scoreTextRight, out int team2) &&
                     team1 >= 0 && team1 <= 6 && team2 >= 0 && team2 <= 6)
                 {
-                    Vars.gameData.team1Score = team1;
-                    Vars.gameData.team2Score = team2;
-                    Vars.loopDelay = 250;
+                    AppData.gameData.team1Score = team1;
+                    AppData.gameData.team2Score = team2;
+                    AppData.loopDelay = 250;
                     Functions.DebugMessage("Recognized team score Team 1:" + scoreTextLeft + " Team 2:" + scoreTextRight);
-                    Vars.gameData.state = State.WaitForUpload;
-                    Vars.getInfoTimeout.Stop();
+                    AppData.gameData.state = State.WaitForUpload;
+                    AppData.getInfoTimeout.Stop();
                 }
             }
         }
@@ -316,7 +314,7 @@ namespace BetterOverwatch
 
                     if (playerName.Equals(string.Empty))
                     {
-                        Vars.gameData.players.Clear();
+                        AppData.gameData.players.Clear();
                         return;
                     }
                     Bitmap rank = frame.Clone(new Rectangle(playerRankX, 331 + (players * 75), 33, 33), frame.PixelFormat);
@@ -335,7 +333,7 @@ namespace BetterOverwatch
                             resultRank[1] = high;
                         }
                     }
-                    Vars.gameData.players.Add(new Player(playerName, resultRank[0].ToString()));
+                    AppData.gameData.players.Add(new Player(playerName, resultRank[0].ToString()));
                 }
                 playerNameX += 945;
                 playerRankX += 422;
@@ -343,12 +341,12 @@ namespace BetterOverwatch
         }
         public static bool IsValidGame()
         {
-            if (Vars.gameData.timer.Elapsed.TotalSeconds < 300)
+            if (AppData.gameData.timer.Elapsed.TotalSeconds < 300)
             {
-                if (Vars.gameData.state >= State.Recording)
+                if (AppData.gameData.state >= State.Recording)
                 {
                     Functions.DebugMessage("Invalid game");
-                    Program.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);
+                    ScreenCaptureHandler.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);
                 }
                 return false;
             }

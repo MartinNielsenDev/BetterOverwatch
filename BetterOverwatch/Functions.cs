@@ -599,10 +599,10 @@ namespace BetterOverwatch
         {
             try
             {
-                if (Directory.Exists(Vars.configPath))
+                if (Directory.Exists(AppData.configPath))
                 {
                     string date = DateTime.Now.ToString("dd/MM/yy HH:mm:ss");
-                    File.AppendAllText(Path.Combine(Vars.configPath, "debug.log"), $"[{date}] {msg + "\r\n"}");
+                    File.AppendAllText(Path.Combine(AppData.configPath, "debug.log"), $"[{date}] {msg + "\r\n"}");
                 }
             }
             catch { }

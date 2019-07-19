@@ -101,6 +101,7 @@
     <Compile Include="DataObjects\CompetitiveGame.cs" />
     <Compile Include="DataObjects\Initialize.cs" />
     <Compile Include="DataObjects\ServerOutput.cs" />
+    <Compile Include="ScreenCaptureHandler.cs" />
     <Compile Include="Forms\AdminPromptForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -114,11 +115,11 @@
     <Compile Include="Game\Objects\Player.cs" />
     <Compile Include="Game\Objects\Stat.cs" />
     <Compile Include="GameMethods.cs" />
-    <Compile Include="Forms\AuthorizeForm.cs">
+    <Compile Include="Forms\AuthenticationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\AuthorizeForm.Designer.cs">
-      <DependentUpon>AuthorizeForm.cs</DependentUpon>
+    <Compile Include="Forms\AuthenticationForm.Designer.cs">
+      <DependentUpon>AuthenticationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="KeyboardHook.cs" />
     <Compile Include="TrayMenu.cs">
@@ -142,7 +143,7 @@
     <Compile Include="Forms\UpdateNotificationForm.Designer.cs">
       <DependentUpon>UpdateNotificationForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Vars.cs" />
+    <Compile Include="AppData.cs" />
     <EmbeddedResource Include="Forms\AdminPromptForm.resx">
       <DependentUpon>AdminPromptForm.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -157,8 +158,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="Forms\AuthorizeForm.resx">
-      <DependentUpon>AuthorizeForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\AuthenticationForm.resx">
+      <DependentUpon>AuthenticationForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\UpdateNotificationForm.resx">
@@ -192,7 +193,6 @@
     <EmbeddedResource Include="Resources\SharpDX.DXGI.dll" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Idle.ico" />
     <EmbeddedResource Include="Resources\Newtonsoft.Json.dll" />
   </ItemGroup>
   <ItemGroup>
@@ -211,9 +211,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\IconDownload.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\System.dll" />
@@ -256,6 +253,8 @@
   <ItemGroup>
     <Content Include="Resources\Icon.ico" />
     <Content Include="Resources\Icon_Active.ico" />
+    <None Include="Resources\success_new.wav" />
+    <None Include="Resources\Icon_Download.png" />
     <Content Include="Resources\Icon_Record.ico" />
     <Content Include="Resources\Icon_Wait.ico" />
   </ItemGroup>

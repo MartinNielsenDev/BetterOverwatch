@@ -17,13 +17,13 @@ namespace BetterOverwatch
 
             try
             {
-                if (File.Exists(Path.Combine(Vars.configPath, "settings.json")))
+                if (File.Exists(Path.Combine(AppData.configPath, "settings.json")))
                 {
-                    string json = File.ReadAllText(Path.Combine(Vars.configPath, "settings.json"));
+                    string json = File.ReadAllText(Path.Combine(AppData.configPath, "settings.json"));
 
                     if (Regex.Replace(json, @"[\s\n\r]", "") != string.Empty && json.Length > 0)
                     {
-                        Vars.settings = JsonConvert.DeserializeObject<Settings>(json);
+                        AppData.settings = JsonConvert.DeserializeObject<Settings>(json);
                     }
                 }
             }
@@ -31,8 +31,8 @@ namespace BetterOverwatch
         }
         public static void Save()
         {
-            string json = JsonConvert.SerializeObject(Vars.settings, Formatting.Indented);
-            File.WriteAllText(Path.Combine(Vars.configPath, "settings.json"), json);
+            string json = JsonConvert.SerializeObject(AppData.settings, Formatting.Indented);
+            File.WriteAllText(Path.Combine(AppData.configPath, "settings.json"), json);
         }
     }
 }

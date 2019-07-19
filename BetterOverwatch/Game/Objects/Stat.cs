@@ -2,7 +2,7 @@
 {
     public class Stat
     {
-        public string heroPlayed = Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].name;
+        public string heroPlayed = AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].name;
         public int time { get; }
         public int eliminations { get; }
         public int objectiveKills { get; }

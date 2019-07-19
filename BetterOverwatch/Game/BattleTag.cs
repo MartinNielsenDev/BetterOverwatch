@@ -13,13 +13,12 @@ namespace BetterOverwatch.Game
         [In, Out] byte[] buffer, int sizeout, out IntPtr lpNumberOfBytesRead);
         public static string ReadFromMemory()
         {
-            if (Vars.isAdmin)
+            if (AppData.isAdmin)
             {
                 Process[] processes = Process.GetProcessesByName("Battle.net");
                 foreach (Process process in processes)
                 {
-                    Console.WriteLine(Vars.blizzardAppOffset);
-                    if (Vars.blizzardAppOffset == 0)
+                    if (AppData.blizzardAppOffset == 0)
                     {
                         if (!Server.FetchBlizzardAppOffset(process.MainModule.FileVersionInfo.FileVersion)) break;
                     }
@@ -29,7 +28,7 @@ namespace BetterOverwatch.Game
                         if (processModule.ModuleName == "battle.net.dll")
                         {
                             IntPtr processBaseAddress = processModule.BaseAddress;
-                            byte[] battleTagBytes = ReadBytes(process.Handle, processBaseAddress + Vars.blizzardAppOffset, new[] { 0x28, 0x10, 0x8, 0x84, 0x0, 0x0 });
+                            byte[] battleTagBytes = ReadBytes(process.Handle, processBaseAddress + AppData.blizzardAppOffset, new[] { 0x28, 0x10, 0x8, 0x84, 0x0, 0x0 });
                             
                             if (battleTagBytes.Length > 0)
                             {
@@ -40,7 +39,7 @@ namespace BetterOverwatch.Game
                                     return $"{battleTagSplit[0]}-{battleTagSplit[1].Substring(0, battleTagSplit[1].Length > 4 ? 5 : 4)}";
                                 }
                             }
-                            battleTagBytes = ReadBytes(process.Handle, processBaseAddress + Vars.blizzardAppOffset, new[] { 0x28, 0x10, 0x8, 0x84, 0x0 });
+                            battleTagBytes = ReadBytes(process.Handle, processBaseAddress + AppData.blizzardAppOffset, new[] { 0x28, 0x10, 0x8, 0x84, 0x0 });
 
                             if (battleTagBytes.Length > 0)
                             {

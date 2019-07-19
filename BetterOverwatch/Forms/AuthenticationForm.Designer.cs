@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace BetterOverwatch.Forms
 {
-    partial class AuthorizeForm
+    partial class AuthenticationForm
     {
         /// <summary>
         /// Required designer variable.
@@ -37,7 +37,7 @@ namespace BetterOverwatch.Forms
             this.borderPanel = new System.Windows.Forms.Panel();
             this.authorizePanel = new System.Windows.Forms.Panel();
             this.textLabel = new System.Windows.Forms.Label();
-            this.authorizeButton = new System.Windows.Forms.Button();
+            this.authenticationButton = new System.Windows.Forms.Button();
             this.headerPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).BeginInit();
             this.borderPanel.SuspendLayout();
@@ -66,7 +66,7 @@ namespace BetterOverwatch.Forms
             this.closeButton.Location = new System.Drawing.Point(463, -7);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(35, 42);
-            this.closeButton.TabIndex = 0;
+            this.closeButton.TabIndex = 999;
             this.closeButton.Text = "x";
             this.closeButton.UseVisualStyleBackColor = true;
             this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
@@ -93,7 +93,7 @@ namespace BetterOverwatch.Forms
             this.borderPanel.Location = new System.Drawing.Point(0, 0);
             this.borderPanel.Name = "borderPanel";
             this.borderPanel.Padding = new System.Windows.Forms.Padding(1);
-            this.borderPanel.Size = new System.Drawing.Size(500, 550);
+            this.borderPanel.Size = new System.Drawing.Size(500, 451);
             this.borderPanel.TabIndex = 27;
             this.borderPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.borderPanel_Paint);
             this.borderPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MoveForm_MouseDown);
@@ -101,55 +101,56 @@ namespace BetterOverwatch.Forms
             // authorizePanel
             // 
             this.authorizePanel.Controls.Add(this.textLabel);
-            this.authorizePanel.Controls.Add(this.authorizeButton);
+            this.authorizePanel.Controls.Add(this.authenticationButton);
             this.authorizePanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.authorizePanel.Location = new System.Drawing.Point(1, 111);
             this.authorizePanel.Name = "authorizePanel";
-            this.authorizePanel.Size = new System.Drawing.Size(498, 438);
+            this.authorizePanel.Size = new System.Drawing.Size(498, 339);
             this.authorizePanel.TabIndex = 35;
             this.authorizePanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MoveForm_MouseDown);
             // 
-            // label3
+            // textLabel
             // 
             this.textLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.textLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textLabel.ForeColor = System.Drawing.Color.White;
-            this.textLabel.Location = new System.Drawing.Point(1, 24);
-            this.textLabel.Name = "label3";
+            this.textLabel.Location = new System.Drawing.Point(2, 175);
+            this.textLabel.Name = "textLabel";
             this.textLabel.Size = new System.Drawing.Size(496, 116);
             this.textLabel.TabIndex = 32;
-            this.textLabel.Text = "";
             this.textLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.textLabel.Text = "It appears to be your first time running Better Overwatch.\r\n\r\nTo login to an existing account or create a new account, click the authenticate button above.\r\n";
             this.textLabel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MoveForm_MouseDown);
             // 
             // authorizeButton
             // 
-            this.authorizeButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.authorizeButton.BackColor = System.Drawing.Color.ForestGreen;
-            this.authorizeButton.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.authorizeButton.FlatAppearance.BorderSize = 0;
-            this.authorizeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.authorizeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.authorizeButton.ForeColor = System.Drawing.SystemColors.Window;
-            this.authorizeButton.Location = new System.Drawing.Point(176, 326);
-            this.authorizeButton.Name = "authorizeButton";
-            this.authorizeButton.Size = new System.Drawing.Size(147, 50);
-            this.authorizeButton.TabIndex = 1;
-            this.authorizeButton.Text = "Authorize";
-            this.authorizeButton.UseVisualStyleBackColor = false;
-            this.authorizeButton.Click += new System.EventHandler(this.authorizeButton_Click);
+            this.authenticationButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.authenticationButton.BackColor = System.Drawing.Color.ForestGreen;
+            this.authenticationButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.authenticationButton.FlatAppearance.BorderSize = 0;
+            this.authenticationButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.authenticationButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.authenticationButton.ForeColor = System.Drawing.SystemColors.Window;
+            this.authenticationButton.Location = new System.Drawing.Point(176, 76);
+            this.authenticationButton.Name = "authorizeButton";
+            this.authenticationButton.Size = new System.Drawing.Size(147, 44);
+            this.authenticationButton.TabIndex = 0;
+            this.authenticationButton.Text = "Authenticate";
+            this.authenticationButton.UseVisualStyleBackColor = false;
+            this.authenticationButton.Click += new System.EventHandler(this.authenticateButton_Click);
             // 
-            // SignUp
+            // AuthorizeForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(54)))), ((int)(((byte)(73)))));
-            this.ClientSize = new System.Drawing.Size(500, 550);
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.ClientSize = new System.Drawing.Size(500, 451);
             this.Controls.Add(this.borderPanel);
             this.Font = new System.Drawing.Font("Century Gothic", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.Name = "SignUp";
+            this.Name = "AuthorizeForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -172,6 +173,6 @@ namespace BetterOverwatch.Forms
         private Button closeButton;
         private PictureBox logoPictureBox;
         public Label textLabel;
-        public Button authorizeButton;
+        public Button authenticationButton;
     }
 }
