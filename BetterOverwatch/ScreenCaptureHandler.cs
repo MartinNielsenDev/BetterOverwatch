@@ -58,7 +58,8 @@ namespace BetterOverwatch
                     {
                         trayMenu.ChangeTray("Waiting for Overwatch, idle...", Resources.Icon);
                         AppData.overwatchRunning = false;
-                        if (AppData.gameData.state == State.Recording ||
+                        if (AppData.gameData.state == State.RoundComplete ||
+                            AppData.gameData.state == State.Recording ||
                             AppData.gameData.state == State.Finished ||
                             AppData.gameData.state == State.WaitForUpload
                             )

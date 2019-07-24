@@ -36,7 +36,8 @@ namespace BetterOverwatch
                 AppData.gameData.timer.Stop();
                 AppData.gameData.currentRating = rating;
 
-                if (AppData.gameData.state == State.Recording ||
+                if (AppData.gameData.state == State.RoundComplete ||
+                    AppData.gameData.state == State.Recording ||
                     AppData.gameData.state == State.Finished ||
                     AppData.gameData.state == State.WaitForUpload ||
                     AppData.gameData.state == State.RoundComplete)
