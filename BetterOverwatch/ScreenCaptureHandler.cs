@@ -10,6 +10,7 @@ namespace BetterOverwatch
 {
     class ScreenCaptureHandler
     {
+        public static Bitmap testImage = new Bitmap(@"C:\Users\Avoid\Desktop\ptr-test.png");
         public static bool captureScreen = false;
         private static DesktopDuplicator desktopDuplicator;
         public static TrayMenu trayMenu;
@@ -28,6 +29,16 @@ namespace BetterOverwatch
             }
             while (true)
             {
+                // TODO: find a reliable way to check whether this page is present
+                // ideas: read the big "competitive play" text or "tank, damage, support" text
+                string tankRating = Functions.BitmapToText(testImage, 625, 594, 62, 32, false, 110, Network.TeamSkillRating, true);
+                string damageRating = Functions.BitmapToText(testImage, 942, 594, 62, 32, false, 110, Network.TeamSkillRating, true);
+                string supportRating = Functions.BitmapToText(testImage, 1260, 594, 62, 32, false, 110, Network.TeamSkillRating, true);
+
+                Console.WriteLine($"Tank rating: {tankRating}");
+                Console.WriteLine($"Damage rating: {damageRating}");
+                Console.WriteLine($"Support rating: {supportRating}");
+                continue;
                 if (!captureScreen)
                 {
                     Thread.Sleep(1000);

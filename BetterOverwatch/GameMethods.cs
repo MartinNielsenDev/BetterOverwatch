@@ -1,5 +1,4 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Text.RegularExpressions;
 using BetterOverwatch.Game;
 using BetterOverwatch.Game.Objects;
