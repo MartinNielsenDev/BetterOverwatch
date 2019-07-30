@@ -116,11 +116,55 @@ namespace BetterOverwatch.Networking
             catch { }
             return true;
         }
+        public static void CalculateStats()
+        {
+            if(AppData.gameData.team1Score != 0 && AppData.gameData.team2Score != 0)
+            {
+                if(AppData.gameData.team1Score > AppData.gameData.team2Score) // win
+                {
+                    AppData.win++;
+                }
+                else if (AppData.gameData.team1Score < AppData.gameData.team2Score) // loss
+                {
+                    AppData.loss++;
+                }
+                else
+                {
+                    AppData.draw++;
+                }
+            }
+            else if(AppData.gameData.endRating - AppData.gameData.startRating > 0) // win
+            {
+                AppData.win++;
+            }
+            else if (AppData.gameData.endRating - AppData.gameData.startRating < 0) // loss
+            {
+                AppData.loss++;
+            }
+            else if(AppData.gameData.endRating - AppData.gameData.startRating == 0 && AppData.gameData.startRating + AppData.gameData.endRating != 0) // draw
+            {
+                AppData.draw++;
+            }
+        }
         public static void CheckGameUpload()
         {
             string game = AppData.gameData.ToString();
             AppData.lastGameJSON = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<CompetitiveGame>(game), Formatting.Indented);
             if (!GameMethods.IsValidGame()) return;
+            CalculateStats();
+
+            if (AppData.settings.outputStatsToTextFile)
+            {
+                try
+                {
+                    string outputStats = ScreenCaptureHandler.trayMenu.winratesForm.textBox1.Text
+                        .Replace("{win}", AppData.win.ToString())
+                        .Replace("{loss}", AppData.loss.ToString())
+                        .Replace("{draw}", AppData.draw.ToString())
+                        .Replace("{wr}", Math.Round(((double)AppData.win / (double)(AppData.win + AppData.loss + AppData.draw)) * 100, 2).ToString());
+                    File.WriteAllText("stats.txt", outputStats);
+                }catch { }
+            }
             UploadGame(game);
         }
         public static void UploadGame(string gameData)

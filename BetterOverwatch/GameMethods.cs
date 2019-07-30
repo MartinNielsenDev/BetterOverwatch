@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.IO;
 using System.Text.RegularExpressions;
 using BetterOverwatch.Game;
 using BetterOverwatch.Game.Objects;
@@ -9,41 +10,114 @@ namespace BetterOverwatch
 {
     class GameMethods
     {
-        public static void ReadPlayMenu(Bitmap frame)
+        public static bool IsOnCompetitiveScreen(Bitmap frame)
         {
-            string ratingText = Functions.BitmapToText(frame, 1100, 444, 100, 40, true, 110, Network.Numbers); // GROUP CHECK
-            ratingText = Regex.Match(ratingText, "[0-9]+").ToString();
+            return (Functions.BitmapToText(frame, 76, 204, 78, 28, true, 110, Network.Numbers, false) == "7029");
+        }
+        public static void ReadRoleRatings(Bitmap frame)
+        {
+            int tankRating = 0, damageRating = 0, supportRating = 0;
+            bool tankCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 552, 560, 182, 1), 255, 255, 255);
+            bool damageCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 869, 560, 182, 1), 255, 255, 255);
+            bool supportCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 1186, 560, 182, 1), 255, 255, 255);
+            string debugString = "";
+            short radius = 170;
 
-            if (ratingText.Length < 4)
+            if (tankCheck)
             {
-                ratingText = Functions.BitmapToText(frame, 1100, 504, 100, 32, true, 110, Network.Numbers); // SOLO CHECK
-                ratingText = Regex.Match(ratingText, "[0-9]+").ToString();
-            }
-            if (ratingText.Length > 4)
-            {
-                ratingText = ratingText.Substring(ratingText.Length - 4);
-            }
+                string tankRatingText = Functions.BitmapToText(frame, 625, 594, 62, 38, false, radius, Network.TeamSkillRating, true);
 
-            if (int.TryParse(ratingText, out int rating) && rating > 999 && rating < 5000)
-            {
-                if (AppData.gameData.currentRating != rating || AppData.gameData.state >= State.Finished)
+                if (tankRatingText.Length > 4)
                 {
-                    AppData.successSound.Play();
-                    Functions.DebugMessage("Recognized rating: '" + ratingText + "'");
-                    ScreenCaptureHandler.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);
+                    tankRatingText = tankRatingText.Substring(tankRatingText.Length - 4);
                 }
-                AppData.gameData.timer.Stop();
-                AppData.gameData.currentRating = rating;
-
-                if (AppData.gameData.state == State.RoundComplete ||
-                    AppData.gameData.state == State.Recording ||
-                    AppData.gameData.state == State.Finished ||
-                    AppData.gameData.state == State.WaitForUpload ||
-                    AppData.gameData.state == State.RoundComplete)
+                else if (tankRatingText.Length < 4)
                 {
-                    Server.CheckGameUpload();
-                    AppData.gameData = new GameData(AppData.gameData.currentRating);
+                    tankCheck = false;
                 }
+                if (tankCheck && int.TryParse(tankRatingText, out tankRating))
+                {
+                    debugString += $" Tank: {tankRatingText}";
+                }
+            }
+            if (damageCheck)
+            {
+                string damageRatingText = Functions.BitmapToText(frame, 942, 594, 62, 38, false, radius, Network.TeamSkillRating, true);
+
+                if (damageRatingText.Length > 4)
+                {
+                    damageRatingText = damageRatingText.Substring(damageRatingText.Length - 4);
+                }
+                else if (damageRatingText.Length < 4)
+                {
+                    damageCheck = false;
+                }
+                if (damageCheck && int.TryParse(damageRatingText, out damageRating))
+                {
+                    debugString += $" Damage: {damageRatingText}";
+                }
+            }
+            if (supportCheck)
+            {
+                string supportRatingText = Functions.BitmapToText(frame, 1260, 594, 62, 38, false, radius, Network.TeamSkillRating, true);
+
+                if (supportRatingText.Length > 4)
+                {
+                    supportRatingText = supportRatingText.Substring(supportRatingText.Length - 4);
+                }
+                else if (supportRatingText.Length < 4)
+                {
+                    supportCheck = false;
+                }
+                if (supportCheck && int.TryParse(supportRatingText, out supportRating))
+                {
+                    debugString += $" Support: {supportRatingText}";
+                }
+            }
+
+            if (tankCheck && AppData.gameData.currentRatings.tank != tankRating ||
+                damageCheck && AppData.gameData.currentRatings.damage != damageRating ||
+                supportCheck && AppData.gameData.currentRatings.support != supportRating ||
+                AppData.gameData.state >= State.Finished)
+            {
+
+                if (tankCheck)
+                {
+                    AppData.gameData.currentRatings.tank = tankRating;
+                    if (AppData.settings.outputToTextFiles)
+                    {
+                        File.WriteAllText("tank.txt", tankRating.ToString());
+                    }
+                }
+                if (damageCheck)
+                {
+                    AppData.gameData.currentRatings.damage = damageRating;
+                    if (AppData.settings.outputToTextFiles)
+                    {
+                        File.WriteAllText("damage.txt", damageRating.ToString());
+                    }
+                }
+                if (supportCheck)
+                {
+                    AppData.gameData.currentRatings.support = supportRating;
+                    if (AppData.settings.outputToTextFiles)
+                    {
+                        File.WriteAllText("support.txt", supportRating.ToString());
+                    }
+                }
+                AppData.successSound.Play();
+                Functions.DebugMessage($"Recognized rating:{debugString}");
+                ScreenCaptureHandler.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);
+            }
+            AppData.gameData.timer.Stop();
+
+            if (AppData.gameData.state == State.Recording ||
+                AppData.gameData.state == State.RoundComplete ||
+                AppData.gameData.state == State.Finished ||
+                AppData.gameData.state == State.WaitForUpload)
+            {
+                Server.CheckGameUpload();
+                AppData.gameData = new GameData(AppData.gameData.currentRatings);
             }
         }
         public static int[] ReadHeroStats(Bitmap frame, int[] statSettings)
@@ -98,7 +172,6 @@ namespace BetterOverwatch
                         break;
                     }
                 }
-                //frame.Save(@"C:\testData\" + eliminations + "_" + Guid.NewGuid() + ".png"); // test
                 AppData.gameData.stats.Add(new Stat((int)AppData.gameData.gameTimer.Elapsed.TotalSeconds, eliminations, damage, objectiveKills, healing, deaths, heroStats));
                 AppData.statsTimer.Restart();
             }
@@ -117,10 +190,12 @@ namespace BetterOverwatch
                     {
                         Server.CheckGameUpload();
                     }
-                    AppData.gameData = new GameData(AppData.gameData.currentRating);
+                    AppData.gameData = new GameData(AppData.gameData.currentRatings);
                     AppData.getInfoTimeout.Restart();
                     AppData.gameData.state = State.Ingame;
-                    AppData.gameData.startRating = AppData.gameData.currentRating;
+                    AppData.gameData.startRatings.tank = AppData.gameData.currentRatings.tank;
+                    AppData.gameData.startRatings.damage = AppData.gameData.currentRatings.damage;
+                    AppData.gameData.startRatings.support = AppData.gameData.currentRatings.support;
 
                     Functions.DebugMessage("Recognized competitive game");
                 }

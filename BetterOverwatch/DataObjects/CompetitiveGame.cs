@@ -20,5 +20,17 @@ namespace BetterOverwatch.DataObjects
         public List<Stat> stats = new List<Stat>();
         public string playerListImageBase64 = string.Empty;
         public string privateToken = string.Empty;
+
+        public class Ratings
+        {
+            public int tank = 0;
+            public int damage = 0;
+            public int support = 0;
+
+            public int AverageRating()
+            {
+                return (tank + damage + support) / 3;
+            }
+        }
     }
 }

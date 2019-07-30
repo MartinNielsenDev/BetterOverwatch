@@ -20,6 +20,7 @@ namespace BetterOverwatch
         public static bool overwatchRunning = false;
         public static int blizzardAppOffset = 0;
         public static int loopDelay = 250;
+        public static int win = 0, loss = 0, draw = 0;
         public static Stopwatch 
             frameTimer = new Stopwatch(),
             getInfoTimeout = new Stopwatch(),

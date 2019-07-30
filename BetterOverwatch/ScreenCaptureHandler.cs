@@ -10,7 +10,6 @@ namespace BetterOverwatch
 {
     class ScreenCaptureHandler
     {
-        public static Bitmap testImage = new Bitmap(@"C:\Users\Avoid\Desktop\ptr-test.png");
         public static bool captureScreen = false;
         private static DesktopDuplicator desktopDuplicator;
         public static TrayMenu trayMenu;
@@ -29,16 +28,6 @@ namespace BetterOverwatch
             }
             while (true)
             {
-                // TODO: find a reliable way to check whether this page is present
-                // ideas: read the big "competitive play" text or "tank, damage, support" text
-                string tankRating = Functions.BitmapToText(testImage, 625, 594, 62, 32, false, 110, Network.TeamSkillRating, true);
-                string damageRating = Functions.BitmapToText(testImage, 942, 594, 62, 32, false, 110, Network.TeamSkillRating, true);
-                string supportRating = Functions.BitmapToText(testImage, 1260, 594, 62, 32, false, 110, Network.TeamSkillRating, true);
-
-                Console.WriteLine($"Tank rating: {tankRating}");
-                Console.WriteLine($"Damage rating: {damageRating}");
-                Console.WriteLine($"Support rating: {supportRating}");
-                continue;
                 if (!captureScreen)
                 {
                     Thread.Sleep(1000);
@@ -48,7 +37,7 @@ namespace BetterOverwatch
                 {
                     if (Functions.IsProcessOpen("Overwatch"))
                     {
-                        if (AppData.gameData.currentRating > 0)
+                        if (AppData.gameData.currentRatings.AverageRating() > 0)
                         {
                             trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);
                         }
@@ -76,7 +65,7 @@ namespace BetterOverwatch
                             )
                         {
                             Server.CheckGameUpload();
-                            AppData.gameData = new GameData(AppData.gameData.currentRating);
+                            AppData.gameData = new GameData(AppData.gameData.currentRatings);
                         }
                     }
                 }
@@ -113,12 +102,10 @@ namespace BetterOverwatch
                         {
                             if (AppData.gameData.state != State.Ingame)
                             {
-                                string quickPlayText = Functions.BitmapToText(frame.DesktopImage, 476, 644, 80, 40, false, 140, Network.Maps, true);
-
-                                if (Functions.CompareStrings(quickPlayText, "PLHY") >= 100)
+                                if (GameMethods.IsOnCompetitiveScreen(frame.DesktopImage))
                                 {
-                                    Thread.Sleep(150);
-                                    GameMethods.ReadPlayMenu(frame.DesktopImage);
+                                    Thread.Sleep(300);
+                                    GameMethods.ReadRoleRatings(frame.DesktopImage);
                                 }
                             }
                             if (AppData.gameData.state == State.Idle || AppData.gameData.state == State.Finished || AppData.gameData.state == State.WaitForUpload)

@@ -14,14 +14,17 @@ namespace BetterOverwatch
     {
         public NotifyIcon trayIcon = new NotifyIcon();
         public ContextMenu contextMenu = new ContextMenu();
-
+        public MenuItem tools = new MenuItem("Tools");
+        public WinratesForm winratesForm = new WinratesForm();
         public TrayMenu()
         {
             try
             {
-                MenuItem debugTools = new MenuItem("Tools");
-                debugTools.MenuItems.Add("Open logs", OpenLogs);
-                debugTools.MenuItems.Add("Export Last Game", FetchJson);
+                tools.MenuItems.Add("Open logs", OpenLogs);
+                tools.MenuItems.Add("Export Last Game", FetchJson);
+                tools.MenuItems.Add("-");
+                tools.MenuItems.Add("Output rating to text files", ToggleRatingTextFiles);
+                tools.MenuItems.Add("Configure stats output", OpenWinrates);
 
                 contextMenu.MenuItems.Add("Better Overwatch v" + AppData.initalize.Version);
                 contextMenu.MenuItems.Add("Login", LoginLogout);
@@ -29,7 +32,7 @@ namespace BetterOverwatch
                 contextMenu.MenuItems.Add("Upload screenshot of player list", ToggleUpload);
                 contextMenu.MenuItems.Add("Start with Windows", ToggleWindows);
                 contextMenu.MenuItems.Add("-");
-                contextMenu.MenuItems.Add(debugTools);
+                contextMenu.MenuItems.Add(tools);
                 contextMenu.MenuItems.Add("Exit", OnExit);
                 contextMenu.MenuItems[0].Enabled = false;
 
@@ -44,6 +47,10 @@ namespace BetterOverwatch
                     {
                         key?.SetValue("BetterOverwatch", "\"" + Application.ExecutablePath + "\"");
                     }
+                }
+                if (AppData.settings.outputToTextFiles)
+                {
+                    tools.MenuItems[3].Checked = true;
                 }
                 ChangeTray("Waiting for Overwatch, idle...", Resources.Icon);
                 trayIcon.ContextMenu = contextMenu;
@@ -61,6 +68,7 @@ namespace BetterOverwatch
         }
         private void OnExit(object sender, EventArgs e)
         {
+            winratesForm.Dispose();
             Application.Exit();
         }
         private void TrayPopup(string text, int timeout)
@@ -76,10 +84,13 @@ namespace BetterOverwatch
         {
             if (AppData.lastGameJSON.Length > 0)
             {
-                string path = Path.Combine(Path.GetTempPath(), "last-game.json");
-                File.WriteAllText(path, AppData.lastGameJSON);
-                Process.Start("notepad.exe", path);
-                TrayPopup("Last game successfully fetched", 3000);
+                try
+                {
+                    string path = Path.Combine(Path.GetTempPath(), "game.json");
+                    File.WriteAllText(path, AppData.lastGameJSON);
+                    Process.Start("notepad.exe", path);
+                    TrayPopup("Last game successfully fetched", 3000);
+                }catch { }
             }
             else
             {
@@ -95,19 +106,23 @@ namespace BetterOverwatch
         }
         private void ToggleUpload(object sender, EventArgs e)
         {
-            if (contextMenu.MenuItems[3].Checked)
-            {
-                contextMenu.MenuItems[3].Checked = false;
-            }
-            else
-            {
-                contextMenu.MenuItems[3].Checked = true;
-            }
+            contextMenu.MenuItems[3].Checked = !contextMenu.MenuItems[3].Checked;
             AppData.settings.uploadScreenshot = contextMenu.MenuItems[3].Checked;
             Settings.Save();
         }
+        private void ToggleRatingTextFiles(object sender, EventArgs e)
+        {
+            tools.MenuItems[3].Checked = !tools.MenuItems[3].Checked;
+            AppData.settings.outputToTextFiles = tools.MenuItems[3].Checked;
+            Settings.Save();
+        }
+        private void OpenWinrates(object sender, EventArgs e)
+        {
+            winratesForm.Show();
+        }
         private void ToggleWindows(object sender, EventArgs e)
         {
+            contextMenu.MenuItems[4].Checked = !contextMenu.MenuItems[4].Checked;
             if (contextMenu.MenuItems[4].Checked)
             {
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
@@ -117,7 +132,6 @@ namespace BetterOverwatch
                         key.DeleteValue("BetterOverwatch");
                     }
                 }
-                contextMenu.MenuItems[4].Checked = false;
             }
             else
             {
@@ -128,7 +142,6 @@ namespace BetterOverwatch
                         key.SetValue("BetterOverwatch", "\"" + Application.ExecutablePath + "\"");
                     }
                 }
-                contextMenu.MenuItems[4].Checked = true;
             }
             AppData.settings.startWithWindows = contextMenu.MenuItems[4].Checked;
             Settings.Save();

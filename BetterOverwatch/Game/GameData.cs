@@ -2,19 +2,28 @@
 using System.Diagnostics;
 using System.Drawing;
 using BetterOverwatch.DataObjects;
+using BetterOverwatch.Game.Objects;
 using Newtonsoft.Json;
 
 namespace BetterOverwatch.Game
 {
     class GameData : CompetitiveGame
     {
-        public GameData(int rating = 0)
+        public GameData(Ratings currentRatings = null)
         {
-            currentRating = rating;
+            if (currentRatings == null)
+            {
+                currentRatings = new Ratings();
+            }
+            this.currentRatings.tank = currentRatings.tank;
+            this.currentRatings.damage = currentRatings.damage;
+            this.currentRatings.support = currentRatings.support;
             privateToken = AppData.settings.privateToken;
         }
         [JsonIgnore]
-        public int currentRating;
+        public Ratings currentRatings = new Ratings();
+        [JsonIgnore]
+        public Ratings startRatings = new Ratings();
         [JsonIgnore]
         public int objectiveTicks = 0;
         [JsonIgnore]
@@ -36,28 +45,33 @@ namespace BetterOverwatch.Game
         {
             battleTag = BattleTag.ReadFromMemory();
             duration = (int)timer.Elapsed.TotalSeconds;
-            endRating = currentRating;
 
+            foreach(HeroPlayed hero in heroesPlayed)
+            {
+                if (hero.RolePlayed() == "tank")
+                {
+                    startRating = startRatings.tank;
+                    endRating = currentRatings.tank;
+                    break;
+                }
+                else if (hero.RolePlayed() == "damage")
+                {
+                    startRating = startRatings.damage;
+                    endRating = currentRatings.damage;
+                    break;
+                }
+                else if (hero.RolePlayed() == "support")
+                {
+                    startRating = startRatings.support;
+                    endRating = currentRatings.support;
+                    break;
+                }
+            }
             if (AppData.settings.uploadScreenshot && playerListImage != null)
             {
                 playerListImageBase64 = Convert.ToBase64String(Functions.ImageToBytes(Functions.ReduceImageSize(playerListImage, 70)));
             }
-            if (players.Count >= 12)
-            {
-                // put yourself into the playerlist for accuracy
-                if (!battleTag.Equals("PLAYER-0000"))
-                {
-                    string[] btagSplit = battleTag.Split('-');
-                    if (btagSplit.Length > 1)
-                    {
-                        players[0].name = btagSplit[0].ToUpper();
-                    }
-                }
-            }
-            else
-            {
-                players.Clear();
-            }
+            if (players.Count != 12) players.Clear();
 
             return JsonConvert.SerializeObject(this, Formatting.None);
         }

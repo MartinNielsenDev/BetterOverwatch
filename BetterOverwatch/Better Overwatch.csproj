@@ -98,6 +98,12 @@
     <Compile Include="DataObjects\CompetitiveGame.cs" />
     <Compile Include="DataObjects\Initialize.cs" />
     <Compile Include="DataObjects\ServerOutput.cs" />
+    <Compile Include="Forms\WinratesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\WinratesForm.Designer.cs">
+      <DependentUpon>WinratesForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ScreenCaptureHandler.cs" />
     <Compile Include="Forms\AdminPromptForm.cs">
       <SubType>Form</SubType>
@@ -108,7 +114,6 @@
     <Compile Include="DataObjects\GitHub.cs" />
     <Compile Include="DataObjects\SemanticVersion.cs" />
     <Compile Include="Game\Objects\HeroPlayed.cs" />
-    <Compile Include="Game\Objects\Map.cs" />
     <Compile Include="Game\Objects\Player.cs" />
     <Compile Include="Game\Objects\Stat.cs" />
     <Compile Include="GameMethods.cs" />
@@ -144,6 +149,9 @@
     <EmbeddedResource Include="Forms\AdminPromptForm.resx">
       <DependentUpon>AdminPromptForm.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\WinratesForm.resx">
+      <DependentUpon>WinratesForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -224,7 +232,7 @@
     <EmbeddedResource Include="Resources\SharpDX.dll" />
     <EmbeddedResource Include="Resources\SharpDX.DXGI.dll" />
     <EmbeddedResource Include="Resources\Newtonsoft.Json.dll" />
-	<EmbeddedResource Include="Resources\NeuralNetwork.dll" />
+    <EmbeddedResource Include="Resources\NeuralNetwork.dll" />
     <Content Include="Resources\Icon.ico" />
     <Content Include="Resources\Icon_Active.ico" />
     <Content Include="Resources\Icon_Record.ico" />
@@ -237,9 +245,9 @@
     <None Include="Resources\raw_ranks\Silver.png" />
     <None Include="Resources\raw_ranks\Unranked.png" />
     <None Include="Resources\success.wav" />
-	<None Include="Resources\success_new.wav" />
+    <None Include="Resources\success_new.wav" />
     <None Include="Resources\Icon_Small.png" />
-	<None Include="Resources\Icon_Download.png" />
+    <None Include="Resources\Icon_Download.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

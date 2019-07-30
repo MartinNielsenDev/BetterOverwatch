@@ -6,7 +6,7 @@ namespace BetterOverwatch
     class Constants
     {
         public static string[] mapList = { "Hanamura", "Horizon Lunar Colony", "Temple of Anubis", "Volskaya Industries", "Blizzard World", "Eichenwalde", "Hollywood", "King's Row", "Numbani", "Ilios", "Lijiang Tower", "Nepal", "Oasis", "Dorado", "Junkertown", "Route 66", "Watchpoint Gibraltar", "Rialto", "Busan", "Paris", "Havana" };
-        public static string[] heroComparerList = { "GGGMFIST", "GENJI", "MCCREE", "PHARAH", "REAPER", "SOLDIERZS", "SOMBRA", "TRACER", "BASTION", "HANZG", "JUHKRAT", "MEI", "TDRBJGRN", "WIDOWMAKER", "DVA", "ORISA", "REINHARDT", "RGADHOG", "WINSTON", "ZARYA", "AHA", "BRIGITTE", "LUCIO", "MERCY", "MOIRA", "SYMMETRA", "ZENYATTA", "WRECKIHGBAL", "ASHE", "BAPTISTE" };
+        public static string[] heroComparerList = { "GGGMFIST", "GENJI", "MCCREE", "PHARAH", "REAPER", "SOLDIERZS", "SOMBRA", "TRACER", "BASTION", "HANZG", "JUHKRAT", "MEI", "TDRBJGRN", "WIDOWMAKER", "DVA", "ORISA", "REINHARDT", "RGADHOG", "WINSTON", "ZARYA", "AHA", "BRIGITTE", "LUCIO", "MERCY", "MOIRA", "SYMMETRA", "ZENYATTA", "WRECKIHGBAL", "ASHE", "BAPTISTE", "SIGMA" };
         public static Hero[] heroList =
         {
             new Hero("Doomfist", new int[]
@@ -17,7 +17,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 2
-            }),
+            }, "damage"),
             new Hero("Genji", new int[]
             {
                 0,
@@ -26,7 +26,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 0
-            }),
+            }, "damage"),
             new Hero("McCree", new int[]
             {
                 0,
@@ -35,7 +35,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 1
-            }),
+            }, "damage"),
             new Hero("Pharah", new int[]
             {
                 0,
@@ -44,7 +44,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 0
-            }),
+            }, "damage"),
             new Hero("Reaper", new int[]
             {
                 0,
@@ -53,7 +53,7 @@ namespace BetterOverwatch
                 2,
                 1,
                 0
-            }),
+            }, "damage"),
             new Hero("Soldier: 76", new int[]
             {
                 0,
@@ -62,7 +62,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 0
-            }),
+            }, "damage"),
             new Hero("Sombra", new int[]
             {
                 0,
@@ -71,7 +71,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 0
-            }),
+            }, "damage"),
             new Hero("Tracer", new int[]
             {
                 0,
@@ -80,7 +80,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 0
-            }),
+            }, "damage"),
             new Hero("Bastion", new int[]
             {
                 0,
@@ -89,7 +89,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 2
-            }),
+            }, "damage"),
             new Hero("Hanzo", new int[]
             {
                 0,
@@ -98,7 +98,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 1
-            }),
+            }, "damage"),
             new Hero("Junkrat", new int[]
             {
                 0,
@@ -107,7 +107,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 0
-            }),
+            }, "damage"),
             new Hero("Mei", new int[]
             {
                 2,
@@ -116,7 +116,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 0
-            }),
+            }, "damage"),
             new Hero("Torbjörn", new int[]
             {
                 0,
@@ -125,7 +125,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 2
-            }),
+            }, "damage"),
             new Hero("Widowmaker", new int[]
             {
                 1,
@@ -134,7 +134,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 0
-            }),
+            }, "damage"),
             new Hero("D.va", new int[]
             {
                 0,
@@ -143,7 +143,7 @@ namespace BetterOverwatch
                 1,
                 2,
                 0
-            }),
+            }, "tank"),
             new Hero("Orisa", new int[]
             {
                 0,
@@ -152,7 +152,7 @@ namespace BetterOverwatch
                 2,
                 2,
                 0
-            }),
+            }, "tank"),
             new Hero("Reinhardt", new int[]
             {
                 2,
@@ -161,7 +161,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 0
-            }),
+            }, "tank"),
             new Hero("Roadhog", new int[]
             {
                 0,
@@ -170,7 +170,7 @@ namespace BetterOverwatch
                 2,
                 1,
                 1
-            }),
+            }, "tank"),
             new Hero("Winston", new int[]
             {
                 2,
@@ -179,7 +179,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 0
-            }),
+            }, "tank"),
             new Hero("Zarya", new int[]
             {
                 2,
@@ -188,7 +188,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 0
-            }),
+            }, "tank"),
             new Hero("Ana", new int[]
             {
                 0,
@@ -197,7 +197,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 0
-            }),
+            }, "support"),
             new Hero("Brigitte", new int[]
             {
                 1,
@@ -206,7 +206,7 @@ namespace BetterOverwatch
                 0,
                 2,
                 0
-            }),
+            }, "support"),
             new Hero("Lúcio", new int[]
             {
                 0,
@@ -215,7 +215,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 0
-            }),
+            }, "support"),
             new Hero("Mercy", new int[]
             {
                 1,
@@ -224,7 +224,7 @@ namespace BetterOverwatch
                 2,
                 1,
                 0
-            }),
+            }, "support"),
             new Hero("Moira", new int[]
             {
                 0,
@@ -233,7 +233,7 @@ namespace BetterOverwatch
                 2,
                 1,
                 2
-            }),
+            }, "support"),
             new Hero("Symmetra", new int[]
             {
                 1,
@@ -242,7 +242,7 @@ namespace BetterOverwatch
                 0,
                 2,
                 0
-            }),
+            }, "damage"),
             new Hero("Zenyatta", new int[]
             {
                 0,
@@ -251,7 +251,7 @@ namespace BetterOverwatch
                 2,
                 1,
                 0
-            }),
+            }, "support"),
             new Hero("Wrecking Ball", new int[]
             {
                 0,
@@ -260,7 +260,7 @@ namespace BetterOverwatch
                 1,
                 1,
                 1
-            }),
+            }, "tank"),
             new Hero("Ashe", new int[]
             {
                 0,
@@ -269,7 +269,7 @@ namespace BetterOverwatch
                 1,
                 0,
                 1
-            }),
+            }, "damage"),
             new Hero("Baptiste", new int[]
             {
                 0,
@@ -278,7 +278,16 @@ namespace BetterOverwatch
                 1,
                 2,
                 1
-            })
+            }, "support"),
+            new Hero("Sigma", new int[]
+            {
+                2,
+                1,
+                0,
+                1,
+                2,
+                0
+            }, "tank")
         };
         public static int[][] heroStatsPositions = {
             new int[]{ 1030, 894},
@@ -301,10 +310,12 @@ namespace BetterOverwatch
     {
         public string name;
         public int[] statSettings;
-        public Hero(string name, int[] statSetting)
+        public string role;
+        public Hero(string name, int[] statSettings, string role)
         {
             this.name = name;
-            this.statSettings = statSetting;
+            this.statSettings = statSettings;
+            this.role = role;
         }
     }
 }

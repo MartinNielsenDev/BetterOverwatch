@@ -175,6 +175,31 @@ namespace BetterOverwatch
             return (correctPixels / (double)(image.Width * image.Height));
 
         }
+        public static bool BitmapIsCertainColor(Bitmap image, int red, int green, int blue)
+        {
+            BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, image.PixelFormat);
+
+            unsafe
+            {
+                for (int y = 0; y < image.Height; y++)
+                {
+                    byte* row = (byte*)data.Scan0 + (y * data.Stride);
+
+                    for (int x = 0; x < image.Width; x++)
+                    {
+                        int b = row[x * 4];
+                        int g = row[(x * 4) + 1];
+                        int r = row[(x * 4) + 2];
+
+                        if (blue - b > 8 || green - g > 8 || red - r > 8)
+                            return false;
+                    }
+                }
+            }
+            image.UnlockBits(data);
+
+            return true;
+        }
         public static void InvertColors(Bitmap image)
         {
             BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, image.PixelFormat);
@@ -270,7 +295,7 @@ namespace BetterOverwatch
                     AdjustContrast(result, 255f, invertColors, limeToWhite);
                 }
                 output = FetchTextFromImage(result, network);
-
+                //result.Save(@"C:\test\" + Guid.NewGuid() + ".png");
                 result.Dispose();
             }
             catch { }

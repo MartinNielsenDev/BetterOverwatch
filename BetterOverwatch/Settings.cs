@@ -10,6 +10,8 @@ namespace BetterOverwatch
         public string publicToken = "";
         public bool uploadScreenshot = true;
         public bool startWithWindows = true;
+        public bool outputToTextFiles = false;
+        public bool outputStatsToTextFile = false;
         public static void Load()
         {
             BetterOverwatchNetworks.Load();

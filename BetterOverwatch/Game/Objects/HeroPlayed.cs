@@ -11,5 +11,16 @@
             this.name = name;
             this.startTime = startTime;
         }
+        public string RolePlayed()
+        {
+            foreach(Hero hero in Constants.heroList)
+            {
+                if(hero.name == name)
+                {
+                    return hero.role;
+                }
+            }
+            return string.Empty;
+        }
     }
 }
