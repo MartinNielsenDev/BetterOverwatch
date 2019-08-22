@@ -16,16 +16,15 @@ namespace BetterOverwatch
         }
         public static void ReadRoleRatings(Bitmap frame)
         {
-            int tankRating = 0, damageRating = 0, supportRating = 0;
             bool tankCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 552, 560, 182, 1), 255, 255, 255);
             bool damageCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 869, 560, 182, 1), 255, 255, 255);
             bool supportCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 1186, 560, 182, 1), 255, 255, 255);
+            int tankRating = 0, damageRating = 0, supportRating = 0;
             string debugString = "";
-            short radius = 170;
 
             if (tankCheck)
             {
-                string tankRatingText = Functions.BitmapToText(frame, 625, 594, 62, 38, false, radius, Network.TeamSkillRating, true);
+                string tankRatingText = Functions.BitmapToText(frame, 625, 594, 62, 38, true, 110, Network.Ratings, true);
 
                 if (tankRatingText.Length > 4)
                 {
@@ -42,7 +41,7 @@ namespace BetterOverwatch
             }
             if (damageCheck)
             {
-                string damageRatingText = Functions.BitmapToText(frame, 942, 594, 62, 38, false, radius, Network.TeamSkillRating, true);
+                string damageRatingText = Functions.BitmapToText(frame, 942, 594, 62, 38, true, 110, Network.Ratings, true);
 
                 if (damageRatingText.Length > 4)
                 {
@@ -59,7 +58,7 @@ namespace BetterOverwatch
             }
             if (supportCheck)
             {
-                string supportRatingText = Functions.BitmapToText(frame, 1260, 594, 62, 38, false, radius, Network.TeamSkillRating, true);
+                string supportRatingText = Functions.BitmapToText(frame, 1260, 594, 62, 38, true, 110, Network.Ratings, true);
 
                 if (supportRatingText.Length > 4)
                 {
@@ -75,12 +74,12 @@ namespace BetterOverwatch
                 }
             }
 
-            if (tankCheck && AppData.gameData.currentRatings.tank != tankRating ||
-                damageCheck && AppData.gameData.currentRatings.damage != damageRating ||
+            if ((tankCheck || damageCheck || supportCheck) &&
+                (tankCheck && AppData.gameData.currentRatings.tank != tankRating ||
+                 damageCheck && AppData.gameData.currentRatings.damage != damageRating ||
                 supportCheck && AppData.gameData.currentRatings.support != supportRating ||
-                AppData.gameData.state >= State.Finished)
+                AppData.gameData.state >= State.Recording))
             {
-
                 if (tankCheck)
                 {
                     AppData.gameData.currentRatings.tank = tankRating;
@@ -107,17 +106,17 @@ namespace BetterOverwatch
                 }
                 AppData.successSound.Play();
                 Functions.DebugMessage($"Recognized rating:{debugString}");
-                ScreenCaptureHandler.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);
-            }
-            AppData.gameData.timer.Stop();
 
-            if (AppData.gameData.state == State.Recording ||
-                AppData.gameData.state == State.RoundComplete ||
-                AppData.gameData.state == State.Finished ||
-                AppData.gameData.state == State.WaitForUpload)
-            {
-                Server.CheckGameUpload();
-                AppData.gameData = new GameData(AppData.gameData.currentRatings);
+                if (AppData.gameData.state >= State.Recording)
+                {
+                    AppData.gameData.timer.Stop();
+                    Server.CheckGameUpload();
+                    AppData.gameData = new GameData(AppData.gameData.currentRatings);
+                }
+                else
+                {
+                    ScreenCaptureHandler.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);
+                }
             }
         }
         public static int[] ReadHeroStats(Bitmap frame, int[] statSettings)

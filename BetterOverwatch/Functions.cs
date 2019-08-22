@@ -566,7 +566,7 @@ namespace BetterOverwatch
             {
                 return Convert.ToChar('A' + bestNode).ToString();
             }
-            if (networkId == Network.TeamSkillRating || networkId == Network.Numbers)
+            if (networkId == Network.TeamSkillRating || networkId == Network.Ratings || networkId == Network.Numbers)
             {
                 return bestNode.ToString();
             }
@@ -593,6 +593,13 @@ namespace BetterOverwatch
                     {
                         text += FetchLetterFromImage(BetterOverwatchNetworks.teamSkillRatingNN, bitmaps[i], network);
                     }
+                    else if(network == Network.Ratings)
+                    {
+                        //StringBuilder sb = GetHashFromImage(bitmaps[i]);
+                        //bitmaps[i].Save($@"D:\Repos\Visual Studio 2019\NeuralNetwork.Trainer\NeuralNetwork.Trainer\TrainData\ratings_rolequeue\test_data\{FetchLetterFromImage(BetterOverwatchNetworks.ratingsNN, bitmaps[i], network)}_{sb.ToString()}.png");
+
+                        text += FetchLetterFromImage(BetterOverwatchNetworks.ratingsNN, bitmaps[i], network);
+                    }
                     else if (network == Network.Numbers)
                     {
                         text += FetchLetterFromImage(BetterOverwatchNetworks.numbersNN, bitmaps[i], network);
@@ -605,7 +612,7 @@ namespace BetterOverwatch
                     {
                         text += FetchLetterFromImage(BetterOverwatchNetworks.playersNN, bitmaps[i], network);
                     }
-                    //bitmaps[i].Save(@"C:\test\" + Guid.NewGuid() + ".png");
+                    //bitmaps[i].Save($@"C:\test\{text}_{Guid.NewGuid()}.png");
                     bitmaps[i].Dispose();
                 }
             }
@@ -634,8 +641,29 @@ namespace BetterOverwatch
             catch { }
             Debug.WriteLine(msg);
         }
+        private static StringBuilder GetHashFromImage(Bitmap bitmap) // DEBUG
+        {
+            byte[] bytes;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bitmap.Save(ms, ImageFormat.Png); // gif for example
+                bytes = ms.ToArray();
+            }
+            System.Security.Cryptography.MD5CryptoServiceProvider md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+            byte[] hash = md5.ComputeHash(bytes);
+
+            // make a hex string of the hash for display or whatever
+            StringBuilder sb = new StringBuilder();
+            foreach (byte b in hash)
+            {
+                sb.Append(b.ToString("x2").ToLower());
+            }
+
+            return sb;
+        }
         /*
  * UNUSED METHODS
+
 private static Bitmap Downscale(Image original)
 {
     double widthPercent = (double)original.Width / 1920 * 1366;

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using BetterOverwatch.DataObjects;
 using BetterOverwatch.Forms;
+using BetterOverwatch.Properties;
 using Newtonsoft.Json;
 
 namespace BetterOverwatch.Networking
@@ -185,6 +186,7 @@ namespace BetterOverwatch.Networking
 
                             if (result.success)
                             {
+                                ScreenCaptureHandler.trayMenu.ChangeTray("Previous game successfully uploaded", Resources.Icon_Active);
                                 Functions.DebugMessage("Successfully uploaded game");
                                 break;
                             }

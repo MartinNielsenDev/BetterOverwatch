@@ -40,6 +40,7 @@ namespace BetterOverwatch
     {
         Maps = 0,
         TeamSkillRating = 1,
+        Ratings = 5,
         Numbers = 2,
         HeroNames = 3,
         PlayerNames = 4
