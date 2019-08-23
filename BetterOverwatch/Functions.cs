@@ -191,7 +191,7 @@ namespace BetterOverwatch
                         int g = row[(x * 4) + 1];
                         int r = row[(x * 4) + 2];
 
-                        if (blue - b > 8 || green - g > 8 || red - r > 8)
+                        if (blue - b > 12 || green - g > 12 || red - r > 12)
                             return false;
                     }
                 }
@@ -225,27 +225,32 @@ namespace BetterOverwatch
         }
         public static double CompareStrings(string string1, string string2)
         {
-            string1 = string1.ToLower();
-            string2 = string2.ToLower();
-            int[,] d = new int[string1.Length + 1, string2.Length + 1];
-
-            if (string1.Length == 0) return string2.Length;
-            if (string2.Length == 0) return string1.Length;
-            for (int i = 0; i <= string1.Length; d[i, 0] = i++) { }
-            for (int j = 0; j <= string2.Length; d[0, j] = j++) { }
-
-            for (int i = 1; i <= string1.Length; i++)
+            try
             {
-                for (int j = 1; j <= string2.Length; j++)
+                string1 = string1.ToLower();
+                string2 = string2.ToLower();
+                int[,] d = new int[string1.Length + 1, string2.Length + 1];
+
+                if (string1.Length == 0) return string2.Length;
+                if (string2.Length == 0) return string1.Length;
+                for (int i = 0; i <= string1.Length; d[i, 0] = i++) { }
+                for (int j = 0; j <= string2.Length; d[0, j] = j++) { }
+
+                for (int i = 1; i <= string1.Length; i++)
                 {
-                    int cost = (string2[j - 1] == string1[i - 1]) ? 0 : 1;
+                    for (int j = 1; j <= string2.Length; j++)
+                    {
+                        int cost = (string2[j - 1] == string1[i - 1]) ? 0 : 1;
 
-                    d[i, j] = Math.Min(Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1), d[i - 1, j - 1] + cost);
+                        d[i, j] = Math.Min(Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1), d[i - 1, j - 1] + cost);
+                    }
                 }
-            }
-            int big = Math.Max(string1.Length, string2.Length);
+                int big = Math.Max(string1.Length, string2.Length);
 
-            return Math.Floor(Convert.ToDouble(big - d[string1.Length, string2.Length]) / Convert.ToDouble(big) * 100);
+                return Math.Floor(Convert.ToDouble(big - d[string1.Length, string2.Length]) / Convert.ToDouble(big) * 100);
+            }
+            catch (Exception e) { Console.WriteLine($"CompareStrings error: {e}"); }
+            return 0.00;
         }
         public static string CheckMaps(string input)
         {
@@ -295,10 +300,10 @@ namespace BetterOverwatch
                     AdjustContrast(result, 255f, invertColors, limeToWhite);
                 }
                 output = FetchTextFromImage(result, network);
-                //result.Save(@"C:\test\" + Guid.NewGuid() + ".png");
+
                 result.Dispose();
             }
-            catch { }
+            catch (Exception e) { Console.WriteLine($"BitmapToText error: {e}"); }
             return output;
         }
         public static int[,] LabelImage(Bitmap image, out int labelCount)
@@ -593,11 +598,8 @@ namespace BetterOverwatch
                     {
                         text += FetchLetterFromImage(BetterOverwatchNetworks.teamSkillRatingNN, bitmaps[i], network);
                     }
-                    else if(network == Network.Ratings)
+                    else if (network == Network.Ratings)
                     {
-                        //StringBuilder sb = GetHashFromImage(bitmaps[i]);
-                        //bitmaps[i].Save($@"D:\Repos\Visual Studio 2019\NeuralNetwork.Trainer\NeuralNetwork.Trainer\TrainData\ratings_rolequeue\test_data\{FetchLetterFromImage(BetterOverwatchNetworks.ratingsNN, bitmaps[i], network)}_{sb.ToString()}.png");
-
                         text += FetchLetterFromImage(BetterOverwatchNetworks.ratingsNN, bitmaps[i], network);
                     }
                     else if (network == Network.Numbers)
@@ -612,7 +614,7 @@ namespace BetterOverwatch
                     {
                         text += FetchLetterFromImage(BetterOverwatchNetworks.playersNN, bitmaps[i], network);
                     }
-                    //bitmaps[i].Save($@"C:\test\{text}_{Guid.NewGuid()}.png");
+
                     bitmaps[i].Dispose();
                 }
             }
@@ -641,7 +643,9 @@ namespace BetterOverwatch
             catch { }
             Debug.WriteLine(msg);
         }
-        private static StringBuilder GetHashFromImage(Bitmap bitmap) // DEBUG
+        /*
+ * UNUSED METHODS
+         private static StringBuilder GetHashFromImage(Bitmap bitmap) // DEBUG
         {
             byte[] bytes;
             using (MemoryStream ms = new MemoryStream())
@@ -661,9 +665,6 @@ namespace BetterOverwatch
 
             return sb;
         }
-        /*
- * UNUSED METHODS
-
 private static Bitmap Downscale(Image original)
 {
     double widthPercent = (double)original.Width / 1920 * 1366;

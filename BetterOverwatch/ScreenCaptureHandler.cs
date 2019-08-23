@@ -10,6 +10,11 @@ namespace BetterOverwatch
 {
     class ScreenCaptureHandler
     {
+        #if DEBUG
+        public static bool debug = true;
+        #else
+        public static bool debug = false;
+        #endif
         public static bool captureScreen = false;
         private static DesktopDuplicator desktopDuplicator;
         public static TrayMenu trayMenu;
@@ -33,7 +38,7 @@ namespace BetterOverwatch
                     Thread.Sleep(1000);
                     continue;
                 }
-                if (!AppData.overwatchRunning)
+                if (!AppData.overwatchRunning && !debug)
                 {
                     if (Functions.IsProcessOpen("Overwatch"))
                     {
@@ -54,7 +59,7 @@ namespace BetterOverwatch
                 }
                 else
                 {
-                    if (!Functions.IsProcessOpen("Overwatch"))
+                    if (!Functions.IsProcessOpen("Overwatch") && !debug)
                     {
                         trayMenu.ChangeTray("Waiting for Overwatch, idle...", Resources.Icon);
                         AppData.overwatchRunning = false;
@@ -69,12 +74,12 @@ namespace BetterOverwatch
                         }
                     }
                 }
-                if (!AppData.overwatchRunning)
+                if (!AppData.overwatchRunning && !debug)
                 {
                     Thread.Sleep(500);
                     continue;
                 }
-                if (AppData.gameData.state == State.Recording && !Functions.ActiveWindowTitle().Equals("Overwatch"))
+                if (AppData.gameData.state == State.Recording && !Functions.ActiveWindowTitle().Equals("Overwatch") && !debug)
                 {
                     Thread.Sleep(500);
                     continue;
@@ -104,8 +109,18 @@ namespace BetterOverwatch
                             {
                                 if (GameMethods.IsOnCompetitiveScreen(frame.DesktopImage))
                                 {
-                                    Thread.Sleep(300);
-                                    GameMethods.ReadRoleRatings(frame.DesktopImage);
+                                    if (AppData.ratingsTimer.ElapsedMilliseconds > 150)
+                                    {
+                                        GameMethods.ReadRoleRatings(frame.DesktopImage);
+                                    }
+                                    else
+                                    {
+                                        AppData.ratingsTimer.Start();
+                                    }
+                                }
+                                else
+                                {
+                                    AppData.ratingsTimer.Reset();
                                 }
                             }
                             if (AppData.gameData.state == State.Idle || AppData.gameData.state == State.Finished || AppData.gameData.state == State.WaitForUpload)
@@ -145,14 +160,14 @@ namespace BetterOverwatch
                                         AppData.gameData.state = State.RoundComplete;
                                         AppData.gameData.timer.Start();
                                         AppData.statsTimer.Restart();
-                                        AppData.getInfoTimeout.Start();
+                                        AppData.getInfoTimeout.Restart();
                                         trayMenu.ChangeTray("Recording... visit the main menu after the game", Resources.Icon_Record);
                                     }
                                 }
                             }
                             if (AppData.gameData.state == State.Recording)
                             {
-                                if (AppData.gameData.tabPressed && AppData.gameData.tabTimer.ElapsedMilliseconds > 250)
+                                if (AppData.gameData.tabPressed && AppData.gameData.tabTimer.ElapsedMilliseconds > 250 || debug)
                                 {
                                     if (GameMethods.ReadHeroPlayed(frame.DesktopImage))
                                     {
@@ -171,6 +186,7 @@ namespace BetterOverwatch
                                 }
                                 else if (GameMethods.ReadRoundStarted(frame.DesktopImage) || AppData.getInfoTimeout.Elapsed.TotalSeconds > 80)
                                 {
+                                    Functions.DebugMessage("Waiting for doors to open...");
                                     AppData.getInfoTimeout.Restart();
                                     AppData.gameData.state = State.RoundBeginning;
                                 }
@@ -188,6 +204,7 @@ namespace BetterOverwatch
                                         AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].startTime = (int)AppData.gameData.gameTimer.Elapsed.TotalSeconds;
                                     }
                                     AppData.gameData.state = State.Recording;
+                                    Functions.DebugMessage($"Round started after {AppData.gameData.gameTimer.Elapsed.TotalSeconds} seconds, goodluck!");
                                 }
                                 else if (AppData.gameData.tabPressed && AppData.gameData.tabTimer.ElapsedMilliseconds > 250/*Functions.GetAsyncKeyState(0x09) < 0*/)
                                 {

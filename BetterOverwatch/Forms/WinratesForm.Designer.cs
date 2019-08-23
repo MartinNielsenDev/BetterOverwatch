@@ -85,7 +85,7 @@
             this.label3.Size = new System.Drawing.Size(287, 36);
             this.label3.TabIndex = 4;
             this.label3.Text = "Text in the box above will be written to stats.txt in the same folder as where Be" +
-    "tterOverwatch.exe is located.";
+    "tterOverwatch.exe is located after each game.";
             // 
             // button2
             // 
@@ -112,7 +112,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Stats Text Output";
+            this.Text = "Stats Text Formatter";
             this.Activated += new System.EventHandler(this.WinratesForm_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.WinratesForm_FormClosing);
             this.ResumeLayout(false);

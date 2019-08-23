@@ -22,7 +22,7 @@ namespace BetterOverwatch
         private static void Main()
         {
             AppData.initalize = new Initalize(
-                "1.4.3",
+                "1.4.4",
                 "betteroverwatch.com",
                 "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
             Application.EnableVisualStyles();

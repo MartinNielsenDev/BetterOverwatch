@@ -24,7 +24,8 @@ namespace BetterOverwatch
         public static Stopwatch 
             frameTimer = new Stopwatch(),
             getInfoTimeout = new Stopwatch(),
-            statsTimer = new Stopwatch();
+            statsTimer = new Stopwatch(),
+            ratingsTimer = new Stopwatch();
     }
     internal enum State
     {

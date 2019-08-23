@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using BetterOverwatch.Game;
@@ -85,7 +86,12 @@ namespace BetterOverwatch
                     AppData.gameData.currentRatings.tank = tankRating;
                     if (AppData.settings.outputToTextFiles)
                     {
-                        File.WriteAllText("tank.txt", tankRating.ToString());
+                        try
+                        {
+                            File.WriteAllText("tank.txt", tankRating.ToString());
+                            Functions.DebugMessage($"Updated tank.txt with '{tankRating}'");
+                        }
+                        catch (Exception e) { Functions.DebugMessage($"Failed to update tank.txt : {e.Message}"); }
                     }
                 }
                 if (damageCheck)
@@ -93,7 +99,12 @@ namespace BetterOverwatch
                     AppData.gameData.currentRatings.damage = damageRating;
                     if (AppData.settings.outputToTextFiles)
                     {
-                        File.WriteAllText("damage.txt", damageRating.ToString());
+                        try
+                        {
+                            File.WriteAllText("damage.txt", damageRating.ToString());
+                            Functions.DebugMessage($"Updated damage.txt with '{damageRating}'");
+                        }
+                        catch (Exception e) { Functions.DebugMessage($"Failed to update damage.txt : {e.Message}"); }
                     }
                 }
                 if (supportCheck)
@@ -101,7 +112,12 @@ namespace BetterOverwatch
                     AppData.gameData.currentRatings.support = supportRating;
                     if (AppData.settings.outputToTextFiles)
                     {
-                        File.WriteAllText("support.txt", supportRating.ToString());
+                        try
+                        {
+                            File.WriteAllText("support.txt", supportRating.ToString());
+                            Functions.DebugMessage($"Updated support.txt with '{supportRating}'");
+                        }
+                        catch (Exception e) { Functions.DebugMessage($"Failed to update support.txt : {e.Message}"); }
                     }
                 }
                 AppData.successSound.Play();
@@ -173,6 +189,7 @@ namespace BetterOverwatch
                 }
                 AppData.gameData.stats.Add(new Stat((int)AppData.gameData.gameTimer.Elapsed.TotalSeconds, eliminations, damage, objectiveKills, healing, deaths, heroStats));
                 AppData.statsTimer.Restart();
+                Functions.DebugMessage($"Hero stats recorded after {AppData.gameData.gameTimer.Elapsed.TotalSeconds} seconds");
             }
         }
         public static void ReadCompetitiveGameEntered(Bitmap frame)
@@ -214,7 +231,7 @@ namespace BetterOverwatch
                     {
                         AppData.gameData.map = mapText;
                         AppData.getInfoTimeout.Restart();
-                        Functions.DebugMessage("Recognized map: '" + mapText + "'");
+                        Functions.DebugMessage($"Recognized map: '{mapText}'");
                     }
                 }
             }
@@ -233,7 +250,7 @@ namespace BetterOverwatch
                     if (int.TryParse(team1Rating, out int rating) && rating > 999 && rating < 5000)
                     {
                         AppData.gameData.team1Rating = rating;
-                        Functions.DebugMessage("Recognized team 1 SR: '" + team1Rating + "'");
+                        Functions.DebugMessage($"Recognized team 1 rating: '{team1Rating}'");
                     }
                 }
             }
@@ -249,7 +266,7 @@ namespace BetterOverwatch
                     if (int.TryParse(team2Rating, out int rating) && rating > 999 && rating < 5000)
                     {
                         AppData.gameData.team2Rating = rating;
-                        Functions.DebugMessage("Recognized team 2 SR: '" + team2Rating + "'");
+                        Functions.DebugMessage($"Recognized team 2 rating: '{team2Rating}'");
                     }
                 }
             }
@@ -302,6 +319,7 @@ namespace BetterOverwatch
                         }
                         AppData.gameData.heroTimer.Restart();
                         AppData.gameData.heroesPlayed.Add(new HeroPlayed(Constants.heroList[h].name, (int)AppData.gameData.gameTimer.Elapsed.TotalSeconds));
+                        Functions.DebugMessage($"Now playing hero {Constants.heroList[h].name} at {AppData.gameData.gameTimer.Elapsed.TotalSeconds} seconds");
                         return true;
                     }
                 }
@@ -310,20 +328,20 @@ namespace BetterOverwatch
         }
         public static void ReadRoundCompleted(Bitmap frame)
         {
-            string roundCompletedText = Functions.BitmapToText(frame, 940, 160, 290, 76);
+            string roundCompletedText = Functions.BitmapToText(frame, 940, 160, 290, 80);
 
-            if (!roundCompletedText.Equals(string.Empty))
+            if (roundCompletedText != string.Empty && Functions.CompareStrings(roundCompletedText, "COMPLETE") >= 70)
             {
-                if (Functions.CompareStrings(roundCompletedText, "COMPLETED") >= 70)
+                if (AppData.gameData.heroesPlayed.Count > 0)
                 {
                     AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].time = (int)AppData.gameData.heroTimer.Elapsed.TotalSeconds;
-                    //Vars.gameData.heroesPlayed.Add(new HeroPlayed(Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].name, (int)Vars.gameData.gameTimer.Elapsed.TotalSeconds));
-                    AppData.gameData.state = State.RoundComplete;
-                    AppData.gameData.heroTimer.Stop();
-                    AppData.gameData.gameTimer.Stop();
-                    AppData.getInfoTimeout.Restart();
-                    Functions.DebugMessage($"Recognized round completed");
                 }
+                //Vars.gameData.heroesPlayed.Add(new HeroPlayed(Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].name, (int)Vars.gameData.gameTimer.Elapsed.TotalSeconds));
+                AppData.gameData.state = State.RoundComplete;
+                AppData.gameData.heroTimer.Stop();
+                AppData.gameData.gameTimer.Stop();
+                AppData.getInfoTimeout.Restart();
+                Functions.DebugMessage($"Recognized round completed");
             }
         }
         public static bool ReadRoundStarted(Bitmap frame)
@@ -412,14 +430,15 @@ namespace BetterOverwatch
                 playerNameX += 945;
                 playerRankX += 422;
             }
+            Functions.DebugMessage("Captured player list");
         }
         public static bool IsValidGame()
         {
-            if (AppData.gameData.timer.Elapsed.TotalSeconds < 300)
+            if (AppData.gameData.timer.Elapsed.TotalSeconds < 300 && !ScreenCaptureHandler.debug)
             {
                 if (AppData.gameData.state >= State.Recording)
                 {
-                    Functions.DebugMessage("Invalid game");
+                    Functions.DebugMessage($"Invalid game state={AppData.gameData.state} gameData.timer={AppData.gameData.timer.Elapsed.TotalSeconds}");
                     ScreenCaptureHandler.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);
                 }
                 return false;
