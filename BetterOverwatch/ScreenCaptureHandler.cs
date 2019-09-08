@@ -10,7 +10,7 @@ namespace BetterOverwatch
 {
     class ScreenCaptureHandler
     {
-        #if DEBUG
+#if DEBUG
         public static bool debug = true;
         #else
         public static bool debug = false;

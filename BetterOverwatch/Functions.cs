@@ -300,7 +300,10 @@ namespace BetterOverwatch
                     AdjustContrast(result, 255f, invertColors, limeToWhite);
                 }
                 output = FetchTextFromImage(result, network);
-
+                if(output.StartsWith("70"))
+                {
+                    //result.Save($@"C:\Users\Avoid\Desktop\test\{output}.png", ImageFormat.Png);
+                }
                 result.Dispose();
             }
             catch (Exception e) { Console.WriteLine($"BitmapToText error: {e}"); }

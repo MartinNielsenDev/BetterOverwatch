@@ -22,7 +22,7 @@ namespace BetterOverwatch
         private static void Main()
         {
             AppData.initalize = new Initalize(
-                "1.4.5",
+                "1.4.6",
                 "betteroverwatch.com",
                 "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
             Application.EnableVisualStyles();
@@ -32,7 +32,7 @@ namespace BetterOverwatch
 
             if (!mutex.WaitOne(TimeSpan.Zero, true))
             {
-                MessageBox.Show("Better Overwatch is already running\r\n\r\nYou must close other instances of Better Overwatch if you want to open this one", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Better Overwatch is already running\r\n\r\nYou must close other instances of Better Overwatch if you want to open this one", "Better Overwatch", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             AppDomain.CurrentDomain.AssemblyResolve += (s, assembly) =>
