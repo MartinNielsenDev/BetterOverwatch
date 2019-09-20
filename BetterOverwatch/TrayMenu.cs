@@ -122,28 +122,31 @@ namespace BetterOverwatch
         }
         private void ToggleWindows(object sender, EventArgs e)
         {
+            try
+            {
+                if (contextMenu.MenuItems[4].Checked)
+                {
+                    using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
+                    {
+                        if (key != null)
+                        {
+                            key.DeleteValue("BetterOverwatch");
+                        }
+                    }
+                }
+                else
+                {
+                    using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
+                    {
+                        if (key != null)
+                        {
+                            key.SetValue("BetterOverwatch", "\"" + Application.ExecutablePath + "\"");
+                        }
+                    }
+                }
+            }catch { }
+            AppData.settings.startWithWindows = !contextMenu.MenuItems[4].Checked;
             contextMenu.MenuItems[4].Checked = !contextMenu.MenuItems[4].Checked;
-            if (contextMenu.MenuItems[4].Checked)
-            {
-                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
-                {
-                    if (key != null)
-                    {
-                        key.DeleteValue("BetterOverwatch");
-                    }
-                }
-            }
-            else
-            {
-                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
-                {
-                    if (key != null)
-                    {
-                        key.SetValue("BetterOverwatch", "\"" + Application.ExecutablePath + "\"");
-                    }
-                }
-            }
-            AppData.settings.startWithWindows = contextMenu.MenuItems[4].Checked;
             Settings.Save();
         }
         private void OpenMatchHistory(object sender, EventArgs e)
