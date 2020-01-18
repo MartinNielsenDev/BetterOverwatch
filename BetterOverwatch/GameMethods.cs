@@ -13,19 +13,19 @@ namespace BetterOverwatch
     {
         public static bool IsOnCompetitiveScreen(Bitmap frame)
         {
-            return (Functions.BitmapToText(frame, 76, 204, 78, 28, false, 110, Network.Numbers, false) == "7029");
+            return Functions.CompareStrings(Functions.BitmapToText(frame, 73, 94, 622, 92, false, 110, Network.Maps, false), "COMPETITIVEPLAY") >= 80;
         }
         public static void ReadRoleRatings(Bitmap frame)
         {
-            bool tankCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 552, 560, 182, 1), 255, 255, 255);
-            bool damageCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 869, 560, 182, 1), 255, 255, 255);
-            bool supportCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 1186, 560, 182, 1), 255, 255, 255);
+            bool tankCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 581, 600, 200, 1), 255, 255, 255);
+            bool damageCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 861, 600, 200, 1), 255, 255, 255);
+            bool supportCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 1140, 600, 200, 1), 255, 255, 255);
             int tankRating = 0, damageRating = 0, supportRating = 0;
             string debugString = "";
 
             if (tankCheck)
             {
-                string tankRatingText = Functions.BitmapToText(frame, 625, 594, 62, 38, true, 110, Network.Ratings, true);
+                string tankRatingText = Functions.BitmapToText(frame, 662, 557, 61, 34, true, 110, Network.Ratings, true);
 
                 if (tankRatingText.Length > 4)
                 {
@@ -42,7 +42,7 @@ namespace BetterOverwatch
             }
             if (damageCheck)
             {
-                string damageRatingText = Functions.BitmapToText(frame, 942, 594, 62, 38, true, 110, Network.Ratings, true);
+                string damageRatingText = Functions.BitmapToText(frame, 941, 557, 61, 34, true, 110, Network.Ratings, true);
 
                 if (damageRatingText.Length > 4)
                 {
@@ -59,7 +59,7 @@ namespace BetterOverwatch
             }
             if (supportCheck)
             {
-                string supportRatingText = Functions.BitmapToText(frame, 1260, 594, 62, 38, true, 110, Network.Ratings, true);
+                string supportRatingText = Functions.BitmapToText(frame, 1221, 557, 61, 34, true, 110, Network.Ratings, true);
 
                 if (supportRatingText.Length > 4)
                 {
@@ -189,7 +189,7 @@ namespace BetterOverwatch
                 }
                 AppData.gameData.stats.Add(new Stat((int)AppData.gameData.gameTimer.Elapsed.TotalSeconds, eliminations, damage, objectiveKills, healing, deaths, heroStats));
                 AppData.statsTimer.Restart();
-                Functions.DebugMessage($"Hero stats recorded after {AppData.gameData.gameTimer.Elapsed.TotalSeconds} seconds");
+                Functions.DebugMessage($"Hero stats recorded after {(int)Math.Floor(AppData.gameData.gameTimer.Elapsed.TotalSeconds)} seconds");
             }
         }
         public static void ReadCompetitiveGameEntered(Bitmap frame)

@@ -614,8 +614,12 @@ namespace BetterOverwatch
                     {
                         text += FetchLetterFromImage(BetterOverwatchNetworks.playersNN, bitmaps[i], network);
                     }
-
-                    bitmaps[i].Dispose();
+                    if(text == "0")
+                    {
+                        //bitmaps[i].Save("C:/test/" + Guid.NewGuid() + ".png", ImageFormat.Bmp);
+                    }
+                    
+                    bitmaps[i].Dispose(); 
                 }
             }
             catch (Exception e)

@@ -204,7 +204,8 @@ namespace BetterOverwatch
                                         AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].startTime = (int)AppData.gameData.gameTimer.Elapsed.TotalSeconds;
                                     }
                                     AppData.gameData.state = State.Recording;
-                                    Functions.DebugMessage($"Round started after {AppData.gameData.gameTimer.Elapsed.TotalSeconds} seconds, goodluck!");
+                                    int roundedSecs = AppData.gameData.gameTimer.Elapsed.TotalSeconds < 2000 ? (int)Math.Floor(AppData.gameData.gameTimer.Elapsed.TotalSeconds) : 0;
+                                    Functions.DebugMessage($"Round started after {roundedSecs} seconds, goodluck!");
                                 }
                                 else if (AppData.gameData.tabPressed && AppData.gameData.tabTimer.ElapsedMilliseconds > 250/*Functions.GetAsyncKeyState(0x09) < 0*/)
                                 {
