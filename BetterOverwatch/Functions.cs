@@ -59,22 +59,23 @@ namespace BetterOverwatch
         }
         public static void AdjustContrast(Bitmap image, float value, bool invertColors = false, bool limeToWhite = false)
         {
-            BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, image.PixelFormat);
+            BitmapData bitmapData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, image.PixelFormat);
             int width = image.Width;
             int height = image.Height;
+            int imageBytes = Image.GetPixelFormatSize(bitmapData.PixelFormat) / 8;
 
             unsafe
             {
-                for (int y = 0; y < height; ++y)
-                {
-                    byte* row = (byte*)data.Scan0 + (y * data.Stride);
-                    int columnOffset = 0;
+                byte* rgb = (byte*)bitmapData.Scan0;
 
-                    for (int x = 0; x < width; ++x)
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
                     {
-                        byte b = row[columnOffset];
-                        byte g = row[columnOffset + 1];
-                        byte r = row[columnOffset + 2];
+                        int pos = (y * bitmapData.Stride) + (x * imageBytes);
+                        byte b = rgb[pos];
+                        byte g = rgb[pos + 1];
+                        byte r = rgb[pos + 2];
 
                         float red = r / 255.0f;
                         float green = g / 255.0f;
@@ -112,17 +113,14 @@ namespace BetterOverwatch
                         {
                             iB = 255;
                         }
-
-                        row[columnOffset] = (byte)iB;
-                        row[columnOffset + 1] = (byte)iG;
-                        row[columnOffset + 2] = (byte)iR;
-
-                        columnOffset += 4;
+                        rgb[pos] = (byte)iB;
+                        rgb[pos + 1] = (byte)iG;
+                        rgb[pos + 2] = (byte)iR;
                     }
                 }
             }
 
-            image.UnlockBits(data);
+            image.UnlockBits(bitmapData);
         }
         public static byte[] GetPixelAtPosition(Bitmap image, int pixelX, int pixelY)
         {
@@ -287,7 +285,7 @@ namespace BetterOverwatch
             string output = string.Empty;
             try
             {
-                Bitmap result = new Bitmap(frame.Clone(new Rectangle(x, y, width, height), PixelFormat.Format32bppArgb));
+                Bitmap result = frame.Clone(new Rectangle(x, y, width, height), PixelFormat.Format24bppRgb);
 
                 if (contrastFirst)
                 {
@@ -299,8 +297,8 @@ namespace BetterOverwatch
                     result = AdjustColors(result, radius, red, green, blue, fillOutside);
                     AdjustContrast(result, 255f, invertColors, limeToWhite);
                 }
+
                 output = FetchTextFromImage(result, network);
-                //result.Save($@"C:\Users\Avoid\Desktop\test\{output}.png", ImageFormat.Png);
                 result.Dispose();
             }
             catch (Exception e) { Console.WriteLine($"BitmapToText error: {e}"); }
@@ -317,18 +315,18 @@ namespace BetterOverwatch
 
             unsafe
             {
-                byte* ptr = (byte*)bitmapData.Scan0;
+                byte* rgb = (byte*)bitmapData.Scan0;
 
-                for (int i = 0; i < image.Height; i++)
+                for (int x = 0; x < bitmapData.Width; x++)
                 {
-                    for (int j = 0; j < image.Width; j++)
+                    for (int y = 0; y < bitmapData.Height; y++)
                     {
-                        if (ptr != null)
+                        int pos = (y * bitmapData.Stride) + (x * imageBytes);
+                        if (rgb != null)
                         {
-                            img[i, j] = (ptr[0] + ptr[1] + ptr[2]) / 3;
-                            label[i, j] = 0;
+                            img[y, x] = (rgb[pos] + rgb[pos + 1] + rgb[pos + 2]) / 3;
+                            label[y, x] = 0;
                         }
-                        ptr += imageBytes;
                     }
                 }
             }
@@ -441,7 +439,7 @@ namespace BetterOverwatch
 
             return label;
         }
-        public static List<Bitmap> GetConnectedComponentLabels(Bitmap image)
+        public static Bitmap[] GetConnectedComponentLabels(Bitmap image)
         {
             int[,] labels = LabelImage(image, out int labelCount);
             List<Bitmap> bitmaps = new List<Bitmap>();
@@ -487,6 +485,7 @@ namespace BetterOverwatch
                     if (height / (double)image.Height > 0.6)
                     {
                         bitmaps.Add(new Bitmap(width, height, image.PixelFormat));
+
                         BitmapData bitmapData = bitmaps[bitmaps.Count - 1].LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, image.PixelFormat);
                         int imageBytes = Image.GetPixelFormatSize(bitmapData.PixelFormat) / 8;
 
@@ -517,7 +516,7 @@ namespace BetterOverwatch
                 }
             }
 
-            return bitmaps;
+            return bitmaps.ToArray();
         }
         public static bool IsProcessOpen(string name)
         {
@@ -586,41 +585,42 @@ namespace BetterOverwatch
             string text = string.Empty;
             try
             {
-                List<Bitmap> bitmaps = GetConnectedComponentLabels(image);
+                Bitmap[] bitmaps = GetConnectedComponentLabels(image);
+                text = AppData.tf.Run(bitmaps);
+                Console.WriteLine("test:" + text);
+                //for (int i = 0; i < bitmaps.Count; i++)
+                //{
+                //    if (network == Network.Maps)
+                //    {
+                //        text += FetchLetterFromImage(BetterOverwatchNetworks.mapsNN, bitmaps[i], network);
+                //    }
+                //    else if (network == Network.TeamSkillRating)
+                //    {
+                //        text += FetchLetterFromImage(BetterOverwatchNetworks.teamSkillRatingNN, bitmaps[i], network);
+                //    }
+                //    else if (network == Network.Ratings)
+                //    {
+                //        text += FetchLetterFromImage(BetterOverwatchNetworks.ratingsNN, bitmaps[i], network);
+                //    }
+                //    else if (network == Network.Numbers)
+                //    {
+                //        text += FetchLetterFromImage(BetterOverwatchNetworks.numbersNN, bitmaps[i], network);
+                //    }
+                //    else if (network == Network.HeroNames)
+                //    {
+                //        text += FetchLetterFromImage(BetterOverwatchNetworks.heroNamesNN, bitmaps[i], network);
+                //    }
+                //    else if (network == Network.PlayerNames)
+                //    {
+                //        text += FetchLetterFromImage(BetterOverwatchNetworks.playersNN, bitmaps[i], network);
+                //    }
+                //    if(text == "0")
+                //    {
+                //        //bitmaps[i].Save("C:/test/" + Guid.NewGuid() + ".png", ImageFormat.Bmp);
+                //    }
 
-                for (int i = 0; i < bitmaps.Count; i++)
-                {
-                    if (network == Network.Maps)
-                    {
-                        text += FetchLetterFromImage(BetterOverwatchNetworks.mapsNN, bitmaps[i], network);
-                    }
-                    else if (network == Network.TeamSkillRating)
-                    {
-                        text += FetchLetterFromImage(BetterOverwatchNetworks.teamSkillRatingNN, bitmaps[i], network);
-                    }
-                    else if (network == Network.Ratings)
-                    {
-                        text += FetchLetterFromImage(BetterOverwatchNetworks.ratingsNN, bitmaps[i], network);
-                    }
-                    else if (network == Network.Numbers)
-                    {
-                        text += FetchLetterFromImage(BetterOverwatchNetworks.numbersNN, bitmaps[i], network);
-                    }
-                    else if (network == Network.HeroNames)
-                    {
-                        text += FetchLetterFromImage(BetterOverwatchNetworks.heroNamesNN, bitmaps[i], network);
-                    }
-                    else if (network == Network.PlayerNames)
-                    {
-                        text += FetchLetterFromImage(BetterOverwatchNetworks.playersNN, bitmaps[i], network);
-                    }
-                    if(text == "0")
-                    {
-                        //bitmaps[i].Save("C:/test/" + Guid.NewGuid() + ".png", ImageFormat.Bmp);
-                    }
-                    
-                    bitmaps[i].Dispose(); 
-                }
+                //    bitmaps[i].Dispose(); 
+                //}
             }
             catch (Exception e)
             {

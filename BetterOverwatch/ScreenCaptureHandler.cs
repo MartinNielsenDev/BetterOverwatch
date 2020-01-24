@@ -105,6 +105,8 @@ namespace BetterOverwatch
                     {
                         try
                         {
+                            GameMethods.ReadRoleRatings(frame.DesktopImage);
+                            continue;
                             if (AppData.gameData.state != State.Ingame)
                             {
                                 if (GameMethods.IsOnCompetitiveScreen(frame.DesktopImage))

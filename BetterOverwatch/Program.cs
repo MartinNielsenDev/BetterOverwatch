@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Threading;
 using System.Windows.Forms;
@@ -9,6 +11,7 @@ using BetterOverwatch.DataObjects;
 using BetterOverwatch.Forms;
 using BetterOverwatch.Game;
 using BetterOverwatch.Networking;
+using BetterOverwatch.TensorFlow;
 
 namespace BetterOverwatch
 {
@@ -18,6 +21,10 @@ namespace BetterOverwatch
         public static AdminPromptForm adminPromptForm;
         private static KeyboardHook keyboardHook;
         private static readonly Mutex mutex = new Mutex(true, "74bf6260-c133-4d69-ad9c-efc607887c97");
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool SetDllDirectory(string lpPathName);
         [STAThread]
         private static void Main()
         {
@@ -37,6 +44,22 @@ namespace BetterOverwatch
             }
             AppDomain.CurrentDomain.AssemblyResolve += (s, assembly) =>
             {
+                if (assembly.Name.Contains("NumSharp.Core,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.NumSharp.Core.dll");
+                }
+                if (assembly.Name.Contains("Google.Protobuf,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.Google.Protobuf.dll");
+                }
+                if (assembly.Name.Contains("tensorflow,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.tensorflow.dll");
+                }
+                if (assembly.Name.Contains("TensorFlow.NET,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.TensorFlow.NET.dll");
+                }
                 if (assembly.Name.Contains("Newtonsoft.Json,"))
                 {
                     return LoadAssembly("BetterOverwatch.Resources.Newtonsoft.Json.dll");
@@ -77,6 +100,26 @@ namespace BetterOverwatch
                 {
                     return LoadAssembly("BetterOverwatch.Resources.System.Xml.dll");
                 }
+                if (assembly.Name.Contains("System.Memory,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.System.Memory.dll");
+                }
+                if (assembly.Name.Contains("System.Numerics.Vectors,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.System.Numerics.Vectors.dll");
+                }
+                if (assembly.Name.Contains("System.Runtime.CompilerServices.Unsafe,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.System.Runtime.CompilerServices.Unsafe.dll");
+                }
+                if (assembly.Name.Contains("System.Runtime.Runtime,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.System.Runtime.dll");
+                }
+                if (assembly.Name.Contains("System.Runtime.ValueTuple,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.System.ValueTuple.dll");
+                }
                 return null;
             };
 
@@ -97,6 +140,12 @@ namespace BetterOverwatch
                 keyboardHook = new KeyboardHook(true);
                 keyboardHook.KeyDown += TABPressed;
                 keyboardHook.KeyUp += TABReleased;
+                AppData.tf = new TensorFlowNetwork();
+
+            //    MessageBox.Show(AppData.tf.Run(new[] {
+            //    new Bitmap(@"C:\test\t\delete\3c9a2329-7bee-4add-845b-3b1394b1d769.png"),
+            //    new Bitmap(@"C:\test\t\delete\6e5739a5-f59a-4b41-b2c2-2b1b595ba52a.png")
+            //}));
                 Functions.DebugMessage("Better Overwatch started");
             }
             catch (Exception e)
