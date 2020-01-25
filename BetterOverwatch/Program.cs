@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Reflection;
@@ -11,7 +10,6 @@ using BetterOverwatch.DataObjects;
 using BetterOverwatch.Forms;
 using BetterOverwatch.Game;
 using BetterOverwatch.Networking;
-using BetterOverwatch.TensorFlow;
 
 namespace BetterOverwatch
 {
@@ -137,15 +135,10 @@ namespace BetterOverwatch
                 AppData.gameData = new GameData();
                 ScreenCaptureHandler.trayMenu = new TrayMenu();
                 Server.autoUpdaterTimer.Start();
-                keyboardHook = new KeyboardHook(true);
-                keyboardHook.KeyDown += TABPressed;
-                keyboardHook.KeyUp += TABReleased;
-                AppData.tf = new TensorFlowNetwork();
+                //keyboardHook = new KeyboardHook(true);
+                //keyboardHook.KeyDown += TABPressed;
+                //keyboardHook.KeyUp += TABReleased;
 
-            //    MessageBox.Show(AppData.tf.Run(new[] {
-            //    new Bitmap(@"C:\test\t\delete\3c9a2329-7bee-4add-845b-3b1394b1d769.png"),
-            //    new Bitmap(@"C:\test\t\delete\6e5739a5-f59a-4b41-b2c2-2b1b595ba52a.png")
-            //}));
                 Functions.DebugMessage("Better Overwatch started");
             }
             catch (Exception e)
@@ -163,6 +156,7 @@ namespace BetterOverwatch
             {
                 Server.VerifyToken();
             }
+
             new Thread(ScreenCaptureHandler.ScreenCapture) { IsBackground = true }.Start();
             Application.Run(ScreenCaptureHandler.trayMenu);
         }

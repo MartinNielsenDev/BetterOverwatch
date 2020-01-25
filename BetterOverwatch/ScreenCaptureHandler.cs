@@ -16,6 +16,7 @@ namespace BetterOverwatch
         public static bool debug = false;
         #endif
         public static bool captureScreen = false;
+        private static Bitmap testImage = new Bitmap(@"C:\Users\Avoid\Documents\overwatch\ScreenShots\overwatch\test.jpg");
         private static DesktopDuplicator desktopDuplicator;
         public static TrayMenu trayMenu;
         public static void ScreenCapture()
@@ -105,8 +106,6 @@ namespace BetterOverwatch
                     {
                         try
                         {
-                            GameMethods.ReadRoleRatings(frame.DesktopImage);
-                            continue;
                             if (AppData.gameData.state != State.Ingame)
                             {
                                 if (GameMethods.IsOnCompetitiveScreen(frame.DesktopImage))

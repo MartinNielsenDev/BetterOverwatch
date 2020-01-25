@@ -13,6 +13,7 @@ namespace BetterOverwatch
     {
         public static bool IsOnCompetitiveScreen(Bitmap frame)
         {
+            return true;
             return Functions.CompareStrings(Functions.BitmapToText(frame, 73, 94, 622, 92, false, 110, Network.Maps, false), "COMPETITIVEPLAY") >= 80;
         }
         public static void ReadRoleRatings(Bitmap frame)

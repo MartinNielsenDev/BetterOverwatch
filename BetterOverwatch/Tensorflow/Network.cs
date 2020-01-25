@@ -1,15 +1,13 @@
 ﻿using NumSharp;
 using System.Collections.Generic;
-using System.IO;
 using Tensorflow;
-using static Tensorflow.Binding;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
-namespace BetterOverwatch.TensorFlow
+namespace BetterOverwatch.Tensorflow
 {
-    class TensorFlowNetwork
+    class Network
     {
         Bitmap[] bitmapArrToTest;
         NDArray ndArrToTest;
@@ -26,8 +24,12 @@ namespace BetterOverwatch.TensorFlow
         Graph graph;
         Session session;
 
-        public TensorFlowNetwork()
+        public Network(Graph graph, Session session)
         {
+            //Graph graph = tf.Graph().as_default();
+            //Session session = tf.Session(graph);
+            //var saver = tf.train.import_meta_graph(Path.Combine(AppData.configPath, "_data\\network.meta"));
+            //saver.restore(session, Path.Combine(AppData.configPath, "_data\\network"));
             keyToValue = new Dictionary<int, string>()
             {
                 { 0, "0" },
@@ -41,9 +43,16 @@ namespace BetterOverwatch.TensorFlow
                 { 8, "8" },
                 { 9, "9" }
             };
-            graph = tf.Graph().as_default();
-            session = tf.Session(graph);
-            LoadModel(session);
+            this.graph = graph;
+            this.session = session;
+
+            this.session.graph.get_tensor_by_name("Train/Ratings/Loss/loss:0");
+            this.graph.get_tensor_by_name("Train/Ratings/Accuracy/accuracy:0");
+            x = this.session.graph.get_tensor_by_name("Input/Ratings/X:0");
+            y = this.session.graph.get_tensor_by_name("Input/Ratings/Y:0");
+            cls_prediction = this.session.graph.get_tensor_by_name("Train/Ratings/Prediction/predictions:0");
+            prob = this.session.graph.get_tensor_by_name("Train/Ratings/Prediction/prob:0");
+            this.session.graph.get_tensor_by_name("Train/Ratings/Optimizer/Adam-op:0");
         }
         public string Run(Bitmap[] bitmapArrToTest)
         {
@@ -54,19 +63,6 @@ namespace BetterOverwatch.TensorFlow
             Test(session);
 
             return GetOutputString();
-        }
-        private void LoadModel(Session sess)
-        {
-            var saver = tf.train.import_meta_graph(Path.Combine(AppData.configPath, @"_data/network.meta"));
-            saver.restore(sess, Path.Combine(AppData.configPath, @"_data/network"));
-
-            sess.graph.get_tensor_by_name("Train/Loss/loss:0");
-            sess.graph.get_tensor_by_name("Train/Accuracy/accuracy:0");
-            x = sess.graph.get_tensor_by_name("Input/X:0");
-            y = sess.graph.get_tensor_by_name("Input/Y:0");
-            cls_prediction = sess.graph.get_tensor_by_name("Train/Prediction/predictions:0");
-            prob = sess.graph.get_tensor_by_name("Train/Prediction/prob:0");
-            sess.graph.get_tensor_by_name("Train/Optimizer/Adam-op:0");
         }
         private void LoadImages(Bitmap[] bitmapArr, NDArray ndArr)
         {
@@ -101,7 +97,7 @@ namespace BetterOverwatch.TensorFlow
             Bitmap result = new Bitmap(width, height);
             using (Graphics g = Graphics.FromImage(result))
             {
-                //g.InterpolationMode = InterpolationMode.Bilinear;
+                g.InterpolationMode = InterpolationMode.Bilinear;
                 g.DrawImage(src, new Rectangle(0, 0, width, height), new Rectangle(0, 0, src.Width, src.Height), GraphicsUnit.Pixel);
             }
             return result;
@@ -110,8 +106,8 @@ namespace BetterOverwatch.TensorFlow
         {
             float[,] floatArray;
             Bitmap resizedImage = ResizeBitmap(bitmap, img_w, img_h);
-            //bitmap.Save(@"C:\test\t\delete\" + System.Guid.NewGuid() + ".png", ImageFormat.Bmp);
-            //resizedImage.Save(@"C:\test\t\delete\" + System.Guid.NewGuid() + ".png", ImageFormat.Bmp);
+            bitmap.Save($@"C:\test\t\delete\{System.Guid.NewGuid()}.png", ImageFormat.Bmp);
+            //resizedImage.Save(@"C:\test\t\delete\" + System.Guid.NewGuid() + ".png", ImageFormat.Exif);
             floatArray = ToGrayscale(resizedImage);
             NDArray nd = new NDArray(floatArray, new Shape(1, img_w, img_h, n_channels));
 

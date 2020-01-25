@@ -10,6 +10,8 @@ using System.Text;
 using AForge.Imaging;
 using AForge.Imaging.Filters;
 using Image = System.Drawing.Image;
+using static Tensorflow.Binding;
+using Tensorflow;
 
 namespace BetterOverwatch
 {
@@ -25,6 +27,8 @@ namespace BetterOverwatch
         public static extern uint SendMessage(IntPtr hWnd, uint msg, uint wParam, uint lParam);
         [DllImport("user32.dll")]
         public static extern short GetAsyncKeyState(int vKey);
+        public static Tensorflow.Network tfobject;
+
         public static string ActiveWindowTitle()
         {
             const int nChars = 256;
@@ -585,9 +589,21 @@ namespace BetterOverwatch
             string text = string.Empty;
             try
             {
+                if (tfobject == null)
+                {
+                    Console.WriteLine("CREATED NETWORK!");
+                    Graph graph = tf.Graph().as_default();
+                    Session session = tf.Session(graph);
+                    var saver = tf.train.import_meta_graph(Path.Combine(AppData.configPath, "_data\\network.meta"));
+                    saver.restore(session, Path.Combine(AppData.configPath, "_data\\network"));
+                    tfobject = new Tensorflow.Network(graph, session);
+                }
                 Bitmap[] bitmaps = GetConnectedComponentLabels(image);
-                text = AppData.tf.Run(bitmaps);
-                Console.WriteLine("test:" + text);
+                text = tfobject.Run(bitmaps);
+                //for (int j = 0; j < bitmaps.Length; j++)
+                //{
+                //    text = FetchLetterFromImage(BetterOverwatchNetworks.ratingsNN, bitmaps[j], network);
+                //}
                 //for (int i = 0; i < bitmaps.Count; i++)
                 //{
                 //    if (network == Network.Maps)
@@ -614,12 +630,12 @@ namespace BetterOverwatch
                 //    {
                 //        text += FetchLetterFromImage(BetterOverwatchNetworks.playersNN, bitmaps[i], network);
                 //    }
-                //    if(text == "0")
+                //    if (text == "0")
                 //    {
                 //        //bitmaps[i].Save("C:/test/" + Guid.NewGuid() + ".png", ImageFormat.Bmp);
                 //    }
 
-                //    bitmaps[i].Dispose(); 
+                //    bitmaps[i].Dispose();
                 //}
             }
             catch (Exception e)

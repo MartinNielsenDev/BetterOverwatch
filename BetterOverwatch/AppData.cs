@@ -5,7 +5,7 @@ using System.Media;
 using BetterOverwatch.Game;
 using BetterOverwatch.DataObjects;
 using BetterOverwatch.Properties;
-using BetterOverwatch.TensorFlow;
+using BetterOverwatch.Tensorflow;
 
 namespace BetterOverwatch
 {
@@ -16,7 +16,7 @@ namespace BetterOverwatch
         public static GameData gameData;
         public static Settings settings;
         public static Initalize initalize;
-        public static TensorFlowNetwork tf;
+        public static Tensorflow.Network tf;
         public static string lastGameJSON = "";
         public static bool isAdmin = false;
         public static bool overwatchRunning = false;
