@@ -4,6 +4,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using BetterOverwatch.DataObjects;
@@ -27,7 +28,7 @@ namespace BetterOverwatch
         private static void Main()
         {
             AppData.initalize = new Initalize(
-                "1.4.9",
+                "1.5.0",
                 "betteroverwatch.com",
                 "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
             Application.EnableVisualStyles();
@@ -42,33 +43,17 @@ namespace BetterOverwatch
             }
             AppDomain.CurrentDomain.AssemblyResolve += (s, assembly) =>
             {
-                if (assembly.Name.Contains("NumSharp.Core,"))
-                {
-                    return LoadAssembly("BetterOverwatch.Resources.NumSharp.Core.dll");
-                }
-                if (assembly.Name.Contains("Google.Protobuf,"))
-                {
-                    return LoadAssembly("BetterOverwatch.Resources.Google.Protobuf.dll");
-                }
-                if (assembly.Name.Contains("tensorflow,"))
-                {
-                    return LoadAssembly("BetterOverwatch.Resources.tensorflow.dll");
-                }
-                if (assembly.Name.Contains("TensorFlow.NET,"))
-                {
-                    return LoadAssembly("BetterOverwatch.Resources.TensorFlow.NET.dll");
-                }
                 if (assembly.Name.Contains("Newtonsoft.Json,"))
                 {
                     return LoadAssembly("BetterOverwatch.Resources.Newtonsoft.Json.dll");
                 }
-                if (assembly.Name.Contains("NeuralNetwork,"))
-                {
-                    return LoadAssembly("BetterOverwatch.Resources.NeuralNetwork.dll");
-                }
                 if (assembly.Name.Contains("AForge.Imaging,"))
                 {
                     return LoadAssembly("BetterOverwatch.Resources.AForge.Imaging.dll");
+                }
+                if (assembly.Name.Contains("ConvNeuralNetwork,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.ConvNeuralNetwork.dll");
                 }
                 if (assembly.Name.Contains("SharpDX.Direct3D11,"))
                 {
@@ -98,26 +83,6 @@ namespace BetterOverwatch
                 {
                     return LoadAssembly("BetterOverwatch.Resources.System.Xml.dll");
                 }
-                if (assembly.Name.Contains("System.Memory,"))
-                {
-                    return LoadAssembly("BetterOverwatch.Resources.System.Memory.dll");
-                }
-                if (assembly.Name.Contains("System.Numerics.Vectors,"))
-                {
-                    return LoadAssembly("BetterOverwatch.Resources.System.Numerics.Vectors.dll");
-                }
-                if (assembly.Name.Contains("System.Runtime.CompilerServices.Unsafe,"))
-                {
-                    return LoadAssembly("BetterOverwatch.Resources.System.Runtime.CompilerServices.Unsafe.dll");
-                }
-                if (assembly.Name.Contains("System.Runtime.Runtime,"))
-                {
-                    return LoadAssembly("BetterOverwatch.Resources.System.Runtime.dll");
-                }
-                if (assembly.Name.Contains("System.Runtime.ValueTuple,"))
-                {
-                    return LoadAssembly("BetterOverwatch.Resources.System.ValueTuple.dll");
-                }
                 return null;
             };
 
@@ -127,17 +92,39 @@ namespace BetterOverwatch
                 {
                     AppData.isAdmin = new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
                 }
-                if (!Server.CheckNewestVersion()) return;
+                if (!Server.CheckNewestVersion())
+                {
+                    DialogResult result = MessageBox.Show("Failed to initialize network\r\n\r\nTry restarting Better Overwatch otherwise seek help on the discord.\r\n\r\nDo you want to clear your user cache? this could help", "Better Overwatch", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        Directory.Delete(Path.Combine(AppData.configPath, "_data"), true);
+                        MessageBox.Show("Successfully cleared user cache\r\n\r\nPlease reopen Better Overwatch", "Better Overwatch", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    return;
+                }
 
                 Directory.CreateDirectory(AppData.configPath);
+                Directory.CreateDirectory(Path.Combine(AppData.configPath, "_data"));
                 AppData.settings = new Settings();
                 Settings.Load();
+                if(!Server.FetchNetworks())
+                {
+                    DialogResult result = MessageBox.Show("Failed to initialize network\r\n\r\nTry restarting Better Overwatch otherwise seek help on the discord.\r\n\r\nDo you want to clear your user cache? this could help", "Better Overwatch", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                    
+                    if(result == DialogResult.Yes)
+                    {
+                        Directory.Delete(Path.Combine(AppData.configPath, "_data"), true);
+                        MessageBox.Show("Successfully cleared user cache\r\n\r\nPlease reopen Better Overwatch", "Better Overwatch", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    return;
+                }
                 AppData.gameData = new GameData();
                 ScreenCaptureHandler.trayMenu = new TrayMenu();
                 Server.autoUpdaterTimer.Start();
-                //keyboardHook = new KeyboardHook(true);
-                //keyboardHook.KeyDown += TABPressed;
-                //keyboardHook.KeyUp += TABReleased;
+                keyboardHook = new KeyboardHook(true);
+                keyboardHook.KeyDown += TABPressed;
+                keyboardHook.KeyUp += TABReleased;
 
                 Functions.DebugMessage("Better Overwatch started");
             }

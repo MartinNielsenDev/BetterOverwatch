@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
+using ConvNeuralNetwork;
 using Newtonsoft.Json;
 
 namespace BetterOverwatch
@@ -12,9 +14,10 @@ namespace BetterOverwatch
         public bool startWithWindows = true;
         public bool outputToTextFiles = false;
         public bool outputStatsToTextFile = false;
+        public string networkVersion = "";
+
         public static void Load()
         {
-            BetterOverwatchNetworks.Load();
             Functions.SetVolume(10);
 
             try
@@ -30,6 +33,10 @@ namespace BetterOverwatch
                 }
             }
             catch { }
+            if(Directory.GetFiles(Path.Combine(AppData.configPath, "_data"), "*").Length == 0)
+            {
+                AppData.settings.networkVersion = Guid.NewGuid().ToString();
+            }
         }
         public static void Save()
         {

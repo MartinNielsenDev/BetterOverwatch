@@ -12,11 +12,10 @@ namespace BetterOverwatch
     {
 #if DEBUG
         public static bool debug = true;
-        #else
+#else
         public static bool debug = false;
-        #endif
+#endif
         public static bool captureScreen = false;
-        private static Bitmap testImage = new Bitmap(@"C:\Users\Avoid\Documents\overwatch\ScreenShots\overwatch\test.jpg");
         private static DesktopDuplicator desktopDuplicator;
         public static TrayMenu trayMenu;
         public static void ScreenCapture()
@@ -104,6 +103,60 @@ namespace BetterOverwatch
                     }
                     if (frame != null)
                     {
+                        /*
+#if DEBUG
+                        foreach (string dir in GetTestImages())
+                        {
+                            string[] files = System.IO.Directory.GetFiles(dir);
+
+                            foreach (var file in files)
+                            {
+                                Bitmap bitmap = new Bitmap(file);
+                                System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+                                stopwatch.Start();
+                                string map = "";
+                                string scoreLeft = "", scoreRight = "";
+                                string team1 = "", team2 = "";
+                                for (int i = 0; i < 100; i++)
+                                {
+                                    if (dir.Contains("maps"))
+                                    {
+                                        map = Functions.BitmapToText(bitmap, 915, 945, 780, 85);
+                                    }
+                                    else if (dir.Contains("gamescore"))
+                                    {
+                                        scoreLeft = Functions.BitmapToText(bitmap, 800, 560, 105, 135, false, 45, NetworkEnum.Ratings);
+                                        scoreRight = Functions.BitmapToText(bitmap, 1000, 560, 105, 135, false, 45, NetworkEnum.Ratings);
+                                    }
+                                    else if (dir.Contains("teamratings"))
+                                    {
+                                        team1 = Functions.BitmapToText(bitmap, 625, 220, 150, 70, false, 90, NetworkEnum.Ratings);
+                                        team2 = Functions.BitmapToText(bitmap, 1205, 220, 150, 70, false, 90, NetworkEnum.Ratings);
+                                    }
+                                    else if (dir.Contains("stats"))
+                                    {
+                                        GameMethods.ReadStats(bitmap);
+                                    }
+                                }
+                                stopwatch.Stop();
+                                if (map != "")
+                                {
+                                    Console.WriteLine($"Time: {stopwatch.ElapsedMilliseconds} Result: {map}");
+                                }
+                                if (scoreLeft != "")
+                                {
+                                    Console.WriteLine($"Time: {stopwatch.ElapsedMilliseconds} Result: Left: {scoreLeft} Right: {scoreRight}");
+                                }
+                                if (team1 != "")
+                                {
+                                    Console.WriteLine($"Time: {stopwatch.ElapsedMilliseconds} Result: Team 1: {team1} Team 2: {team2} File: {System.IO.Path.GetFileName(file)}");
+                                }
+                                bitmap.Dispose();
+                            }
+                        }
+                        return;
+#endif
+                        */
                         try
                         {
                             if (AppData.gameData.state != State.Ingame)
@@ -168,7 +221,7 @@ namespace BetterOverwatch
                             }
                             if (AppData.gameData.state == State.Recording)
                             {
-                                if (AppData.gameData.tabPressed && AppData.gameData.tabTimer.ElapsedMilliseconds > 250 || debug)
+                                if (AppData.gameData.tabPressed && AppData.gameData.tabTimer.ElapsedMilliseconds > 250)
                                 {
                                     if (GameMethods.ReadHeroPlayed(frame.DesktopImage))
                                     {
@@ -228,5 +281,16 @@ namespace BetterOverwatch
                 }
             }
         }
+#if DEBUG
+        private static string[] GetTestImages()
+        {
+            return new string[] {
+                @"C:\test\_traindata\maps",
+                @"C:\test\_traindata\gamescore",
+                @"C:\test\_traindata\teamratings",
+                @"C:\test\_traindata\stats"
+            };
+        }
+#endif
     }
 }

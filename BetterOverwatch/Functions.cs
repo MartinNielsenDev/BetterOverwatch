@@ -5,13 +5,12 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using AForge.Imaging;
 using AForge.Imaging.Filters;
 using Image = System.Drawing.Image;
-using static Tensorflow.Binding;
-using Tensorflow;
 
 namespace BetterOverwatch
 {
@@ -27,8 +26,8 @@ namespace BetterOverwatch
         public static extern uint SendMessage(IntPtr hWnd, uint msg, uint wParam, uint lParam);
         [DllImport("user32.dll")]
         public static extern short GetAsyncKeyState(int vKey);
-        public static Tensorflow.Network tfobject;
-
+        [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl)]
+        static unsafe extern int memcpy(byte* dest, byte* src, long count);
         public static string ActiveWindowTitle()
         {
             const int nChars = 256;
@@ -45,7 +44,7 @@ namespace BetterOverwatch
         {
             return frame.Clone(new Rectangle(x, y, width, height), PixelFormat.Format32bppArgb);
         }
-        public static Bitmap AdjustColors(Bitmap b, short radius, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true)
+        public static void AdjustColors(Bitmap b, short radius, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true)
         {
             EuclideanColorFiltering filter = new EuclideanColorFiltering
             {
@@ -58,23 +57,19 @@ namespace BetterOverwatch
                 filter.FillColor = new RGB(255, 255, 255);
             }
             filter.ApplyInPlace(b);
-
-            return b;
         }
-        public static void AdjustContrast(Bitmap image, float value, bool invertColors = false, bool limeToWhite = false)
+        public static void AdjustContrast(Bitmap bitmap, float value, bool invertColors = false, bool limeToWhite = false)
         {
-            BitmapData bitmapData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, image.PixelFormat);
-            int width = image.Width;
-            int height = image.Height;
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
             int imageBytes = Image.GetPixelFormatSize(bitmapData.PixelFormat) / 8;
 
             unsafe
             {
                 byte* rgb = (byte*)bitmapData.Scan0;
 
-                for (int x = 0; x < width; x++)
+                for (int x = 0; x < bitmap.Width; x++)
                 {
-                    for (int y = 0; y < height; y++)
+                    for (int y = 0; y < bitmap.Height; y++)
                     {
                         int pos = (y * bitmapData.Stride) + (x * imageBytes);
                         byte b = rgb[pos];
@@ -124,11 +119,11 @@ namespace BetterOverwatch
                 }
             }
 
-            image.UnlockBits(bitmapData);
+            bitmap.UnlockBits(bitmapData);
         }
-        public static byte[] GetPixelAtPosition(Bitmap image, int pixelX, int pixelY)
+        public static byte[] GetPixelAtPosition(Bitmap bitmap, int pixelX, int pixelY)
         {
-            BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, image.PixelFormat);
+            BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat);
             byte r, g, b;
             unsafe
             {
@@ -138,26 +133,26 @@ namespace BetterOverwatch
                 r = row[(pixelX * 4) + 2];
             }
 
-            image.UnlockBits(data);
+            bitmap.UnlockBits(data);
 
             return new[] { r, g, b };
         }
-        public static double CompareTwoBitmaps(Bitmap image, Bitmap image2)
+        public static double CompareTwoBitmaps(Bitmap bitmap, Bitmap bitmap2)
         {
             int correctPixels = 0;
-            if (image.Width + image.Height != image2.Width + image2.Height) return 0.00;
+            if (bitmap.Width + bitmap.Height != bitmap2.Width + bitmap2.Height) return 0.00;
 
-            BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, image.PixelFormat);
-            BitmapData data2 = image2.LockBits(new Rectangle(0, 0, image2.Width, image2.Height), ImageLockMode.ReadOnly, image2.PixelFormat);
+            BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat);
+            BitmapData data2 = bitmap2.LockBits(new Rectangle(0, 0, bitmap2.Width, bitmap2.Height), ImageLockMode.ReadOnly, bitmap2.PixelFormat);
 
             unsafe
             {
-                for (int y = 0; y < image.Height; y++)
+                for (int y = 0; y < bitmap.Height; y++)
                 {
                     byte* row = (byte*)data.Scan0 + (y * data.Stride);
                     byte* row2 = (byte*)data2.Scan0 + (y * data2.Stride);
 
-                    for (int x = 0; x < image.Width; x++)
+                    for (int x = 0; x < bitmap.Width; x++)
                     {
                         byte b = row[x * 4];
                         byte g = row[(x * 4) + 1];
@@ -171,23 +166,23 @@ namespace BetterOverwatch
                 }
             }
 
-            image.UnlockBits(data);
-            image2.UnlockBits(data);
+            bitmap.UnlockBits(data);
+            bitmap2.UnlockBits(data);
 
-            return (correctPixels / (double)(image.Width * image.Height));
+            return correctPixels / (double)(bitmap.Width * bitmap.Height);
 
         }
-        public static bool BitmapIsCertainColor(Bitmap image, int red, int green, int blue)
+        public static bool BitmapIsCertainColor(Bitmap bitmap, int red, int green, int blue)
         {
-            BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, image.PixelFormat);
+            BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat);
 
             unsafe
             {
-                for (int y = 0; y < image.Height; y++)
+                for (int y = 0; y < bitmap.Height; y++)
                 {
                     byte* row = (byte*)data.Scan0 + (y * data.Stride);
 
-                    for (int x = 0; x < image.Width; x++)
+                    for (int x = 0; x < bitmap.Width; x++)
                     {
                         int b = row[x * 4];
                         int g = row[(x * 4) + 1];
@@ -198,20 +193,20 @@ namespace BetterOverwatch
                     }
                 }
             }
-            image.UnlockBits(data);
+            bitmap.UnlockBits(data);
 
             return true;
         }
-        public static void InvertColors(Bitmap image)
+        public static void InvertColors(Bitmap bitmap)
         {
-            BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, image.PixelFormat);
+            BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
             unsafe
             {
-                for (int y = 0; y < image.Height; y++)
+                for (int y = 0; y < bitmap.Height; y++)
                 {
                     byte* row = (byte*)data.Scan0 + (y * data.Stride);
 
-                    for (int x = 0; x < image.Width; x++)
+                    for (int x = 0; x < bitmap.Width; x++)
                     {
                         byte b = row[x * 4];
                         byte g = row[(x * 4) + 1];
@@ -223,7 +218,7 @@ namespace BetterOverwatch
                 }
             }
 
-            image.UnlockBits(data);
+            bitmap.UnlockBits(data);
         }
         public static double CompareStrings(string string1, string string2)
         {
@@ -274,39 +269,69 @@ namespace BetterOverwatch
         {
             int seconds = Convert.ToInt32(Math.Floor((double)time / 1000));
 
-            if ((eliminations / seconds) * 60 < 7 &&
-                (damage / seconds) * 60 < 2000 &&
-                (objKills / seconds) * 60 < 7 &&
-                (healing / seconds) * 60 < 2000 &&
-                    (deaths / seconds) * 60 < 7)
+            if (eliminations / seconds * 60 < 7 &&
+                damage / seconds * 60 < 2000 &&
+                objKills / seconds * 60 < 7 &&
+                healing / seconds * 60 < 2000 &&
+                    deaths / seconds * 60 < 7)
             {
                 return true;
             }
             return false;
         }
-        public static string BitmapToText(Bitmap frame, int x, int y, int width, int height, bool contrastFirst = false, short radius = 110, Network network = 0, bool invertColors = false, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true, bool limeToWhite = false)
+        public static string FetchTextFromBitmap(Bitmap frame, int x, int y, int width, int height, bool contrastFirst = false, short radius = 110, NetworkEnum network = NetworkEnum.Maps, bool invertColors = false, byte red = 255, byte green = 255, byte blue = 255, bool fillOutside = true, bool limeToWhite = false)
         {
             string output = string.Empty;
             try
             {
-                Bitmap result = frame.Clone(new Rectangle(x, y, width, height), PixelFormat.Format24bppRgb);
-
-                if (contrastFirst)
+                using (Bitmap cropped = CropImage(frame, new Rectangle(x, y, width, height)))
                 {
-                    AdjustContrast(result, 255f, invertColors, limeToWhite);
-                    result = AdjustColors(result, radius, red, green, blue, fillOutside);
-                }
-                else
-                {
-                    result = AdjustColors(result, radius, red, green, blue, fillOutside);
-                    AdjustContrast(result, 255f, invertColors, limeToWhite);
-                }
+                    using (Bitmap cloned = new Bitmap(width, height, PixelFormat.Format24bppRgb))
+                    {
+                        using (Graphics g = Graphics.FromImage(cloned))
+                        {
+                            g.DrawImage(cropped, new Rectangle(0, 0, width, height));
+                        }
 
-                output = FetchTextFromImage(result, network);
-                result.Dispose();
+                        if (contrastFirst)
+                        {
+                            AdjustContrast(cloned, 255f, invertColors, limeToWhite);
+                            AdjustColors(cloned, radius, red, green, blue, fillOutside);
+                        }
+                        else
+                        {
+                            AdjustColors(cloned, radius, red, green, blue, fillOutside);
+                            AdjustContrast(cloned, 255f, invertColors, limeToWhite);
+                        }
+                        output = FetchTextFromBitmap(cloned, network);
+                    }
+                }
             }
             catch (Exception e) { Console.WriteLine($"BitmapToText error: {e}"); }
             return output;
+        }
+        private static unsafe Bitmap CropImage(Bitmap bitmap, Rectangle rectangle)
+        {
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat);
+            int bitmapBytes = bitmapData.Stride / bitmapData.Width;
+            byte* srcPtr = (byte*)bitmapData.Scan0.ToPointer() + rectangle.Y * bitmapData.Stride + rectangle.X * bitmapBytes;
+            int srcStride = bitmapData.Stride;
+
+            Bitmap croppedBitmap = new Bitmap(rectangle.Width, rectangle.Height, bitmap.PixelFormat);
+            BitmapData croppedBitmapData = croppedBitmap.LockBits(new Rectangle(0, 0, croppedBitmap.Width, croppedBitmap.Height), ImageLockMode.WriteOnly, croppedBitmap.PixelFormat);
+            byte* dstPtr = (byte*)croppedBitmapData.Scan0.ToPointer();
+            int dstStride = croppedBitmapData.Stride;
+
+            for (int y = 0; y < rectangle.Height; y++)
+            {
+                memcpy(dstPtr, srcPtr, dstStride);
+                srcPtr += srcStride;
+                dstPtr += dstStride;
+            }
+            bitmap.UnlockBits(bitmapData);
+            croppedBitmap.UnlockBits(croppedBitmapData);
+
+            return croppedBitmap;
         }
         public static int[,] LabelImage(Bitmap image, out int labelCount)
         {
@@ -443,7 +468,7 @@ namespace BetterOverwatch
 
             return label;
         }
-        public static Bitmap[] GetConnectedComponentLabels(Bitmap image)
+        public static Bitmap[] FetchConnectedComponentLabels(Bitmap image)
         {
             int[,] labels = LabelImage(image, out int labelCount);
             List<Bitmap> bitmaps = new List<Bitmap>();
@@ -483,8 +508,8 @@ namespace BetterOverwatch
 
                 for (int i = 1; i < labelCount; i++)
                 {
-                    int width = (rects[i].Width - rects[i].X) + 1;
-                    int height = (rects[i].Height - rects[i].Y) + 1;
+                    int width = rects[i].Width - rects[i].X + 1;
+                    int height = rects[i].Height - rects[i].Y + 1;
 
                     if (height / (double)image.Height > 0.6)
                     {
@@ -503,7 +528,7 @@ namespace BetterOverwatch
                                 {
                                     int pos = (y * bitmapData.Stride) + (x * imageBytes);
 
-                                    if (labels[(y + rects[i].Y), (x + rects[i].X)] == i)
+                                    if (labels[y + rects[i].Y, x + rects[i].X] == i)
                                     {
                                         if (rgb != null)
                                         {
@@ -527,20 +552,20 @@ namespace BetterOverwatch
             if (Process.GetProcessesByName(name).Length > 0) return true;
             return false;
         }
-        public static byte[] ImageToBytes(Image img)
+        public static byte[] BitmapToBytes(Bitmap bitmap)
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                img.Save(ms, ImageFormat.Png);
+                bitmap.Save(ms, ImageFormat.Png);
                 return ms.ToArray();
             }
         }
-        public static Bitmap ReduceImageSize(Bitmap imgPhoto, int percent)
+        public static Bitmap ReduceBitmapSize(Bitmap bitmap, int percent)
         {
-            float nPercent = ((float)percent / 100);
+            float nPercent = (float)percent / 100;
 
-            int sourceWidth = imgPhoto.Width;
-            int sourceHeight = imgPhoto.Height;
+            int sourceWidth = bitmap.Width;
+            int sourceHeight = bitmap.Height;
             const int sourceX = 0;
             const int sourceY = 0;
 
@@ -550,104 +575,62 @@ namespace BetterOverwatch
             int destHeight = (int)(sourceHeight * nPercent);
 
             Bitmap bmPhoto = new Bitmap(destWidth, destHeight, PixelFormat.Format24bppRgb);
-            bmPhoto.SetResolution(imgPhoto.HorizontalResolution, imgPhoto.VerticalResolution);
+            bmPhoto.SetResolution(bitmap.HorizontalResolution, bitmap.VerticalResolution);
 
             Graphics grPhoto = Graphics.FromImage(bmPhoto);
             grPhoto.InterpolationMode = InterpolationMode.High;
-            grPhoto.DrawImage(imgPhoto, new Rectangle(destX, destY, destWidth, destHeight), new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight), GraphicsUnit.Pixel);
+            grPhoto.DrawImage(bitmap, new Rectangle(destX, destY, destWidth, destHeight), new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight), GraphicsUnit.Pixel);
             grPhoto.Dispose();
 
             return bmPhoto;
         }
-        public static string FetchLetterFromImage(BackPropNetwork network, Bitmap image, Network networkId)
-        {
-            double[] input = BackPropNetwork.CharToDoubleArray(image);
-
-            for (int i = 0; i < network.InputNodesCount; i++)
-            {
-                network.InputNode(i).Value = input[i];
-            }
-            network.Run();
-            int bestNode = network.BestNodeIndex;
-
-            if (networkId == Network.Maps || networkId == Network.HeroNames)
-            {
-                return Convert.ToChar('A' + bestNode).ToString();
-            }
-            if (networkId == Network.TeamSkillRating || networkId == Network.Ratings || networkId == Network.Numbers)
-            {
-                return bestNode.ToString();
-            }
-            if (networkId == Network.PlayerNames)
-            {
-                return bestNode < 9 ? (bestNode + 1).ToString() : Convert.ToChar('A' + (bestNode - 9)).ToString();
-            }
-            return string.Empty;
-        }
-        public static string FetchTextFromImage(Bitmap image, Network network)
+        public static string FetchTextFromBitmap(Bitmap bitmap, NetworkEnum networkEnum)
         {
             string text = string.Empty;
             try
             {
-                if (tfobject == null)
+                Bitmap[] bitmaps = FetchConnectedComponentLabels(bitmap);
+                if (bitmaps.Length > 0)
                 {
-                    Console.WriteLine("CREATED NETWORK!");
-                    Graph graph = tf.Graph().as_default();
-                    Session session = tf.Session(graph);
-                    var saver = tf.train.import_meta_graph(Path.Combine(AppData.configPath, "_data\\network.meta"));
-                    saver.restore(session, Path.Combine(AppData.configPath, "_data\\network"));
-                    tfobject = new Tensorflow.Network(graph, session);
-                }
-                Bitmap[] bitmaps = GetConnectedComponentLabels(image);
-                text = tfobject.Run(bitmaps);
-                //for (int j = 0; j < bitmaps.Length; j++)
-                //{
-                //    text = FetchLetterFromImage(BetterOverwatchNetworks.ratingsNN, bitmaps[j], network);
-                //}
-                //for (int i = 0; i < bitmaps.Count; i++)
-                //{
-                //    if (network == Network.Maps)
-                //    {
-                //        text += FetchLetterFromImage(BetterOverwatchNetworks.mapsNN, bitmaps[i], network);
-                //    }
-                //    else if (network == Network.TeamSkillRating)
-                //    {
-                //        text += FetchLetterFromImage(BetterOverwatchNetworks.teamSkillRatingNN, bitmaps[i], network);
-                //    }
-                //    else if (network == Network.Ratings)
-                //    {
-                //        text += FetchLetterFromImage(BetterOverwatchNetworks.ratingsNN, bitmaps[i], network);
-                //    }
-                //    else if (network == Network.Numbers)
-                //    {
-                //        text += FetchLetterFromImage(BetterOverwatchNetworks.numbersNN, bitmaps[i], network);
-                //    }
-                //    else if (network == Network.HeroNames)
-                //    {
-                //        text += FetchLetterFromImage(BetterOverwatchNetworks.heroNamesNN, bitmaps[i], network);
-                //    }
-                //    else if (network == Network.PlayerNames)
-                //    {
-                //        text += FetchLetterFromImage(BetterOverwatchNetworks.playersNN, bitmaps[i], network);
-                //    }
-                //    if (text == "0")
-                //    {
-                //        //bitmaps[i].Save("C:/test/" + Guid.NewGuid() + ".png", ImageFormat.Bmp);
-                //    }
+                    int[] predictions = AppData.networks[(int)networkEnum].GetPredictionFromBitmaps(bitmaps);
+                    switch (networkEnum)
+                    {
+                        case NetworkEnum.Maps:
+                        case NetworkEnum.Heroes:
+                            text = string.Join("", predictions.Select(x => (char)((int)'A' + x)).ToArray());
+                            break;
+                        case NetworkEnum.Ratings:
+                        case NetworkEnum.Stats:
+                            text = string.Join("", predictions.Select(x => x.ToString()).ToArray());
+                            break;
+                        case NetworkEnum.Players:
+                            foreach (int prediction in predictions)
+                            {
+                                if (((int)'A' + prediction - 9) < (int)'A')
+                                {
+                                    text += prediction.ToString();
+                                }
+                                else
+                                {
+                                    text += (char)((int)'A' + prediction - 9);
+                                }
+                            }
+                            break;
 
-                //    bitmaps[i].Dispose();
-                //}
+                    }
+                }
+                foreach (Bitmap bmp in bitmaps) bmp.Dispose();
             }
             catch (Exception e)
             {
-                DebugMessage("getTextFromImage() error: " + e);
+                DebugMessage("FetchTextFromBitmap() error: " + e);
             }
             return text;
         }
         public static void SetVolume(int vol)
         {
-            int newVolume = ((ushort.MaxValue / 100) * vol);
-            uint newVolumeAllChannels = (((uint)newVolume & 0x0000ffff) | ((uint)newVolume << 16));
+            int newVolume = ushort.MaxValue / 100 * vol;
+            uint newVolumeAllChannels = ((uint)newVolume & 0x0000ffff) | ((uint)newVolume << 16);
             waveOutSetVolume(IntPtr.Zero, newVolumeAllChannels);
         }
         public static void DebugMessage(string msg)

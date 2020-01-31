@@ -5,7 +5,7 @@ using System.Media;
 using BetterOverwatch.Game;
 using BetterOverwatch.DataObjects;
 using BetterOverwatch.Properties;
-using BetterOverwatch.Tensorflow;
+using ConvNeuralNetwork;
 
 namespace BetterOverwatch
 {
@@ -13,10 +13,10 @@ namespace BetterOverwatch
     {
         public static string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "overwatchtracker");
         public static SoundPlayer successSound = new SoundPlayer(Resources.success_new);
+        public static ConvNet[] networks;
         public static GameData gameData;
         public static Settings settings;
         public static Initalize initalize;
-        public static Tensorflow.Network tf;
         public static string lastGameJSON = "";
         public static bool isAdmin = false;
         public static bool overwatchRunning = false;
@@ -39,13 +39,12 @@ namespace BetterOverwatch
         Finished = 5,
         WaitForUpload = 6
     }
-    internal enum Network
+    internal enum NetworkEnum
     {
         Maps = 0,
-        TeamSkillRating = 1,
-        Ratings = 5,
-        Numbers = 2,
-        HeroNames = 3,
-        PlayerNames = 4
+        Ratings = 1,
+        Stats = 2,
+        Players = 3,
+        Heroes = 4
     }
 }
