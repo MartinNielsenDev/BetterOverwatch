@@ -4,7 +4,6 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using BetterOverwatch.DataObjects;
@@ -16,8 +15,8 @@ namespace BetterOverwatch
 {
     internal class Program
     {
-        public static AuthenticationForm autenticationForm;
-        public static AdminPromptForm adminPromptForm;
+        internal static AuthenticationForm autenticationForm;
+        internal static AdminPromptForm adminPromptForm;
         private static KeyboardHook keyboardHook;
         private static readonly Mutex mutex = new Mutex(true, "74bf6260-c133-4d69-ad9c-efc607887c97");
 
@@ -94,13 +93,8 @@ namespace BetterOverwatch
                 }
                 if (!Server.CheckNewestVersion())
                 {
+                    Directory.Delete(Path.Combine(AppData.configPath, "_data"), true);
                     DialogResult result = MessageBox.Show("Failed to initialize network\r\n\r\nTry restarting Better Overwatch otherwise seek help on the discord.\r\n\r\nDo you want to clear your user cache? this could help", "Better Overwatch", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-
-                    if (result == DialogResult.Yes)
-                    {
-                        Directory.Delete(Path.Combine(AppData.configPath, "_data"), true);
-                        MessageBox.Show("Successfully cleared user cache\r\n\r\nPlease reopen Better Overwatch", "Better Overwatch", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
                     return;
                 }
 
@@ -110,13 +104,8 @@ namespace BetterOverwatch
                 Settings.Load();
                 if(!Server.FetchNetworks())
                 {
-                    DialogResult result = MessageBox.Show("Failed to initialize network\r\n\r\nTry restarting Better Overwatch otherwise seek help on the discord.\r\n\r\nDo you want to clear your user cache? this could help", "Better Overwatch", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-                    
-                    if(result == DialogResult.Yes)
-                    {
-                        Directory.Delete(Path.Combine(AppData.configPath, "_data"), true);
-                        MessageBox.Show("Successfully cleared user cache\r\n\r\nPlease reopen Better Overwatch", "Better Overwatch", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
+                    Directory.Delete(Path.Combine(AppData.configPath, "_data"), true);
+                    DialogResult result = MessageBox.Show("Failed to initialize network\r\n\r\nTry restarting Better Overwatch otherwise seek help on the discord.", "Better Overwatch", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                     return;
                 }
                 AppData.gameData = new GameData();

@@ -5,9 +5,9 @@ namespace BetterOverwatch
 {
     class Constants
     {
-        public static string[] mapList = { "Hanamura", "Horizon Lunar Colony", "Temple of Anubis", "Volskaya Industries", "Blizzard World", "Eichenwalde", "Hollywood", "King's Row", "Numbani", "Ilios", "Lijiang Tower", "Nepal", "Oasis", "Dorado", "Junkertown", "Route 66", "Watchpoint Gibraltar", "Rialto", "Busan", "Paris", "Havana" };
-        public static string[] heroComparerList = { "DOOMFIST", "GENJI", "MCCREE", "PHARAH", "REAPER", "SOLDIERIO", "SOMBRA", "TRACER", "BASTION", "HANZO", "JUNKRAT", "MEI", "TORBJORN", "WIDOWMAKER", "DVA", "ORISA", "REINHARDT", "ROADHOG", "WINSTON", "ZARYA", "ANA", "BRIGITTE", "LUCIO", "MERCY", "MOIRA", "SYMMETRA", "ZENYATTA", "WRECKINGBAL", "ASHE", "BAPTISTE", "SIGMA" };
-        public static Hero[] heroList =
+        internal static string[] MAP_LIST = { "Hanamura", "Horizon Lunar Colony", "Temple of Anubis", "Volskaya Industries", "Blizzard World", "Eichenwalde", "Hollywood", "King's Row", "Numbani", "Ilios", "Lijiang Tower", "Nepal", "Oasis", "Dorado", "Junkertown", "Route 66", "Watchpoint Gibraltar", "Rialto", "Busan", "Paris", "Havana" };
+        internal static string[] HERO_COMPARER_LIST = { "DOOMFIST", "GENJI", "MCCREE", "PHARAH", "REAPER", "SOLDIERIO", "SOMBRA", "TRACER", "BASTION", "HANZO", "JUNKRAT", "MEI", "TORBJORN", "WIDOWMAKER", "DVA", "ORISA", "REINHARDT", "ROADHOG", "WINSTON", "ZARYA", "ANA", "BRIGITTE", "LUCIO", "MERCY", "MOIRA", "SYMMETRA", "ZENYATTA", "WRECKINGBAL", "ASHE", "BAPTISTE", "SIGMA" };
+        internal static Hero[] HERO_LIST =
         {
             new Hero("Doomfist", new int[]
             {
@@ -289,7 +289,7 @@ namespace BetterOverwatch
                 0
             }, "tank")
         };
-        public static int[][] heroStatsPositions = {
+        internal static int[][] HERO_STAT_POSITIONS = {
             new int[]{ 1030, 894},
             new int[]{ 1030, 957},
             new int[]{ 1300, 894},
@@ -297,7 +297,7 @@ namespace BetterOverwatch
             new int[]{ 1570, 894},
             new int[]{ 1570, 957}
         };
-        public static Bitmap[] rankList = {
+        internal static Bitmap[] RANK_LIST = {
             new Bitmap(Resources.Unranked),
             new Bitmap(Resources.Silver),
             new Bitmap(Resources.Gold),

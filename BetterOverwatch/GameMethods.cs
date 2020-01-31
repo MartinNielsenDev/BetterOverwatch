@@ -11,21 +11,42 @@ namespace BetterOverwatch
 {
     class GameMethods
     {
-        public static bool IsOnCompetitiveScreen(Bitmap frame)
+        internal static bool IsOnCompetitiveScreen(Bitmap frame)
         {
-            return Functions.CompareStrings(Functions.FetchTextFromBitmap(frame, 73, 94, 622, 92, false, 110, NetworkEnum.Maps, false), "COMPETITIVEPLAY") >= 80;
+            return Functions.CompareStrings(BitmapFunctions.ProcessFrame(frame, Rectangles.CompetitiveScreen, false, 110, NetworkEnum.Maps, false), "COMPETITIVEPLAY") >= 80;
         }
-        public static void ReadRoleRatings(Bitmap frame)
+        internal static void ReadRoleRatings(Bitmap frame)
         {
-            bool tankCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 581, 600, 200, 1), 255, 255, 255);
-            bool damageCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 861, 600, 200, 1), 255, 255, 255);
-            bool supportCheck = Functions.BitmapIsCertainColor(Functions.CaptureRegion(frame, 1140, 600, 200, 1), 255, 255, 255);
-            int tankRating = 0, damageRating = 0, supportRating = 0;
+            Rectangle tankRect = Rectangles.TankCheck;
+            Rectangle damageRect = Rectangles.DamageCheck;
+            Rectangle supportRect = Rectangles.SupportCheck;
+            Rectangle tankRatingRect = Rectangles.TankRating;
+            Rectangle damageRatingRect = Rectangles.DamageRating;
+            Rectangle supportRatingRect = Rectangles.SupportRating;
+            bool tankCheck = BitmapFunctions.BitmapIsCertainColor(BitmapFunctions.CropImage(frame, tankRect), 255, 255, 255);
+            bool damageCheck = BitmapFunctions.BitmapIsCertainColor(BitmapFunctions.CropImage(frame, damageRect), 255, 255, 255);
+            bool supportCheck = BitmapFunctions.BitmapIsCertainColor(BitmapFunctions.CropImage(frame, supportRect), 255, 255, 255);
+            int tankRating = 0;
+            int damageRating = 0;
+            int supportRating = 0;
             string debugString = "";
 
+            if (!tankCheck && !damageCheck && !supportCheck)
+            {
+                tankRect.X -= 226;
+                damageRect.X -= 226;
+                supportRect.X -= 226;
+                tankRatingRect.X -= 226;
+                damageRatingRect.X -= 226;
+                supportRatingRect.X -= 226;
+
+                tankCheck = BitmapFunctions.BitmapIsCertainColor(BitmapFunctions.CropImage(frame, tankRect), 255, 255, 255);
+                damageCheck = BitmapFunctions.BitmapIsCertainColor(BitmapFunctions.CropImage(frame, damageRect), 255, 255, 255);
+                supportCheck = BitmapFunctions.BitmapIsCertainColor(BitmapFunctions.CropImage(frame, supportRect), 255, 255, 255);
+            }
             if (tankCheck)
             {
-                string tankRatingText = Functions.FetchTextFromBitmap(frame, 662, 557, 61, 34, true, 110, NetworkEnum.Ratings, true);
+                string tankRatingText = BitmapFunctions.ProcessFrame(frame, tankRatingRect, true, 110, NetworkEnum.Ratings, true);
 
                 if (tankRatingText.Length > 4)
                 {
@@ -42,7 +63,7 @@ namespace BetterOverwatch
             }
             if (damageCheck)
             {
-                string damageRatingText = Functions.FetchTextFromBitmap(frame, 941, 557, 61, 34, true, 110, NetworkEnum.Ratings, true);
+                string damageRatingText = BitmapFunctions.ProcessFrame(frame, damageRatingRect, true, 110, NetworkEnum.Ratings, true);
 
                 if (damageRatingText.Length > 4)
                 {
@@ -59,7 +80,7 @@ namespace BetterOverwatch
             }
             if (supportCheck)
             {
-                string supportRatingText = Functions.FetchTextFromBitmap(frame, 1221, 557, 61, 34, true, 110, NetworkEnum.Ratings, true);
+                string supportRatingText = BitmapFunctions.ProcessFrame(frame, supportRatingRect, true, 110, NetworkEnum.Ratings, true);
 
                 if (supportRatingText.Length > 4)
                 {
@@ -79,7 +100,7 @@ namespace BetterOverwatch
                 (tankCheck && AppData.gameData.currentRatings.tank != tankRating ||
                  damageCheck && AppData.gameData.currentRatings.damage != damageRating ||
                 supportCheck && AppData.gameData.currentRatings.support != supportRating ||
-                AppData.gameData.state >= State.Recording))
+                AppData.gameData.state >= State.Record))
             {
                 if (tankCheck)
                 {
@@ -123,7 +144,7 @@ namespace BetterOverwatch
                 AppData.successSound.Play();
                 Functions.DebugMessage($"Recognized rating:{debugString}");
 
-                if (AppData.gameData.state >= State.Recording)
+                if (AppData.gameData.state >= State.Record)
                 {
                     AppData.gameData.timer.Stop();
                     Server.CheckGameUpload();
@@ -135,7 +156,7 @@ namespace BetterOverwatch
                 }
             }
         }
-        public static int[] ReadHeroStats(Bitmap frame, int[] statSettings)
+        internal static int[] ReadHeroStats(Bitmap frame, int[] statSettings)
         {
             int[] heroStats = { 0, 0, 0, 0, 0, 0 };
 
@@ -143,7 +164,7 @@ namespace BetterOverwatch
             {
                 if (statSettings[i] > 0)
                 {
-                    string heroStatText = Functions.FetchTextFromBitmap(frame, Constants.heroStatsPositions[i][0], Constants.heroStatsPositions[i][1], statSettings[i] == 1 ? 40 : 80, 21, false, 110, NetworkEnum.Stats);
+                    string heroStatText = BitmapFunctions.ProcessFrame(frame, new Rectangle(Constants.HERO_STAT_POSITIONS[i][0], Constants.HERO_STAT_POSITIONS[i][1], statSettings[i] == 1 ? 40 : 80, 21), false, 110, NetworkEnum.Stats);
 
                     if (int.TryParse(heroStatText, out int heroStat))
                     {
@@ -154,18 +175,18 @@ namespace BetterOverwatch
 
             return heroStats;
         }
-        public static void ReadStats(Bitmap frame)
+        internal static void ReadStats(Bitmap frame)
         {
             if (AppData.statsTimer.Elapsed.TotalSeconds < 20) return;
-            string eliminationsText = Functions.FetchTextFromBitmap(frame, 129, 895, 40, 23, false, 110, NetworkEnum.Stats);
+            string eliminationsText = BitmapFunctions.ProcessFrame(frame, Rectangles.EliminationsStat, false, 110, NetworkEnum.Stats);
             if (eliminationsText.Equals(string.Empty)) return;
-            string damageText = Functions.FetchTextFromBitmap(frame, 129, 959, 80, 23, false, 110, NetworkEnum.Stats);
+            string damageText = BitmapFunctions.ProcessFrame(frame, Rectangles.DamageStat, false, 110, NetworkEnum.Stats);
             if (damageText.Equals(string.Empty)) return;
-            string objectiveKillsText = Functions.FetchTextFromBitmap(frame, 379, 895, 40, 23, false, 110, NetworkEnum.Stats);
+            string objectiveKillsText = BitmapFunctions.ProcessFrame(frame, Rectangles.ObjectiveKillsStat, false, 110, NetworkEnum.Stats);
             if (objectiveKillsText.Equals(string.Empty)) return;
-            string healingText = Functions.FetchTextFromBitmap(frame, 379, 959, 80, 23, false, 110, NetworkEnum.Stats);
+            string healingText = BitmapFunctions.ProcessFrame(frame, Rectangles.HealingStat, false, 110, NetworkEnum.Stats);
             if (healingText.Equals(string.Empty)) return;
-            string deathsText = Functions.FetchTextFromBitmap(frame, 629, 959, 40, 23, false, 110, NetworkEnum.Stats);
+            string deathsText = BitmapFunctions.ProcessFrame(frame, Rectangles.DeathsStat, false, 110, NetworkEnum.Stats);
             if (deathsText.Equals(string.Empty)) return;
 
             if (int.TryParse(eliminationsText, out int eliminations) &&
@@ -178,11 +199,11 @@ namespace BetterOverwatch
                 if (eliminations == 0 & objectiveKills == 0 & deaths == 0 & damage == 0 & healing == 0) return;
                 int[] heroStats = { };
 
-                for (int i = 0; i < Constants.heroList.Length; i++)
+                for (int i = 0; i < Constants.HERO_LIST.Length; i++)
                 {
-                    if (Constants.heroList[i].name.Equals(AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].name))
+                    if (Constants.HERO_LIST[i].name.Equals(AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].name))
                     {
-                        heroStats = ReadHeroStats(frame, Constants.heroList[i].statSettings);
+                        heroStats = ReadHeroStats(frame, Constants.HERO_LIST[i].statSettings);
                         break;
                     }
                 }
@@ -191,9 +212,9 @@ namespace BetterOverwatch
                 Functions.DebugMessage($"Hero stats recorded after {(int)Math.Floor(AppData.gameData.gameTimer.Elapsed.TotalSeconds)} seconds");
             }
         }
-        public static void ReadCompetitiveGameEntered(Bitmap frame)
+        internal static void ReadCompetitiveGameEntered(Bitmap frame)
         {
-            string compText = Functions.FetchTextFromBitmap(frame, 1354, 892, 323, 48, false, 120, 0, false, 255, 255, 0);
+            string compText = BitmapFunctions.ProcessFrame(frame, Rectangles.CompetitiveEntered, false, 120, 0, false, 255, 255, 0);
 
             if (!compText.Equals(string.Empty))
             {
@@ -201,12 +222,12 @@ namespace BetterOverwatch
 
                 if (percent >= 70)
                 {
-                    if (AppData.gameData.state == State.Finished || AppData.gameData.state == State.WaitForUpload) // a game finished
+                    if (AppData.gameData.state == State.Finished || AppData.gameData.state == State.Upload) // a game finished
                     {
                         Server.CheckGameUpload();
                     }
                     AppData.gameData = new GameData(AppData.gameData.currentRatings);
-                    AppData.getInfoTimeout.Restart();
+                    AppData.infoTimer.Restart();
                     AppData.gameData.state = State.Ingame;
                     AppData.gameData.startRatings.tank = AppData.gameData.currentRatings.tank;
                     AppData.gameData.startRatings.damage = AppData.gameData.currentRatings.damage;
@@ -216,31 +237,30 @@ namespace BetterOverwatch
                 }
             }
         }
-        public static void ReadMap(Bitmap frame)
+        internal static void ReadMap(Bitmap frame)
         {
             if (AppData.gameData.map.Equals(string.Empty))
             {
-                string mapText = Functions.FetchTextFromBitmap(frame, 915, 945, 780, 85);
+                string mapText = BitmapFunctions.ProcessFrame(frame, Rectangles.Map);
 
                 if (!mapText.Equals(string.Empty))
                 {
-                    Console.WriteLine(mapText);
                     mapText = Functions.CheckMaps(mapText);
 
                     if (!mapText.Equals(string.Empty))
                     {
                         AppData.gameData.map = mapText;
-                        AppData.getInfoTimeout.Restart();
+                        AppData.infoTimer.Restart();
                         Functions.DebugMessage($"Recognized map: '{mapText}'");
                     }
                 }
             }
         }
-        public static void ReadTeamsSkillRating(Bitmap frame)
+        internal static void ReadTeamsSkillRating(Bitmap frame)
         {
             if (AppData.gameData.team1Rating == 0)
             {
-                string team1Rating = Functions.FetchTextFromBitmap(frame, 625, 220, 150, 70, false, 90, NetworkEnum.Ratings);
+                string team1Rating = BitmapFunctions.ProcessFrame(frame, Rectangles.Team1Rating, false, 90, NetworkEnum.Ratings);
                 team1Rating = Regex.Match(team1Rating, "[0-9]+").ToString();
 
                 if (!team1Rating.Equals(string.Empty) && team1Rating.Length >= 4) // TEAM 1 SR
@@ -256,7 +276,7 @@ namespace BetterOverwatch
             }
             if (AppData.gameData.team2Rating == 0)
             {
-                string team2Rating = Functions.FetchTextFromBitmap(frame, 1205, 220, 150, 70, false, 90, NetworkEnum.Ratings);
+                string team2Rating = BitmapFunctions.ProcessFrame(frame, Rectangles.Team2Rating, false, 90, NetworkEnum.Ratings);
                 team2Rating = Regex.Match(team2Rating, "[0-9]+").ToString();
 
                 if (!team2Rating.Equals(string.Empty) && team2Rating.Length >= 4) // TEAM 1 SR
@@ -271,16 +291,16 @@ namespace BetterOverwatch
                 }
             }
         }
-        public static void ReadMainMenu(Bitmap frame)
+        internal static void ReadMainMenu(Bitmap frame)
         {
-            string menuText = Functions.FetchTextFromBitmap(frame, 50, 234, 118, 58, false, 140);
+            string menuText = BitmapFunctions.ProcessFrame(frame, Rectangles.MainMenu, false, 140);
 
             if (!menuText.Equals(string.Empty))
             {
                 if (menuText.Equals("PLAY"))
                 {
                     Functions.DebugMessage("Recognized main menu");
-                    AppData.loopDelay = 250;
+                    AppData.loopDelay = 500;
                     AppData.gameData.state = State.Finished;
                     AppData.gameData.timer.Stop();
                     AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].time = (int)AppData.gameData.gameTimer.Elapsed.TotalSeconds;
@@ -288,27 +308,26 @@ namespace BetterOverwatch
                 }
             }
         }
-        public static bool ReadHeroPlayed(Bitmap frame)
+        internal static bool ReadHeroPlayed(Bitmap frame)
         {
-            string heroText = Functions.FetchTextFromBitmap(frame, 955, 834, 170, 35, false, 200, NetworkEnum.Heroes);
+            string heroText = BitmapFunctions.ProcessFrame(frame, Rectangles.Hero, false, 200, NetworkEnum.Heroes);
 
             if (!heroText.Equals(string.Empty))
             {
-                Console.WriteLine(heroText);
-                for (int h = 0; h < Constants.heroComparerList.Length; h++)
+                for (int h = 0; h < Constants.HERO_COMPARER_LIST.Length; h++)
                 {
-                    double accuracy = Functions.CompareStrings(heroText, Constants.heroComparerList[h]);
+                    double accuracy = Functions.CompareStrings(heroText, Constants.HERO_COMPARER_LIST[h]);
 
                     if (accuracy >= 70)
                     {
                         if (AppData.gameData.heroesPlayed.Count > 0 &&
-                            AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].name == Constants.heroList[h].name)
+                            AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].name == Constants.HERO_LIST[h].name)
                         {
                             return true; // if playing the same hero, don't continue
                         }
                         if (AppData.gameData.heroesPlayed.Count > 0)
                         {
-                            if ((AppData.gameData.state == State.RoundComplete || AppData.gameData.state == State.RoundBeginning) &&
+                            if ((AppData.gameData.state == State.RoundComplete || AppData.gameData.state == State.RoundStart) &&
                                 AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].time == 0)
                             {
                                 AppData.gameData.heroesPlayed.RemoveAt(AppData.gameData.heroesPlayed.Count - 1);
@@ -319,17 +338,17 @@ namespace BetterOverwatch
                             }
                         }
                         AppData.gameData.heroTimer.Restart();
-                        AppData.gameData.heroesPlayed.Add(new HeroPlayed(Constants.heroList[h].name, (int)AppData.gameData.gameTimer.Elapsed.TotalSeconds));
-                        Functions.DebugMessage($"Now playing hero {Constants.heroList[h].name} at {AppData.gameData.gameTimer.Elapsed.TotalSeconds} seconds");
+                        AppData.gameData.heroesPlayed.Add(new HeroPlayed(Constants.HERO_LIST[h].name, (int)AppData.gameData.gameTimer.Elapsed.TotalSeconds));
+                        Functions.DebugMessage($"Now playing hero {Constants.HERO_LIST[h].name} at {AppData.gameData.gameTimer.Elapsed.TotalSeconds} seconds");
                         return true;
                     }
                 }
             }
             return false;
         }
-        public static void ReadRoundCompleted(Bitmap frame)
+        internal static void ReadRoundCompleted(Bitmap frame)
         {
-            string roundCompletedText = Functions.FetchTextFromBitmap(frame, 940, 160, 290, 80);
+            string roundCompletedText = BitmapFunctions.ProcessFrame(frame, Rectangles.RoundCompleted);
 
             if (roundCompletedText != string.Empty && Functions.CompareStrings(roundCompletedText, "COMPLETE") >= 70)
             {
@@ -337,38 +356,37 @@ namespace BetterOverwatch
                 {
                     AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].time = (int)AppData.gameData.heroTimer.Elapsed.TotalSeconds;
                 }
-                //Vars.gameData.heroesPlayed.Add(new HeroPlayed(Vars.gameData.heroesPlayed[Vars.gameData.heroesPlayed.Count - 1].name, (int)Vars.gameData.gameTimer.Elapsed.TotalSeconds));
                 AppData.gameData.state = State.RoundComplete;
                 AppData.gameData.heroTimer.Stop();
                 AppData.gameData.gameTimer.Stop();
-                AppData.getInfoTimeout.Restart();
+                AppData.infoTimer.Restart();
                 Functions.DebugMessage($"Recognized round completed");
             }
         }
-        public static bool ReadRoundStarted(Bitmap frame)
+        internal static bool ReadRoundStarted(Bitmap frame)
         {
             // hackfix: not actually reading the text, just checking the length
-            string roundStartedText = Functions.FetchTextFromBitmap(frame, 915, 70, 175, 13, true, 110, NetworkEnum.Maps);
+            string roundStartedText = BitmapFunctions.ProcessFrame(frame, Rectangles.RoundStarted, true, 110, NetworkEnum.Maps);
 
             if (roundStartedText.Length >= 10) AppData.gameData.objectiveTicks++;
             else if (roundStartedText.Length < 4) AppData.gameData.objectiveTicks = 0;
 
             return AppData.gameData.objectiveTicks >= 4;
         }
-        public static void ReadFinalScore(Bitmap frame)
+        internal static void ReadFinalScore(Bitmap frame)
         {
-            string finalScoreText = Functions.FetchTextFromBitmap(frame, 870, 433, 180, 40);
+            string finalScoreText = BitmapFunctions.ProcessFrame(frame, Rectangles.FinalScore, false, 110, NetworkEnum.Heroes);
 
             if (!finalScoreText.Equals(string.Empty))
             {
                 Console.WriteLine(finalScoreText);
-                if (Functions.CompareStrings(finalScoreText, "FIHNLSCORE") >= 40)
+                if (Functions.CompareStrings(finalScoreText, "TINALSCORE") >= 50)
                 {
                     Functions.DebugMessage("Recognized final score");
                     AppData.gameData.state = State.Finished;
                     AppData.gameData.timer.Stop();
                     AppData.gameData.gameTimer.Stop();
-                    AppData.getInfoTimeout.Restart();
+                    AppData.infoTimer.Restart();
                     if (AppData.gameData.heroesPlayed.Count > 0)
                     {
                         AppData.gameData.heroesPlayed[AppData.gameData.heroesPlayed.Count - 1].time = (int)AppData.gameData.heroTimer.Elapsed.TotalSeconds;
@@ -377,12 +395,12 @@ namespace BetterOverwatch
                 }
             }
         }
-        public static void ReadGameScore(Bitmap frame)
+        internal static void ReadGameScore(Bitmap frame)
         {
             if (AppData.gameData.team1Score == 0 && AppData.gameData.team1Score == 0 || ScreenCaptureHandler.debug)
             {
-                string scoreTextLeft = Functions.FetchTextFromBitmap(frame, 800, 560, 105, 135, false, 45, NetworkEnum.Ratings);
-                string scoreTextRight = Functions.FetchTextFromBitmap(frame, 1000, 560, 105, 135, false, 45, NetworkEnum.Ratings);
+                string scoreTextLeft = BitmapFunctions.ProcessFrame(frame, Rectangles.Team1Score, false, 45, NetworkEnum.Ratings);
+                string scoreTextRight = BitmapFunctions.ProcessFrame(frame, Rectangles.Team2Score, false, 45, NetworkEnum.Ratings);
                 scoreTextLeft = Regex.Match(scoreTextLeft, "[0-9]+").ToString();
                 scoreTextRight = Regex.Match(scoreTextRight, "[0-9]+").ToString();
 
@@ -393,14 +411,14 @@ namespace BetterOverwatch
                 {
                     AppData.gameData.team1Score = team1;
                     AppData.gameData.team2Score = team2;
-                    AppData.loopDelay = 250;
+                    AppData.loopDelay = 500;
                     Functions.DebugMessage("Recognized team score Team 1:" + scoreTextLeft + " Team 2:" + scoreTextRight);
-                    AppData.gameData.state = State.WaitForUpload;
-                    AppData.getInfoTimeout.Stop();
+                    AppData.gameData.state = State.Upload;
+                    AppData.infoTimer.Stop();
                 }
             }
         }
-        public static void ReadPlayerNamesAndRank(Bitmap frame)
+        internal static void ReadPlayerNamesAndRank(Bitmap frame)
         {
             int playerNameX = 355, playerRankX = 733;
 
@@ -408,7 +426,7 @@ namespace BetterOverwatch
             {
                 for (int players = 0; players < 6; players++)
                 {
-                    string playerName = Functions.FetchTextFromBitmap(frame, playerNameX, 325 + (players * 75), 260, 43, true, 110, NetworkEnum.Players, false, 255, 255, 255, true, true);
+                    string playerName = BitmapFunctions.ProcessFrame(frame, new Rectangle(playerNameX, 325 + (players * 75), 260, 43), true, 110, NetworkEnum.Players, false, 255, 255, 255, true, true);
 
                     if (playerName.Equals(string.Empty))
                     {
@@ -416,14 +434,14 @@ namespace BetterOverwatch
                         return;
                     }
                     Bitmap rank = frame.Clone(new Rectangle(playerRankX, 331 + (players * 75), 33, 33), frame.PixelFormat);
-                    byte[] backgroundColor = Functions.GetPixelAtPosition(rank, 0, 32);
-                    Functions.AdjustColors(rank, 100, backgroundColor[0], backgroundColor[1], backgroundColor[2]); // fill rank with white
-                    Functions.AdjustColors(rank, 100, backgroundColor[0], backgroundColor[1], backgroundColor[2], false); // fill backgroundColor with black
+                    byte[] backgroundColor = BitmapFunctions.GetPixelAtPosition(rank, 0, 32);
+                    BitmapFunctions.AdjustColors(rank, 100, backgroundColor[0], backgroundColor[1], backgroundColor[2]); // fill rank with white
+                    BitmapFunctions.AdjustColors(rank, 100, backgroundColor[0], backgroundColor[1], backgroundColor[2], false); // fill backgroundColor with black
                     double[] resultRank = new double[2] { -1, -1 };
 
-                    for (int r = 0; r < Constants.rankList.Length; r++)
+                    for (int r = 0; r < Constants.RANK_LIST.Length; r++)
                     {
-                        double high = Functions.CompareTwoBitmaps(rank, Constants.rankList[r]);
+                        double high = Functions.CompareTwoBitmaps(rank, Constants.RANK_LIST[r]);
 
                         if (high > resultRank[1])
                         {
@@ -438,11 +456,11 @@ namespace BetterOverwatch
             }
             //Functions.DebugMessage("Captured player list");
         }
-        public static bool IsValidGame()
+        internal static bool IsValidGame()
         {
             if (AppData.gameData.timer.Elapsed.TotalSeconds < 300 && !ScreenCaptureHandler.debug)
             {
-                if (AppData.gameData.state >= State.Recording)
+                if (AppData.gameData.state >= State.Record)
                 {
                     Functions.DebugMessage($"Invalid game state={AppData.gameData.state} gameData.timer={AppData.gameData.timer.Elapsed.TotalSeconds}");
                     ScreenCaptureHandler.trayMenu.ChangeTray("Ready to record, enter a competitive game to begin", Resources.Icon_Active);

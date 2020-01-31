@@ -150,31 +150,31 @@ namespace BetterOverwatch
         }
         [DllImport("user32.dll")]
         static public extern short GetKeyState(System.Windows.Forms.Keys nVirtKey);
-        public static bool GetCapslock()
+        internal static bool GetCapslock()
         {
             return Convert.ToBoolean(GetKeyState(Keys.CapsLock)) & true;
         }
-        public static bool GetNumlock()
+        internal static bool GetNumlock()
         {
             return Convert.ToBoolean(GetKeyState(Keys.NumLock)) & true;
         }
-        public static bool GetScrollLock()
+        internal static bool GetScrollLock()
         {
             return Convert.ToBoolean(GetKeyState(Keys.Scroll)) & true;
         }
-        public static bool GetShiftPressed()
+        internal static bool GetShiftPressed()
         {
             int state = GetKeyState(Keys.ShiftKey);
             if (state > 1 || state < -1) return true;
             return false;
         }
-        public static bool GetCtrlPressed()
+        internal static bool GetCtrlPressed()
         {
             int state = GetKeyState(Keys.ControlKey);
             if (state > 1 || state < -1) return true;
             return false;
         }
-        public static bool GetAltPressed()
+        internal static bool GetAltPressed()
         {
             int state = GetKeyState(Keys.Menu);
             if (state > 1 || state < -1) return true;

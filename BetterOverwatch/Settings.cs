@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text.RegularExpressions;
-using ConvNeuralNetwork;
 using Newtonsoft.Json;
 
 namespace BetterOverwatch
@@ -16,7 +15,7 @@ namespace BetterOverwatch
         public bool outputStatsToTextFile = false;
         public string networkVersion = "";
 
-        public static void Load()
+        internal static void Load()
         {
             Functions.SetVolume(10);
 
@@ -38,7 +37,7 @@ namespace BetterOverwatch
                 AppData.settings.networkVersion = Guid.NewGuid().ToString();
             }
         }
-        public static void Save()
+        internal static void Save()
         {
             string json = JsonConvert.SerializeObject(AppData.settings, Formatting.Indented);
             File.WriteAllText(Path.Combine(AppData.configPath, "settings.json"), json);

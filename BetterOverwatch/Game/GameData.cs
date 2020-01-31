@@ -69,7 +69,7 @@ namespace BetterOverwatch.Game
             }
             if (AppData.settings.uploadScreenshot && playerListImage != null)
             {
-                playerListImageBase64 = Convert.ToBase64String(Functions.BitmapToBytes(Functions.ReduceBitmapSize(playerListImage, 70)));
+                playerListImageBase64 = Convert.ToBase64String(BitmapFunctions.BitmapToBytes(BitmapFunctions.ReduceBitmapSize(playerListImage, 70)));
             }
             if (players.Count != 12) players.Clear();
 

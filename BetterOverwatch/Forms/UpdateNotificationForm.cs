@@ -133,7 +133,7 @@ namespace BetterOverwatch.Forms
         public const int FLASHW_TIMERNOFG = 12;
         
 
-        public static bool FlashWindowEx(IntPtr hWnd, int flags)
+        internal static bool FlashWindowEx(IntPtr hWnd, int flags)
         {
             FLASHWINFO fInfo = new FLASHWINFO();
 

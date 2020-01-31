@@ -18,8 +18,8 @@ namespace BetterOverwatch.Networking
 {
     class Server
     {
-        public static Stopwatch autoUpdaterTimer = new Stopwatch();
-        public static void AutoUpdater()
+        internal static Stopwatch autoUpdaterTimer = new Stopwatch();
+        internal static void AutoUpdater()
         {
             if (autoUpdaterTimer.ElapsedMilliseconds / 1000 >= 600)
             {
@@ -27,7 +27,7 @@ namespace BetterOverwatch.Networking
                 autoUpdaterTimer.Restart();
             }
         }
-        public static bool FetchNetworks()
+        internal static bool FetchNetworks()
         {
             try
             {
@@ -41,7 +41,6 @@ namespace BetterOverwatch.Networking
 
                     if (result.success)
                     {
-                        Console.WriteLine("ok");
                         using (var md5 = MD5.Create())
                         {
                             for (int i = 0; i < result.networks.Length; i++)
@@ -76,7 +75,7 @@ namespace BetterOverwatch.Networking
                 return false;
             }
         }
-        public static void VerifyToken()
+        internal static void VerifyToken()
         {
             try
             {
@@ -112,7 +111,7 @@ namespace BetterOverwatch.Networking
                 Program.autenticationForm.Show();
             }
         }
-        public static bool FetchBlizzardAppOffset(string version)
+        internal static bool FetchBlizzardAppOffset(string version)
         {
             try
             {
@@ -134,7 +133,7 @@ namespace BetterOverwatch.Networking
             catch { }
             return false;
         }
-        public static bool CheckNewestVersion()
+        internal static bool CheckNewestVersion()
         {
             try
             {
@@ -168,7 +167,7 @@ namespace BetterOverwatch.Networking
             catch { }
             return true;
         }
-        public static void CalculateStats()
+        internal static void CalculateStats()
         {
             if (AppData.gameData.team1Score != 0 && AppData.gameData.team2Score != 0)
             {
@@ -198,7 +197,7 @@ namespace BetterOverwatch.Networking
                 AppData.draw++;
             }
         }
-        public static void CheckGameUpload()
+        internal static void CheckGameUpload()
         {
             string game = AppData.gameData.ToString();
             AppData.lastGameJSON = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<CompetitiveGame>(game), Formatting.Indented);
@@ -220,7 +219,7 @@ namespace BetterOverwatch.Networking
             }
             UploadGame(game);
         }
-        public static void UploadGame(string gameData)
+        internal static void UploadGame(string gameData)
         {
             Functions.DebugMessage("Uploading GameData...");
             new Thread(() =>
@@ -250,7 +249,7 @@ namespace BetterOverwatch.Networking
                 }
             }).Start();
         }
-        public static async Task StartLocalAuthServer()
+        internal static async Task StartLocalAuthServer()
         {
             // this local server is for capturing the privateToken and publicToken from the server through the user's browser
             try

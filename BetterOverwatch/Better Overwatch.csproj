@@ -115,6 +115,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BitmapFunctions.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DataObjects\CompetitiveGame.cs" />
     <Compile Include="DataObjects\Initialize.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="Forms\WinratesForm.Designer.cs">
       <DependentUpon>WinratesForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Rectangles.cs" />
     <Compile Include="ScreenCaptureHandler.cs" />
     <Compile Include="Forms\AdminPromptForm.cs">
       <SubType>Form</SubType>
@@ -227,6 +229,7 @@
     </Reference>
     <Reference Include="ConvNeuralNetwork">
       <HintPath>Resources\ConvNeuralNetwork.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

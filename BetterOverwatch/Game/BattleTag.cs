@@ -9,9 +9,9 @@ namespace BetterOverwatch.Game
     class BattleTag
     {
         [DllImport("kernel32.dll", EntryPoint = "ReadProcessMemory")]
-        public static extern int ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress,
+        internal static extern int ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress,
         [In, Out] byte[] buffer, int sizeout, out IntPtr lpNumberOfBytesRead);
-        public static string ReadFromMemory()
+        internal static string ReadFromMemory()
         {
             if (AppData.isAdmin)
             {

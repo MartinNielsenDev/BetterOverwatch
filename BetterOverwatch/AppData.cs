@@ -11,21 +11,20 @@ namespace BetterOverwatch
 {
     internal class AppData
     {
-        public static string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "overwatchtracker");
-        public static SoundPlayer successSound = new SoundPlayer(Resources.success_new);
-        public static ConvNet[] networks;
-        public static GameData gameData;
-        public static Settings settings;
-        public static Initalize initalize;
-        public static string lastGameJSON = "";
-        public static bool isAdmin = false;
-        public static bool overwatchRunning = false;
-        public static int blizzardAppOffset = 0;
-        public static int loopDelay = 250;
-        public static int win = 0, loss = 0, draw = 0;
-        public static Stopwatch 
-            frameTimer = new Stopwatch(),
-            getInfoTimeout = new Stopwatch(),
+        internal static string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "overwatchtracker");
+        internal static SoundPlayer successSound = new SoundPlayer(Resources.success_new);
+        internal static ConvNet[] networks;
+        internal static GameData gameData;
+        internal static Settings settings;
+        internal static Initalize initalize;
+        internal static string lastGameJSON = "";
+        internal static bool isAdmin = false;
+        internal static bool overwatchRunning = false;
+        internal static int blizzardAppOffset = 0;
+        internal static int loopDelay = 500;
+        internal static int win = 0, loss = 0, draw = 0;
+        internal static Stopwatch
+            infoTimer = new Stopwatch(),
             statsTimer = new Stopwatch(),
             ratingsTimer = new Stopwatch();
     }
@@ -33,11 +32,11 @@ namespace BetterOverwatch
     {
         Idle = 0,
         Ingame = 1,
-        Recording = 2,
+        Record = 2,
         RoundComplete = 3,
-        RoundBeginning = 4,
+        RoundStart = 4,
         Finished = 5,
-        WaitForUpload = 6
+        Upload = 6
     }
     internal enum NetworkEnum
     {

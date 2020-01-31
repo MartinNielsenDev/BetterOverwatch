@@ -45,7 +45,7 @@ namespace BetterOverwatch.Forms
             Close();
         }
 
-        public static void Elevate()
+        internal static void Elevate()
         {
             try
             {
