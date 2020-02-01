@@ -1,5 +1,4 @@
 # Better Overwatch - A competitive match tracker
-[![Build status](https://ci.appveyor.com/api/projects/status/94bxngssk039i80q?svg=true)](https://ci.appveyor.com/project/MartinNielsenDev/overwatchtracker)
 [![Latest Release](https://img.shields.io/github/release/martinnielsendev/overwatchtracker.svg)](https://github.com/MartinNielsenDev/OverwatchTracker/releases)
 
 Official website at http://betteroverwatch.com/
