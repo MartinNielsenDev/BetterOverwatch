@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Threading;
 using System.Windows.Forms;
@@ -14,15 +15,19 @@ namespace BetterOverwatch
 {
     internal class Program
     {
-        public static AuthenticationForm autenticationForm;
-        public static AdminPromptForm adminPromptForm;
+        internal static AuthenticationForm autenticationForm;
+        internal static AdminPromptForm adminPromptForm;
         private static KeyboardHook keyboardHook;
         private static readonly Mutex mutex = new Mutex(true, "74bf6260-c133-4d69-ad9c-efc607887c97");
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool SetDllDirectory(string lpPathName);
         [STAThread]
         private static void Main()
         {
             AppData.initalize = new Initalize(
-                "1.4.9",
+                "1.5.0",
                 "betteroverwatch.com",
                 "https://api.github.com/repos/MartinNielsenDev/OverwatchTracker/releases/latest");
             Application.EnableVisualStyles();
@@ -41,13 +46,13 @@ namespace BetterOverwatch
                 {
                     return LoadAssembly("BetterOverwatch.Resources.Newtonsoft.Json.dll");
                 }
-                if (assembly.Name.Contains("NeuralNetwork,"))
-                {
-                    return LoadAssembly("BetterOverwatch.Resources.NeuralNetwork.dll");
-                }
                 if (assembly.Name.Contains("AForge.Imaging,"))
                 {
                     return LoadAssembly("BetterOverwatch.Resources.AForge.Imaging.dll");
+                }
+                if (assembly.Name.Contains("ConvNeuralNetwork,"))
+                {
+                    return LoadAssembly("BetterOverwatch.Resources.ConvNeuralNetwork.dll");
                 }
                 if (assembly.Name.Contains("SharpDX.Direct3D11,"))
                 {
@@ -86,17 +91,30 @@ namespace BetterOverwatch
                 {
                     AppData.isAdmin = new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
                 }
-                if (!Server.CheckNewestVersion()) return;
+                if (!Server.CheckNewestVersion())
+                {
+                    Directory.Delete(Path.Combine(AppData.configPath, "_data"), true);
+                    DialogResult result = MessageBox.Show("Failed to initialize network\r\n\r\nTry restarting Better Overwatch otherwise seek help on the discord.\r\n\r\nDo you want to clear your user cache? this could help", "Better Overwatch", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                    return;
+                }
 
                 Directory.CreateDirectory(AppData.configPath);
+                Directory.CreateDirectory(Path.Combine(AppData.configPath, "_data"));
                 AppData.settings = new Settings();
                 Settings.Load();
+                if(!Server.FetchNetworks())
+                {
+                    Directory.Delete(Path.Combine(AppData.configPath, "_data"), true);
+                    DialogResult result = MessageBox.Show("Failed to initialize network\r\n\r\nTry restarting Better Overwatch otherwise seek help on the discord.", "Better Overwatch", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                    return;
+                }
                 AppData.gameData = new GameData();
                 ScreenCaptureHandler.trayMenu = new TrayMenu();
                 Server.autoUpdaterTimer.Start();
                 keyboardHook = new KeyboardHook(true);
                 keyboardHook.KeyDown += TABPressed;
                 keyboardHook.KeyUp += TABReleased;
+
                 Functions.DebugMessage("Better Overwatch started");
             }
             catch (Exception e)
@@ -114,6 +132,7 @@ namespace BetterOverwatch
             {
                 Server.VerifyToken();
             }
+
             new Thread(ScreenCaptureHandler.ScreenCapture) { IsBackground = true }.Start();
             Application.Run(ScreenCaptureHandler.trayMenu);
         }

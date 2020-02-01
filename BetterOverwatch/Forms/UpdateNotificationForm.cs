@@ -79,7 +79,7 @@ namespace BetterOverwatch.Forms
         }
         public void OpenUpdate()
         {
-            string argument = "/C choice /C Y /N /D Y /T 4 & Del /F /Q \"{0}\" & choice /C Y /N /D Y /T 2 & Move /Y \"{1}\" \"{2}\" & Start \"\" /D \"{3}\" \"{4}\" {5}";
+            string argument = "/C choice /C Y /N /D Y /T 4 & Del /F /Q \"{0}\" & choice /C Y /N /D Y /T 4 & Move /Y \"{1}\" \"{2}\" & Start \"\" /D \"{3}\" \"{4}\" {5}";
             string tempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"overwatchtracker\betteroverwatch.exe");
             string currentPath = Application.ExecutablePath;
 
@@ -133,7 +133,7 @@ namespace BetterOverwatch.Forms
         public const int FLASHW_TIMERNOFG = 12;
         
 
-        public static bool FlashWindowEx(IntPtr hWnd, int flags)
+        internal static bool FlashWindowEx(IntPtr hWnd, int flags)
         {
             FLASHWINFO fInfo = new FLASHWINFO();
 

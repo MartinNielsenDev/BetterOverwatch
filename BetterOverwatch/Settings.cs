@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
@@ -12,9 +13,10 @@ namespace BetterOverwatch
         public bool startWithWindows = true;
         public bool outputToTextFiles = false;
         public bool outputStatsToTextFile = false;
-        public static void Load()
+        public string networkVersion = "";
+
+        internal static void Load()
         {
-            BetterOverwatchNetworks.Load();
             Functions.SetVolume(10);
 
             try
@@ -30,8 +32,12 @@ namespace BetterOverwatch
                 }
             }
             catch { }
+            if(Directory.GetFiles(Path.Combine(AppData.configPath, "_data"), "*").Length == 0)
+            {
+                AppData.settings.networkVersion = Guid.NewGuid().ToString();
+            }
         }
-        public static void Save()
+        internal static void Save()
         {
             string json = JsonConvert.SerializeObject(AppData.settings, Formatting.Indented);
             File.WriteAllText(Path.Combine(AppData.configPath, "settings.json"), json);

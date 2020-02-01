@@ -10,7 +10,7 @@ namespace BetterOverwatch.Forms
 {
     public partial class AdminPromptForm : Form
     {
-        private const int BCM_SETSHIELD = (0x1600 + 0x000C);
+        private const int BCM_SETSHIELD = 0x1600 + 0x000C;
 
         public AdminPromptForm()
         {
@@ -45,7 +45,7 @@ namespace BetterOverwatch.Forms
             Close();
         }
 
-        public static void Elevate()
+        internal static void Elevate()
         {
             try
             {

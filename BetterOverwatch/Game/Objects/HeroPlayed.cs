@@ -13,7 +13,7 @@
         }
         public string RolePlayed()
         {
-            foreach(Hero hero in Constants.heroList)
+            foreach(Hero hero in Constants.HERO_LIST)
             {
                 if(hero.name == name)
                 {
