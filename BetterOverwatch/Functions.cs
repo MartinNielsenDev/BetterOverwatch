@@ -97,19 +97,31 @@ namespace BetterOverwatch
             catch (Exception e) { Console.WriteLine($"CompareStrings error: {e}"); }
             return 0.00;
         }
-        internal static string CheckMaps(string input)
+        internal static bool IsMapBlacklisted(string map)
+        {
+            bool blacklisted = false;
+
+            foreach (string blacklistedMap in Constants.MAP_LIST_BLACKLIST)
+            {
+                if (map.Equals(blacklistedMap))
+                {
+                    blacklisted = true;
+                    break;
+                }
+            }
+
+            return blacklisted;
+        }
+        internal static string CheckMaps(string map)
         {
             for (int i = 0; i < Constants.MAP_LIST.Length; i++)
             {
                 string mapName = Constants.MAP_LIST[i].Replace(" ", string.Empty).ToLower();
 
-                if (input.ToLower().Contains(mapName)) return Constants.MAP_LIST[i];
-            }
-            for (int i = 0; i < Constants.MAP_LIST.Length; i++)
-            {
-                string mapName = Constants.MAP_LIST[i].Replace(" ", string.Empty).ToLower();
-
-                if (CompareStrings(input, mapName) >= 60) return Constants.MAP_LIST[i];
+                if (map.ToLower().Equals(mapName) || (CompareStrings(map, mapName) >= 60 && !IsMapBlacklisted(map)))
+                {
+                    return Constants.MAP_LIST[i];
+                }
             }
             return string.Empty;
         }

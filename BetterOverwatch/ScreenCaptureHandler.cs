@@ -151,6 +151,7 @@ namespace BetterOverwatch
                                     AppData.loopDelay = 500;
                                     AppData.gameData.state = State.RoundComplete;
                                     AppData.gameData.timer.Start();
+                                    AppData.ratingsTimer.Reset();
                                     AppData.statsTimer.Restart();
                                     AppData.infoTimer.Restart();
                                     trayMenu.ChangeTray("Recording... visit the main menu after the game", Resources.Icon_Record);
