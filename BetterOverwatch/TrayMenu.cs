@@ -153,7 +153,7 @@ namespace BetterOverwatch
         {
             if (!AppData.settings.publicToken.Equals(string.Empty))
             {
-                Process.Start($"http://{AppData.initalize.Host}/user/{AppData.settings.publicToken}");
+                Process.Start($"https://{AppData.initalize.Host}/user/{AppData.settings.publicToken}");
             }
         }
         private async void LoginLogout(object sender, EventArgs e)

@@ -33,7 +33,7 @@ namespace BetterOverwatch.Networking
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues($"http://api.{AppData.initalize.Host}/network/", new NameValueCollection
+                    byte[] response = client.UploadValues($"https://api.{AppData.initalize.Host}/network/", new NameValueCollection
                     {
                         { "version", AppData.settings.networkVersion.ToString() }
                     });
@@ -81,7 +81,7 @@ namespace BetterOverwatch.Networking
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues($"http://api.{AppData.initalize.Host}/verify-account/", new NameValueCollection
+                    byte[] response = client.UploadValues($"https://api.{AppData.initalize.Host}/verify-account/", new NameValueCollection
                     {
                         { "privateToken", AppData.settings.privateToken }
                     });
@@ -117,7 +117,7 @@ namespace BetterOverwatch.Networking
             {
                 using (WebClient client = new WebClient())
                 {
-                    byte[] response = client.UploadValues($"http://api.{AppData.initalize.Host}/fetch-offset/", new NameValueCollection
+                    byte[] response = client.UploadValues($"https://api.{AppData.initalize.Host}/fetch-offset/", new NameValueCollection
                     {
                         { "version", version }
                     });
@@ -230,7 +230,7 @@ namespace BetterOverwatch.Networking
                     {
                         using (WebClient client = new WebClient())
                         {
-                            byte[] response = client.UploadValues($"http://api.{AppData.initalize.Host}/game/upload/", new NameValueCollection {
+                            byte[] response = client.UploadValues($"https://api.{AppData.initalize.Host}/game/upload/", new NameValueCollection {
                                 { "gameData", gameData }
                             });
                             ServerOutput.TokensOutput result = JsonConvert.DeserializeObject<ServerOutput.TokensOutput>(Encoding.UTF8.GetString(response));
